@@ -156,11 +156,6 @@ int main(int argc, char *argv[]) {
 	keys = SDL_GetKeyboardState(&numKeys);
 	SDL_Event evt;
 
-	//variables for deltatime
-	double deltaTime;
-	double newTime;
-	double oldTime = 0;
-
 	//movement variables
 	char direction = 'i';
 
@@ -169,9 +164,6 @@ int main(int argc, char *argv[]) {
 
 
 		frameStart = SDL_GetTicks();
-
-		//newTime = SDL_GetTicks();
-		//deltaTime = newTime - oldTime;
 
 		//Checks if Escape is press or X in the window
 		if (SDL_PollEvent(&evt)) {
@@ -196,7 +188,6 @@ int main(int argc, char *argv[]) {
 		SDL_RenderPresent(renderer);
 		SDL_RenderClear(renderer);
 
-		//oldTime = newTime;
 		frameTime = SDL_GetTicks() - frameStart;
 
 		if (frameDelay > frameTime) {
