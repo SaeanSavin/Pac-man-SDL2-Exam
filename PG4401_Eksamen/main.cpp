@@ -10,6 +10,74 @@ void printError(std::ostream &os, const std::string &msg) {
 	os << msg << " error " << SDL_GetError() << std::endl;
 }
 
+//movement function
+
+char movePlayer(const Uint8 *keys, SDL_Rect &coords, SDL_Surface *surface, char direction) {
+
+	//if idle, check input
+		if (keys[SDL_SCANCODE_W]) {
+			direction = 'w';
+		}
+
+		if (keys[SDL_SCANCODE_S]) {
+			direction = 's';
+		}
+
+		if (keys[SDL_SCANCODE_A]) {
+			direction = 'a';
+		}
+
+		if (keys[SDL_SCANCODE_D]) {
+			direction = 'd';
+		}
+
+	//if out of bounds, set to idle
+	else {
+
+		//Make sure image dont move out of bounds
+		if (coords.x > SCREEN_WIDTH - surface->w) {
+			coords.x = SCREEN_WIDTH - surface->w;
+			direction = 'i';
+		}
+
+		if (coords.y > SCREEN_HEIGHT - surface->h) {
+			coords.y = SCREEN_HEIGHT - surface->h;
+			direction = 'i';
+		}
+
+		if (coords.x < 0) {
+			coords.x = 0;
+			direction = 'i';
+		}
+
+		if (coords.y < 0) {
+			coords.y = 0;
+			direction = 'i';
+		}
+	}
+	//decide movement
+	switch (direction) {
+		case 'w':
+			coords.y -= 1;
+			break;
+		case 's':
+			coords.y += 1;
+			break;
+		case 'a':
+			coords.x -= 1;
+			break;
+		case 'd':
+			coords.x += 1;
+			break;
+		default:
+			break;
+	}
+	
+	return direction;
+}
+
+
+
 int main(int argc, char *argv[]) {
 	
 	//Initizing SDL Video subsystem
@@ -79,9 +147,19 @@ int main(int argc, char *argv[]) {
 	keys = SDL_GetKeyboardState(&numKeys);
 	SDL_Event evt;
 
+	//variables for deltatime
+	double deltaTime;
+	double newTime;
+	double oldTime = 0;
+
+	//movement variables
+	char direction = 'i';
+
 	//Game Loop
 	while (isRunning) {
 
+		newTime = SDL_GetTicks();
+		deltaTime = newTime - oldTime;
 
 		//Checks if Escape is press or X in the window
 		if (SDL_PollEvent(&evt)) {
@@ -94,49 +172,19 @@ int main(int argc, char *argv[]) {
 			}
 		}
 
+
 		//Keys input for movement
 		SDL_PumpEvents();
 
-		if (keys[SDL_SCANCODE_W]) {
-			coords.y -= 1;
-		}
-
-		if (keys[SDL_SCANCODE_S]) {
-			coords.y += 1;
-		}
-
-		if (keys[SDL_SCANCODE_A]) {
-			coords.x -= 1;
-		}
-
-		if (keys[SDL_SCANCODE_D]) {
-			coords.x += 1;
-		}
-
-		//Make sure image dont move out of bounds
-
-		if (coords.x > SCREEN_WIDTH - surface->w) {
-			coords.x = SCREEN_WIDTH - surface->w;
-		}
-
-		if (coords.y > SCREEN_HEIGHT - surface->h) {
-			coords.y = SCREEN_HEIGHT - surface->h;
-		}
-
-		if (coords.x < 0) {
-			coords.x = 0;
-		}
-
-		if (coords.y < 0) {
-			coords.y = 0;
-		}
-
+		direction = movePlayer(keys, coords, surface, direction);
 
 		//Prepare Renderer for a new frame
 		SDL_RenderCopy(renderer, drawable, nullptr, &coords);
 
 		SDL_RenderPresent(renderer);
 		SDL_RenderClear(renderer);
+
+		oldTime = newTime;
 	}
 
 	//Program exit 
