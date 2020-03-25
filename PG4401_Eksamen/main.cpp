@@ -5,15 +5,18 @@
 const int SCREEN_WIDTH = 1280;
 const int SCREEN_HEIGHT = 720;
 
+//Player speed
+const int speed = 4;
+
 //Error function
 void printError(std::ostream &os, const std::string &msg) {
 	os << msg << " error " << SDL_GetError() << std::endl;
 }
 
 //movement function
-
 char movePlayer(const Uint8 *keys, SDL_Rect &coords, SDL_Surface *surface, char direction) {
-
+	
+	SDL_PumpEvents();
 	//if idle, check input
 		if (keys[SDL_SCANCODE_W]) {
 			direction = 'w';
@@ -58,16 +61,16 @@ char movePlayer(const Uint8 *keys, SDL_Rect &coords, SDL_Surface *surface, char 
 	//decide movement
 	switch (direction) {
 		case 'w':
-			coords.y -= 1;
+			coords.y -= speed;
 			break;
 		case 's':
-			coords.y += 1;
+			coords.y += speed;
 			break;
 		case 'a':
-			coords.x -= 1;
+			coords.x -= speed;
 			break;
 		case 'd':
-			coords.x += 1;
+			coords.x += speed;
 			break;
 		default:
 			break;
@@ -80,6 +83,12 @@ char movePlayer(const Uint8 *keys, SDL_Rect &coords, SDL_Surface *surface, char 
 
 int main(int argc, char *argv[]) {
 	
+	const int FPS = 60;
+	const int frameDelay = 1000 / FPS;
+
+	Uint32 frameStart;
+	int frameTime;
+
 	//Initizing SDL Video subsystem
 	SDL_Init(SDL_INIT_VIDEO);
 	SDL_Window *window = nullptr;
@@ -92,7 +101,7 @@ int main(int argc, char *argv[]) {
 		SDL_WINDOWPOS_UNDEFINED,
 		SCREEN_WIDTH,
 		SCREEN_HEIGHT,
-		SDL_WINDOW_SHOWN | SDL_WINDOW_OPENGL | SDL_WINDOW_INPUT_FOCUS
+		SDL_WINDOW_SHOWN | SDL_WINDOW_OPENGL | SDL_WINDOW_INPUT_FOCUS | SDL_WINDOW_BORDERLESS
 	);
 
 	//Checks if window exist
@@ -158,8 +167,11 @@ int main(int argc, char *argv[]) {
 	//Game Loop
 	while (isRunning) {
 
-		newTime = SDL_GetTicks();
-		deltaTime = newTime - oldTime;
+
+		frameStart = SDL_GetTicks();
+
+		//newTime = SDL_GetTicks();
+		//deltaTime = newTime - oldTime;
 
 		//Checks if Escape is press or X in the window
 		if (SDL_PollEvent(&evt)) {
@@ -174,9 +186,9 @@ int main(int argc, char *argv[]) {
 
 
 		//Keys input for movement
-		SDL_PumpEvents();
-
 		direction = movePlayer(keys, coords, surface, direction);
+
+		//std::cout << direction << std::endl;
 
 		//Prepare Renderer for a new frame
 		SDL_RenderCopy(renderer, drawable, nullptr, &coords);
@@ -184,7 +196,12 @@ int main(int argc, char *argv[]) {
 		SDL_RenderPresent(renderer);
 		SDL_RenderClear(renderer);
 
-		oldTime = newTime;
+		//oldTime = newTime;
+		frameTime = SDL_GetTicks() - frameStart;
+
+		if (frameDelay > frameTime) {
+			SDL_Delay(frameDelay - frameTime);
+		}
 	}
 
 	//Program exit 
