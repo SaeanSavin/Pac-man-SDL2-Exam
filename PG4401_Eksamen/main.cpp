@@ -3,6 +3,6 @@
 
 
 int main(int argc, char *argv[]) {
-	std::cout << "PG4401 Eksamen" << std::endl;
+	std::cout << "PG4401 Eksamen test" << std::endl;
 	return 0;
 }
