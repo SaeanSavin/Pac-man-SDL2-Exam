@@ -1,5 +1,8 @@
 #include <iostream>
+#include <fstream>
+#include <string>
 #include <SDL.h>
+#include <SDL_image.h>
 
 //Window size
 const int SCREEN_WIDTH = 1280;
@@ -79,17 +82,39 @@ char movePlayer(const Uint8 *keys, SDL_Rect &coords, SDL_Surface *surface, char 
 	return direction;
 }
 
-
-
-int main(int argc, char *argv[]) {
+void frames(const int FPS) {
 	
-	const int FPS = 60;
 	const int frameDelay = 1000 / FPS;
 
 	Uint32 frameStart;
 	int frameTime;
 
-	//Initizing SDL Video subsystem
+	frameStart = SDL_GetTicks();
+
+	frameTime = SDL_GetTicks() - frameStart;
+
+	if (frameDelay > frameTime) {
+		SDL_Delay(frameDelay - frameTime);
+	}
+}
+
+void readMap(std::string map) {
+	std::ifstream fIn(map);
+
+	if (!fIn) {
+		std::cout << "Cannot open map file" << std::endl;
+		return;
+	}
+
+	std::string str;
+
+	while (std::getline(fIn, str)) {
+		std::cout << str << std::endl;
+	}
+
+}
+
+SDL_Window *createWindow(const int w, const int h) {
 	SDL_Init(SDL_INIT_VIDEO);
 	SDL_Window *window = nullptr;
 
@@ -99,18 +124,27 @@ int main(int argc, char *argv[]) {
 		"Pac-man",
 		SDL_WINDOWPOS_UNDEFINED,
 		SDL_WINDOWPOS_UNDEFINED,
-		SCREEN_WIDTH,
-		SCREEN_HEIGHT,
-		SDL_WINDOW_SHOWN | SDL_WINDOW_OPENGL | SDL_WINDOW_INPUT_FOCUS | SDL_WINDOW_BORDERLESS
+		w,
+		h,
+		SDL_WINDOW_SHOWN | SDL_WINDOW_OPENGL | SDL_WINDOW_BORDERLESS
 	);
+	return window;
+}
 
-	//Checks if window exist
+int main(int argc, char *argv[]) {
+	
+	const int FPS = 60;
+
+	readMap("../maps/test.txt");
+
+	SDL_Window *window = createWindow(1280, 720);
 	if (window == nullptr) {
 		printError(std::cout, "Failed to create window: ");
 		SDL_Quit();
 		return EXIT_FAILURE;
 	}
-	
+
+
 	//Creates Renderer 
 	SDL_Renderer *renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
 
@@ -126,13 +160,14 @@ int main(int argc, char *argv[]) {
 	SDL_RenderClear(renderer);
 
 	//Creates Surface
-	SDL_Surface *surface = SDL_LoadBMP("../images/my_picture.bmp");
+	SDL_Surface *surface = IMG_Load("../images/hamstercam.png");
 
 	//Checks if a surface exist
 	if (surface == nullptr) {
 		printError(std::cout, "Failed to load image: ");
 		SDL_DestroyRenderer(renderer);
 		SDL_DestroyWindow(window);
+		IMG_Quit();
 		SDL_Quit();
 		return EXIT_FAILURE;
 	}
@@ -162,8 +197,7 @@ int main(int argc, char *argv[]) {
 	//Game Loop
 	while (isRunning) {
 
-
-		frameStart = SDL_GetTicks();
+		frames(FPS);
 
 		//Checks if Escape is press or X in the window
 		if (SDL_PollEvent(&evt)) {
@@ -176,7 +210,6 @@ int main(int argc, char *argv[]) {
 			}
 		}
 
-
 		//Keys input for movement
 		direction = movePlayer(keys, coords, surface, direction);
 
@@ -187,16 +220,11 @@ int main(int argc, char *argv[]) {
 
 		SDL_RenderPresent(renderer);
 		SDL_RenderClear(renderer);
-
-		frameTime = SDL_GetTicks() - frameStart;
-
-		if (frameDelay > frameTime) {
-			SDL_Delay(frameDelay - frameTime);
-		}
 	}
 
 	//Program exit 
 	SDL_DestroyWindow(window);
+	IMG_Quit();
 	SDL_Quit();
 	return EXIT_SUCCESS;
 }
