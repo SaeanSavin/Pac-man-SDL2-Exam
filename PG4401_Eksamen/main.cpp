@@ -1,6 +1,9 @@
 #include <iostream>
 #include <fstream>
+#include <sstream>
 #include <string>
+#include <vector>
+
 #include <SDL.h>
 #include <SDL_image.h>
 
@@ -98,7 +101,7 @@ void frames(const int FPS) {
 	}
 }
 
-void readMap(std::string map) {
+void renderMap(std::string map, std::vector<std::vector<char>> &mapVector) {
 	std::ifstream fIn(map);
 
 	if (!fIn.is_open()) {
@@ -109,7 +112,14 @@ void readMap(std::string map) {
 	std::string str;
 
 	while (std::getline(fIn, str)) {
-		std::cout << str << std::endl;
+
+		std::vector<char> mapRow;
+		
+		for(int i = 0; i < str.length(); i++) {
+			mapRow.emplace_back(str[i]);
+		}
+
+		mapVector.emplace_back(mapRow);
 	}
 
 	fIn.close();
@@ -136,7 +146,16 @@ int main(int argc, char *argv[]) {
 	
 	const int FPS = 60;
 
-	readMap("../maps/test.txt");
+	std::vector<std::vector<char>> map {};
+	renderMap("../maps/pacMap.txt", map);
+
+	//for debug
+	for (auto& row : map) {
+		for (auto& c : row) {
+			std::cout << c;
+		}
+		std::cout << std::endl;
+	}
 
 	SDL_Window *window = createWindow(SCREEN_WIDTH, SCREEN_HEIGHT);
 	if (window == nullptr) {
