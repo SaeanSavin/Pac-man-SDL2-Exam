@@ -101,7 +101,7 @@ void frames(const int FPS) {
 	}
 }
 
-void renderMap(std::string map, std::vector<std::vector<char>> &mapVector) {
+void loadMap(std::string map, std::vector<std::vector<char>> &mapVector) {
 	std::ifstream fIn(map);
 
 	if (!fIn.is_open()) {
@@ -147,7 +147,7 @@ int main(int argc, char *argv[]) {
 	const int FPS = 60;
 
 	std::vector<std::vector<char>> map {};
-	renderMap("../maps/pacMap.txt", map);
+	loadMap("../maps/pacMap.txt", map);
 
 	//for debug
 	for (auto& row : map) {
