@@ -137,7 +137,7 @@ int main(int argc, char *argv[]) {
 
 	readMap("../maps/test.txt");
 
-	SDL_Window *window = createWindow(1280, 720);
+	SDL_Window *window = createWindow(SCREEN_WIDTH, SCREEN_HEIGHT);
 	if (window == nullptr) {
 		printError(std::cout, "Failed to create window: ");
 		SDL_Quit();
