@@ -101,7 +101,7 @@ void frames(const int FPS) {
 void readMap(std::string map) {
 	std::ifstream fIn(map);
 
-	if (!fIn) {
+	if (!fIn.is_open()) {
 		std::cout << "Cannot open map file" << std::endl;
 		return;
 	}
