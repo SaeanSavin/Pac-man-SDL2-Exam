@@ -112,6 +112,7 @@ void readMap(std::string map) {
 		std::cout << str << std::endl;
 	}
 
+	fIn.close();
 }
 
 SDL_Window *createWindow(const int w, const int h) {
