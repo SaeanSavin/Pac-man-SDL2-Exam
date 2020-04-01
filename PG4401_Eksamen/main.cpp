@@ -8,8 +8,8 @@
 #include <SDL_image.h>
 
 //Window size
-const int SCREEN_WIDTH = 1280;
-const int SCREEN_HEIGHT = 720;
+const int SCREEN_WIDTH = 450;
+const int SCREEN_HEIGHT = 500;
 
 //Player speed
 const int speed = 4;
@@ -101,30 +101,6 @@ void frames(const int FPS) {
 	}
 }
 
-void loadMap(std::string map, std::vector<std::vector<char>> &mapVector) {
-	std::ifstream fIn(map);
-
-	if (!fIn.is_open()) {
-		std::cout << "Cannot open map file" << std::endl;
-		return;
-	}
-
-	std::string str;
-
-	while (std::getline(fIn, str)) {
-
-		std::vector<char> mapRow;
-		
-		for(int i = 0; i < str.length(); i++) {
-			mapRow.emplace_back(str[i]);
-		}
-
-		mapVector.emplace_back(mapRow);
-	}
-
-	fIn.close();
-}
-
 SDL_Window *createWindow(const int w, const int h) {
 	SDL_Init(SDL_INIT_VIDEO);
 	SDL_Window *window = nullptr;
@@ -140,6 +116,43 @@ SDL_Window *createWindow(const int w, const int h) {
 		SDL_WINDOW_SHOWN | SDL_WINDOW_OPENGL | SDL_WINDOW_BORDERLESS
 	);
 	return window;
+}
+
+SDL_Texture* LoadTexture(const char *pos, SDL_Renderer *renderer) {
+
+	SDL_Surface* tmpSurface = IMG_Load(pos);
+	SDL_Texture* texture = SDL_CreateTextureFromSurface(renderer, tmpSurface);
+	SDL_FreeSurface(tmpSurface);
+
+	return texture;
+}
+
+void loadMap(std::string map, std::vector<std::vector<char>>& mapVector) {
+	std::ifstream fIn(map);
+
+	if (!fIn.is_open()) {
+		std::cout << "Cannot open map file" << std::endl;
+		return;
+	}
+
+	std::string str;
+
+	while (std::getline(fIn, str)) {
+
+		std::vector<char> mapRow;
+
+		for (int i = 0; i < str.length(); i++) {
+			mapRow.emplace_back(str[i]);
+		}
+
+		mapVector.emplace_back(mapRow);
+	}
+
+	fIn.close();
+}
+
+void drawMap(std::vector<std::vector<char>>& mapVector) {
+
 }
 
 int main(int argc, char *argv[]) {
@@ -205,6 +218,18 @@ int main(int argc, char *argv[]) {
 	//Freeing the RGB surface
 	SDL_FreeSurface(surface);
 
+	//Create Textures
+	
+	SDL_Texture* pellet = LoadTexture("../images/mapTiles/pellet.png", renderer);
+	SDL_Texture* wall_bottom = LoadTexture("../images/mapTiles/wall_bottom_single.png", renderer);
+	SDL_Texture* wall_top = LoadTexture("../images/mapTiles/wall_top_single.png", renderer);
+	SDL_Texture* wall_left = LoadTexture("../images/mapTiles/wall_left_single.png", renderer);
+	SDL_Texture* wall_right = LoadTexture("../images/mapTiles/wall_right_single.png", renderer);
+	SDL_Texture* corner_top_right = LoadTexture("../images/mapTiles/wall_corner_tr_single.png", renderer);
+	SDL_Texture* corner_top_left = LoadTexture("../images/mapTiles/wall_corner_tl_single.png", renderer);
+	SDL_Texture* corner_bottom_right = LoadTexture("../images/mapTiles/wall_corner_br_single.png", renderer);
+	SDL_Texture* corner_bottom_left = LoadTexture("../images/mapTiles/wall_corner_bl_single.png", renderer);
+
 	bool isRunning = true;
 	const Uint8 *keys = nullptr;
 	int numKeys;
@@ -237,6 +262,57 @@ int main(int argc, char *argv[]) {
 
 		//Prepare Renderer for a new frame
 		SDL_RenderCopy(renderer, drawable, nullptr, &coords);
+		
+		//render map
+
+		SDL_Rect mapRect;
+		mapRect.w = 16;
+		mapRect.h = 16;
+		mapRect.x = 0;
+		mapRect.y = 0;
+
+
+
+		for (auto& row : map) {
+			for (auto& c : row) {
+				
+				switch (c) {
+					case 'x':
+						SDL_RenderCopy(renderer, pellet, nullptr, &mapRect);
+						break;
+					case '1' :
+						SDL_RenderCopy(renderer, corner_bottom_left, nullptr, &mapRect);
+						break;
+					case '3':
+						SDL_RenderCopy(renderer, corner_bottom_right, nullptr, &mapRect);
+						break;
+					case '7':
+						SDL_RenderCopy(renderer, corner_top_left, nullptr, &mapRect);
+						break;
+					case '9':
+						SDL_RenderCopy(renderer, corner_top_right, nullptr, &mapRect);
+						break;
+					case '2' :
+						SDL_RenderCopy(renderer, wall_bottom, nullptr, &mapRect);
+						break;
+					case '4':
+						SDL_RenderCopy(renderer, wall_left, nullptr, &mapRect);
+						break;
+					case '6':
+						SDL_RenderCopy(renderer, wall_right, nullptr, &mapRect);
+						break;
+					case '8':
+						SDL_RenderCopy(renderer, wall_top, nullptr, &mapRect);
+						break;
+					case ' ': 
+					case '-':
+						break;
+				}
+				mapRect.x += 16;
+			}
+			mapRect.x = 0;
+			mapRect.y += 16;
+		}
 
 		SDL_RenderPresent(renderer);
 		SDL_RenderClear(renderer);
