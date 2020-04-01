@@ -16,6 +16,9 @@
     <Filter Include="Images">
       <UniqueIdentifier>{6a139617-674c-4e5e-8539-bd09ad4691db}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Images\MapTiles">
+      <UniqueIdentifier>{8997ba9c-7d82-4b2e-b37a-d4596e066d43}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
