@@ -1,4 +1,4 @@
-#include <iostream>
+//#include <iostream>
 #include <fstream>
 #include <sstream>
 #include <string>
@@ -6,6 +6,7 @@
 
 #include "GameManager.h"
 #include "SDL_Manager.h"
+//#include "Texture_Manager.h"
 
 //Window size
 const int SCREEN_WIDTH = 450;
@@ -110,6 +111,7 @@ GameManager::GameManager() {}
 int GameManager::play(std::string name) {
 
 	auto sdl_manager = std::make_unique<SDL_Manager>();
+	//auto texture_manager = std::make_unique<Texture_Manager>();
 	
 	const int FPS = 60;
 
@@ -127,33 +129,27 @@ int GameManager::play(std::string name) {
 	SDL_Window *window = sdl_manager->createWindow("Pac-man", SCREEN_WIDTH, SCREEN_HEIGHT);
 	SDL_Renderer *renderer = sdl_manager->createRenderer(window);
 
-	//draws background 
-	SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
-	SDL_RenderClear(renderer);
+	//draws background
+	sdl_manager->SetRenderColor(renderer, 0, 0, 0, 255);
+	sdl_manager->ClearRender(renderer);
 
-	//Creates Surface
-	SDL_Surface* surface = IMG_Load("../images/pacman.png");
+	SDL_Surface *surface = sdl_manager->createSurface("../images/pacman.png", window, renderer);
+	//SDL_Texture *drawable = texture_manager->draw(renderer, surface);
+	
+	//SDL_Rect coords = texture_manager->setCoords(surface);
 
-	//Checks if a surface exist
-	if (surface == nullptr) {
-		//printError(std::cout, "Failed to load image: ");
-		SDL_DestroyRenderer(renderer);
-		SDL_DestroyWindow(window);
-		IMG_Quit();
-		SDL_Quit();
-		return EXIT_FAILURE;
-	}
-
+	
 	//Draw images to VRAM
 	SDL_Texture* drawable = SDL_CreateTextureFromSurface(renderer, surface);
 
+	
 	//Setting coordinates for images
 	SDL_Rect coords;
 	coords.h = surface->h;
 	coords.w = surface->w;
 	coords.x = 0;
-	coords.y = 100;
-
+	coords.y = 100;	
+	
 	//Freeing the RGB surface
 	SDL_FreeSurface(surface);
 
