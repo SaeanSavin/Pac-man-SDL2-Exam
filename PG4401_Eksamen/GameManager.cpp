@@ -14,12 +14,6 @@ const int SCREEN_HEIGHT = 500;
 //Player speed
 const int speed = 2;
 
-/*
-void printError(std::ostream& os, const std::string& msg) {
-	os << msg << " error " << SDL_GetError() << std::endl;
-}
-*/
-
 //movement function
 char movePlayer(const Uint8 *keys, SDL_Rect& coords, SDL_Surface *surface, char direction) {
 
@@ -86,42 +80,6 @@ char movePlayer(const Uint8 *keys, SDL_Rect& coords, SDL_Surface *surface, char 
 	return direction;
 }
 
-
-void frames(const int FPS) {
-
-	const int frameDelay = 1000 / FPS;
-
-	Uint32 frameStart;
-	int frameTime;
-
-	frameStart = SDL_GetTicks();
-
-	frameTime = SDL_GetTicks() - frameStart;
-
-	if (frameDelay > frameTime) {
-		SDL_Delay(frameDelay - frameTime);
-	}
-}
-
-/*
-SDL_Window* createWindow(const int w, const int h) {
-	SDL_Init(SDL_INIT_VIDEO);
-	SDL_Window* window = nullptr;
-
-	//Creates Window
-	window = SDL_CreateWindow(
-
-		"Pac-man",
-		SDL_WINDOWPOS_UNDEFINED,
-		SDL_WINDOWPOS_UNDEFINED,
-		w,
-		h,
-		SDL_WINDOW_SHOWN | SDL_WINDOW_OPENGL | SDL_WINDOW_BORDERLESS
-		);
-	return window;
-}
-*/
-
 SDL_Texture* LoadTexture(const char* pos, SDL_Renderer *renderer) {
 
 	SDL_Surface* tmpSurface = IMG_Load(pos);
@@ -131,40 +89,6 @@ SDL_Texture* LoadTexture(const char* pos, SDL_Renderer *renderer) {
 	return texture;
 }
 
-/*
-void loadMap(std::string map, std::vector<std::vector<char>> &mapVector) {
-	std::ifstream fIn(map);
-
-	if (!fIn.is_open()) {
-		std::cout << "Cannot open map file" << std::endl;
-		return;
-	}
-
-	std::string str;
-
-	while (std::getline(fIn, str)) {
-
-		std::vector<char> mapRow;
-
-		for (int i = 0; i < str.length(); i++) {
-			mapRow.emplace_back(str[i]);
-		}
-
-		mapVector.emplace_back(mapRow);
-	}
-
-	fIn.close();
-}
-*/
-
-/*
-void drawMap(std::vector<std::vector<char>> &mapVector) {
-
-}
-
-*/
-
-/*
 void GameManager::setFramerate(const int FPS) {
 	const int frameDelay = 1000 / FPS;
 
@@ -179,7 +103,7 @@ void GameManager::setFramerate(const int FPS) {
 		SDL_Delay(frameDelay - frameTime);
 	}
 }
-*/
+
 
 GameManager::GameManager() {}
 
@@ -200,31 +124,9 @@ int GameManager::play(std::string name) {
 		std::cout << std::endl;
 	}
 
-	/*
-	SDL_Window* window = createWindow(SCREEN_WIDTH, SCREEN_HEIGHT);
-	if (window == nullptr) {
-		printError(std::cout, "Failed to create window: ");
-		SDL_Quit();
-		return EXIT_FAILURE;
-	}
-	*/
-	
 	SDL_Window *window = sdl_manager->createWindow("Pac-man", SCREEN_WIDTH, SCREEN_HEIGHT);
 	SDL_Renderer *renderer = sdl_manager->createRenderer(window);
 
-
-	/*
-	//Creates Renderer
-	SDL_Renderer* renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
-
-	if (renderer == nullptr) {
-		//printError(std::cout, "Failed to create renderer: ");
-		SDL_DestroyWindow(window);
-		SDL_Quit();
-		return EXIT_FAILURE;
-	}
-	*/
-	
 	//draws background 
 	SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
 	SDL_RenderClear(renderer);
@@ -280,7 +182,7 @@ int GameManager::play(std::string name) {
 	while (isRunning) {
 
 		//setFramerate(FPS);
-		frames(FPS);
+		setFramerate(FPS);
 
 		//Checks if Escape is press or X in the window
 		if (SDL_PollEvent(&evt)) {
@@ -387,8 +289,5 @@ void GameManager::loadMap(std::string map, std::vector<std::vector<char>> &mapVe
 
 	fIn.close();
 }
-/*
-void GameManager::drawMap(std::vector<std::vector<char>> &mapVector) {
-}
 
-*/
+void GameManager::drawMap(std::vector<std::vector<char>> &mapVector) {}
