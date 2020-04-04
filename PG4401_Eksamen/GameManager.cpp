@@ -199,8 +199,6 @@ int GameManager::play(std::string name) {
 		//Keys input for movement
 		direction = movePlayer(keys, coords, surface, direction);
 
-		//std::cout << direction << std::endl;
-
 		//Prepare Renderer for a new frame
 		SDL_RenderCopy(renderer, drawable, nullptr, &coords);
 
@@ -211,8 +209,6 @@ int GameManager::play(std::string name) {
 		mapRect.h = 16;
 		mapRect.x = 0;
 		mapRect.y = 0;
-
-
 
 		for (auto& row : map) {
 			for (auto& c : row) {
