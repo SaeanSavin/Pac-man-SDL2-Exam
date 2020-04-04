@@ -12,7 +12,7 @@ const int SCREEN_WIDTH = 450;
 const int SCREEN_HEIGHT = 500;
 
 //Player speed
-const int speed = 4;
+const int speed = 2;
 
 /*
 void printError(std::ostream& os, const std::string& msg) {
@@ -183,14 +183,14 @@ void GameManager::setFramerate(const int FPS) {
 
 GameManager::GameManager() {}
 
-int GameManager::play() {
+int GameManager::play(std::string name) {
 
 	auto sdl_manager = std::make_unique<SDL_Manager>();
 	
 	const int FPS = 60;
 
 	std::vector<std::vector<char>> map{};
-	loadMap("../maps/pacmap.txt", map);
+	loadMap(name, map);
 
 	//for debug
 	for (auto& row : map) {
@@ -230,7 +230,7 @@ int GameManager::play() {
 	SDL_RenderClear(renderer);
 
 	//Creates Surface
-	SDL_Surface* surface = IMG_Load("../images/hamstercam.png");
+	SDL_Surface* surface = IMG_Load("../images/pacman.png");
 
 	//Checks if a surface exist
 	if (surface == nullptr) {

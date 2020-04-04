@@ -33,7 +33,7 @@ int main(int argc, char *argv[]) {
 	
 	auto gm = std::make_unique<GameManager>();
 
-	gm->play();
+	gm->play(name);
 
 	return 0;
 
