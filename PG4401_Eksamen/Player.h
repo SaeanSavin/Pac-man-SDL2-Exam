@@ -10,7 +10,7 @@ class Player :
 	public Character
 {
 public:
-	void movePlayer(const Uint8 *keys, SDL_Rect &coords, SDL_Surface *surface, int &SCREEN_WIDTH, int &SCREEN_HEIGHT);
+	void movePlayer(const Uint8 *keys, SDL_Rect &coords, SDL_Surface *surface, int &SCREEN_WIDTH, int &SCREEN_HEIGHT) override;
 
 	char getDirection() {
 		return direction;
