@@ -39,5 +39,23 @@ SDL_Renderer *SDL_Manager::createRenderer(SDL_Window *w) {
 	return renderer;
 }
 
+SDL_Surface *SDL_Manager::createSurface(const char *c, SDL_Window *window, SDL_Renderer *renderer) {
+	SDL_Surface *surface = IMG_Load(c);
 
+	if (surface == nullptr) {
+		SDL_DestroyRenderer(renderer);
+		SDL_DestroyWindow(window);
+		IMG_Quit();
+		SDL_Quit();
+		return nullptr;
+	}
+	return surface;
+}
 
+void SDL_Manager::SetRenderColor(SDL_Renderer *renderer, int r, int g, int b, int a) {
+	SDL_SetRenderDrawColor(renderer, r, g, b, 255);
+}
+
+void SDL_Manager::ClearRender(SDL_Renderer *renderer) {
+	SDL_RenderClear(renderer);
+}
