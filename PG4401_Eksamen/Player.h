@@ -9,7 +9,17 @@ class Player :
 	public Character
 {
 public:
-	char movePlayer(const Uint8* keys, SDL_Rect& coords, SDL_Surface* surface, char direction);
+	void movePlayer(const Uint8 *keys, SDL_Rect &coords, SDL_Surface *surface, int *SCREEN_WIDTH, int *SCREEN_HEIGHT);
+
+	char getDirection() {
+		return direction;
+	}
+	void setDirection(char d) {
+		direction = d;
+	}
+private:
+	int speed = 2;
+	char direction;
 };
 
 #endif

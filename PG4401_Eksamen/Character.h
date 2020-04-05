@@ -9,6 +9,7 @@ public:
 
 private:
 	SDL_Texture* texture;
+	int speed;
 	//TODO: add move function
 
 };

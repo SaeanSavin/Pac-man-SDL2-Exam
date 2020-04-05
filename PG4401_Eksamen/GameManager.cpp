@@ -6,80 +6,15 @@
 
 #include "GameManager.h"
 #include "SDL_Manager.h"
+
+#include "Player.h"
 //#include "Texture_Manager.h"
 
 //Window size
-const int SCREEN_WIDTH = 450;
-const int SCREEN_HEIGHT = 500;
-
-//Player speed
-const int speed = 2;
-
-//movement function
-char movePlayer(const Uint8 *keys, SDL_Rect& coords, SDL_Surface *surface, char direction) {
-
-	SDL_PumpEvents();
-	//if idle, check input
-	if (keys[SDL_SCANCODE_W]) {
-		direction = 'w';
-	}
-
-	if (keys[SDL_SCANCODE_S]) {
-		direction = 's';
-	}
-
-	if (keys[SDL_SCANCODE_A]) {
-		direction = 'a';
-	}
-
-	if (keys[SDL_SCANCODE_D]) {
-		direction = 'd';
-	}
-
-	//if out of bounds, set to idle
-	else {
-
-		//Make sure image dont move out of bounds
-		if (coords.x > SCREEN_WIDTH - surface->w) {
-			coords.x = SCREEN_WIDTH - surface->w;
-			direction = 'i';
-		}
-
-		if (coords.y > SCREEN_HEIGHT - surface->h) {
-			coords.y = SCREEN_HEIGHT - surface->h;
-			direction = 'i';
-		}
-
-		if (coords.x < 0) {
-			coords.x = 0;
-			direction = 'i';
-		}
-
-		if (coords.y < 0) {
-			coords.y = 0;
-			direction = 'i';
-		}
-	}
-	//decide movement
-	switch (direction) {
-	case 'w':
-		coords.y -= speed;
-		break;
-	case 's':
-		coords.y += speed;
-		break;
-	case 'a':
-		coords.x -= speed;
-		break;
-	case 'd':
-		coords.x += speed;
-		break;
-	default:
-		break;
-	}
-
-	return direction;
-}
+struct screen {
+	int W;
+	int H;
+};
 
 SDL_Texture* LoadTexture(const char* pos, SDL_Renderer *renderer) {
 
@@ -110,6 +45,12 @@ GameManager::GameManager() {}
 
 int GameManager::play(std::string name) {
 
+	screen SCREEN;
+	SCREEN.W = 450;
+	SCREEN.H = 500;
+
+	auto p1 = std::make_unique<Player>();
+
 	auto sdl_manager = std::make_unique<SDL_Manager>();
 	//auto texture_manager = std::make_unique<Texture_Manager>();
 	
@@ -126,7 +67,7 @@ int GameManager::play(std::string name) {
 		std::cout << std::endl;
 	}
 
-	SDL_Window *window = sdl_manager->createWindow("Pac-man", SCREEN_WIDTH, SCREEN_HEIGHT);
+	SDL_Window *window = sdl_manager->createWindow("Pac-man", SCREEN.W, SCREEN.H);
 	SDL_Renderer *renderer = sdl_manager->createRenderer(window);
 
 	//draws background
@@ -193,7 +134,8 @@ int GameManager::play(std::string name) {
 		}
 
 		//Keys input for movement
-		direction = movePlayer(keys, coords, surface, direction);
+		
+		p1->movePlayer(keys, coords, surface, &SCREEN.W, &SCREEN.H);
 
 		//Prepare Renderer for a new frame
 		SDL_RenderCopy(renderer, drawable, nullptr, &coords);
