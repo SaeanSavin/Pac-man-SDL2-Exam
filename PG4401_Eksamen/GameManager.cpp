@@ -149,10 +149,10 @@ int GameManager::play(std::string name) {
 
 	//Setting coordinates for images
 	SDL_Rect coords;
-	coords.h = surface->h;
-	coords.w = surface->w;
-	coords.x = 0;
-	coords.y = 100;
+	coords.h = 32;
+	coords.w = 32;
+	coords.x = 8;
+	coords.y = 8;
 
 	//Freeing the RGB surface
 	SDL_FreeSurface(surface);
