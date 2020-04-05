@@ -1,7 +1,7 @@
 #include "Player.h"
 
 //movement function
-void Player::movePlayer(const Uint8 *keys, SDL_Rect &coords, SDL_Surface *surface, int* SCREEN_WIDTH, int* SCREEN_HEIGHT) {
+void Player::movePlayer(const Uint8 *keys, SDL_Rect &coords, SDL_Surface *surface, int &SCREEN_WIDTH, int &SCREEN_HEIGHT) {
 
 	SDL_PumpEvents();
 	//if idle, check input
@@ -25,13 +25,13 @@ void Player::movePlayer(const Uint8 *keys, SDL_Rect &coords, SDL_Surface *surfac
 	else {
 
 		//Make sure image dont move out of bounds
-		if (coords.x > *SCREEN_WIDTH - surface->w) {
-			coords.x = *SCREEN_HEIGHT - surface->w;
+		if (coords.x > SCREEN_WIDTH - surface->w) {
+			coords.x = SCREEN_HEIGHT - surface->w;
 			direction = 'i';
 		}
 
-		if (coords.y > *SCREEN_WIDTH - surface->h) {
-			coords.y = *SCREEN_HEIGHT - surface->h;
+		if (coords.y > SCREEN_WIDTH - surface->h) {
+			coords.y = SCREEN_HEIGHT - surface->h;
 			direction = 'i';
 		}
 
@@ -63,5 +63,6 @@ void Player::movePlayer(const Uint8 *keys, SDL_Rect &coords, SDL_Surface *surfac
 		break;
 	}
 
-	return;
+	//std::cout << "coords: " << coords.x << ", " << coords.y << std::endl;
+	//std::cout << surface->w << ", " << surface->h << std::endl;
 }

@@ -3,13 +3,14 @@
 
 #include "Character.h"
 
+#include <iostream>
 #include <SDL.h>
 
 class Player :
 	public Character
 {
 public:
-	void movePlayer(const Uint8 *keys, SDL_Rect &coords, SDL_Surface *surface, int *SCREEN_WIDTH, int *SCREEN_HEIGHT);
+	void movePlayer(const Uint8 *keys, SDL_Rect &coords, SDL_Surface *surface, int &SCREEN_WIDTH, int &SCREEN_HEIGHT);
 
 	char getDirection() {
 		return direction;
