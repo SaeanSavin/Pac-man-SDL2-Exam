@@ -5,8 +5,7 @@
 
 #include <SDL.h>
 
-class Player :
-	public Character
+class Player : public Character
 {
 public:
 	void movePlayer(const Uint8 *keys, SDL_Rect &coords, SDL_Surface *surface, int *SCREEN_WIDTH, int *SCREEN_HEIGHT);
