@@ -12,8 +12,16 @@ SDL_Rect Texture_Manager::setCoords(SDL_Surface *s) {
 	coords.h = 16;
 	coords.w = 16;
 	coords.x = 0;
-	coords.y = 100;
+	coords.y = 0;
 	return coords;
+}
+
+SDL_Texture *Texture_Manager::loadTexture(const char *c, SDL_Renderer *r) {
+	SDL_Surface *tmpSurface = IMG_Load(c);
+	SDL_Texture *texture = SDL_CreateTextureFromSurface(r, tmpSurface);
+	SDL_FreeSurface(tmpSurface);
+
+	return texture;
 }
 
 

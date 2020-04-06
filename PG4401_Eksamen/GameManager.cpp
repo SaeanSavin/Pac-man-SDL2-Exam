@@ -13,15 +13,6 @@
 int SCREEN_WIDTH = 450;
 int SCREEN_HEIGHT = 500;
 
-SDL_Texture* LoadTexture(const char* pos, SDL_Renderer *renderer) {
-
-	SDL_Surface* tmpSurface = IMG_Load(pos);
-	SDL_Texture* texture = SDL_CreateTextureFromSurface(renderer, tmpSurface);
-	SDL_FreeSurface(tmpSurface);
-
-	return texture;
-}
-
 void GameManager::setFramerate(const int FPS) {
 	const int frameDelay = 1000 / FPS;
 
@@ -69,31 +60,19 @@ int GameManager::play(std::string name) {
 	SDL_Texture *drawable = texture_manager->draw(renderer, surface);
 	SDL_Rect coords = texture_manager->setCoords(surface);
  
-	//Draw images to VRAM
-	//SDL_Texture* drawable = SDL_CreateTextureFromSurface(renderer, surface);
-
-	/*
-	SDL_Rect coords;
-	coords.h = 16;
-	coords.w = 16;
-	coords.x = 0;
-	coords.y = 100;
-	*/
-
-	//Setting coordinates for images
 	//Freeing the RGB surface
 	SDL_FreeSurface(surface);
 
 	//Create Textures
-	SDL_Texture* pellet = LoadTexture("../images/mapTiles/pellet.png", renderer);
-	SDL_Texture* wall_bottom = LoadTexture("../images/mapTiles/wall_bottom_single.png", renderer);
-	SDL_Texture* wall_top = LoadTexture("../images/mapTiles/wall_top_single.png", renderer);
-	SDL_Texture* wall_left = LoadTexture("../images/mapTiles/wall_left_single.png", renderer);
-	SDL_Texture* wall_right = LoadTexture("../images/mapTiles/wall_right_single.png", renderer);
-	SDL_Texture* corner_top_right = LoadTexture("../images/mapTiles/wall_corner_tr_single.png", renderer);
-	SDL_Texture* corner_top_left = LoadTexture("../images/mapTiles/wall_corner_tl_single.png", renderer);
-	SDL_Texture* corner_bottom_right = LoadTexture("../images/mapTiles/wall_corner_br_single.png", renderer);
-	SDL_Texture* corner_bottom_left = LoadTexture("../images/mapTiles/wall_corner_bl_single.png", renderer);
+	SDL_Texture* pellet = texture_manager->loadTexture("../images/mapTiles/pellet.png", renderer);
+	SDL_Texture* wall_bottom = texture_manager->loadTexture("../images/mapTiles/wall_bottom_single.png", renderer);
+	SDL_Texture* wall_top = texture_manager->loadTexture("../images/mapTiles/wall_top_single.png", renderer);
+	SDL_Texture* wall_left = texture_manager->loadTexture("../images/mapTiles/wall_left_single.png", renderer);
+	SDL_Texture* wall_right = texture_manager->loadTexture("../images/mapTiles/wall_right_single.png", renderer);
+	SDL_Texture* corner_top_right = texture_manager->loadTexture("../images/mapTiles/wall_corner_tr_single.png", renderer);
+	SDL_Texture* corner_top_left = texture_manager->loadTexture("../images/mapTiles/wall_corner_tl_single.png", renderer);
+	SDL_Texture* corner_bottom_right = texture_manager->loadTexture("../images/mapTiles/wall_corner_br_single.png", renderer);
+	SDL_Texture* corner_bottom_left = texture_manager->loadTexture("../images/mapTiles/wall_corner_bl_single.png", renderer);
 
 	bool isRunning = true;
 	const Uint8* keys = nullptr;
@@ -107,9 +86,6 @@ int GameManager::play(std::string name) {
 	//Game Loop
 	while (isRunning) {
 
-		//std::cout << "Surface w: " << surface->w << ", Surface h: " << surface->h << std::endl;
-
-		//setFramerate(FPS);
 		setFramerate(FPS);
 
 		//Checks if Escape is press or X in the window
@@ -123,9 +99,7 @@ int GameManager::play(std::string name) {
 				isRunning = false;
 			}
 		}
-		//std::cout << "Coords: " << coords.w << ", " << coords.h << std::endl;
-		//std::cout << "Position: " << coords.x << ", " << coords.y << std::endl;
-		
+
 		//Keys input for movement
 		p1->movePlayer(keys, coords, surface, SCREEN_WIDTH, SCREEN_HEIGHT);
 
