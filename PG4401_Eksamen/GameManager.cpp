@@ -11,10 +11,8 @@
 //#include "Texture_Manager.h"
 
 //Window size
-struct screen {
-	int W;
-	int H;
-};
+int SCREEN_WIDTH = 450;
+int SCREEN_HEIGHT = 500;
 
 SDL_Texture* LoadTexture(const char* pos, SDL_Renderer *renderer) {
 
@@ -40,14 +38,9 @@ void GameManager::setFramerate(const int FPS) {
 	}
 }
 
-
 GameManager::GameManager() {}
 
 int GameManager::play(std::string name) {
-
-	screen SCREEN;
-	SCREEN.W = 450;
-	SCREEN.H = 500;
 
 	auto p1 = std::make_unique<Player>();
 
@@ -67,7 +60,7 @@ int GameManager::play(std::string name) {
 		std::cout << std::endl;
 	}
 
-	SDL_Window *window = sdl_manager->createWindow("Pac-man", SCREEN.W, SCREEN.H);
+	SDL_Window *window = sdl_manager->createWindow("Pac-man", SCREEN_WIDTH, SCREEN_HEIGHT);
 	SDL_Renderer *renderer = sdl_manager->createRenderer(window);
 
 	//draws background
@@ -86,13 +79,13 @@ int GameManager::play(std::string name) {
 	
 	//Setting coordinates for images
 	SDL_Rect coords;
-	coords.h = surface->h;
-	coords.w = surface->w;
+	coords.h = 16;
+	coords.w = 16;
 	coords.x = 0;
 	coords.y = 100;	
 	
 	//Freeing the RGB surface
-	SDL_FreeSurface(surface);
+	//SDL_FreeSurface(surface);
 
 	//Create Textures
 
@@ -135,7 +128,7 @@ int GameManager::play(std::string name) {
 
 		//Keys input for movement
 		
-		p1->movePlayer(keys, coords, surface, &SCREEN.W, &SCREEN.H);
+		p1->movePlayer(keys, coords, surface, SCREEN_WIDTH, SCREEN_HEIGHT);
 
 		//Prepare Renderer for a new frame
 		SDL_RenderCopy(renderer, drawable, nullptr, &coords);
