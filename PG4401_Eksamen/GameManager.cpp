@@ -8,7 +8,6 @@
 #include "SDL_Manager.h"
 
 #include "Player.h"
-//#include "Texture_Manager.h"
 
 //Window size
 int SCREEN_WIDTH = 450;
@@ -43,9 +42,8 @@ GameManager::GameManager() {}
 int GameManager::play(std::string name) {
 
 	auto p1 = std::make_unique<Player>();
-
 	auto sdl_manager = std::make_unique<SDL_Manager>();
-	//auto texture_manager = std::make_unique<Texture_Manager>();
+	auto texture_manager = std::make_unique<Texture_Manager>();
 	
 	const int FPS = 60;
 
@@ -68,27 +66,25 @@ int GameManager::play(std::string name) {
 	sdl_manager->ClearRender(renderer);
 
 	SDL_Surface *surface = sdl_manager->createSurface("../images/pacman.png", window, renderer);
-	//SDL_Texture *drawable = texture_manager->draw(renderer, surface);
-	
-	//SDL_Rect coords = texture_manager->setCoords(surface);
-
-	
+	SDL_Texture *drawable = texture_manager->draw(renderer, surface);
+	SDL_Rect coords = texture_manager->setCoords(surface);
+ 
 	//Draw images to VRAM
-	SDL_Texture* drawable = SDL_CreateTextureFromSurface(renderer, surface);
+	//SDL_Texture* drawable = SDL_CreateTextureFromSurface(renderer, surface);
 
-	
-	//Setting coordinates for images
+	/*
 	SDL_Rect coords;
 	coords.h = 16;
 	coords.w = 16;
 	coords.x = 0;
-	coords.y = 100;	
-	
+	coords.y = 100;
+	*/
+
+	//Setting coordinates for images
 	//Freeing the RGB surface
 	SDL_FreeSurface(surface);
 
 	//Create Textures
-
 	SDL_Texture* pellet = LoadTexture("../images/mapTiles/pellet.png", renderer);
 	SDL_Texture* wall_bottom = LoadTexture("../images/mapTiles/wall_bottom_single.png", renderer);
 	SDL_Texture* wall_top = LoadTexture("../images/mapTiles/wall_top_single.png", renderer);
@@ -111,6 +107,8 @@ int GameManager::play(std::string name) {
 	//Game Loop
 	while (isRunning) {
 
+		//std::cout << "Surface w: " << surface->w << ", Surface h: " << surface->h << std::endl;
+
 		//setFramerate(FPS);
 		setFramerate(FPS);
 
@@ -125,9 +123,10 @@ int GameManager::play(std::string name) {
 				isRunning = false;
 			}
 		}
-
-		//Keys input for movement
+		//std::cout << "Coords: " << coords.w << ", " << coords.h << std::endl;
+		//std::cout << "Position: " << coords.x << ", " << coords.y << std::endl;
 		
+		//Keys input for movement
 		p1->movePlayer(keys, coords, surface, SCREEN_WIDTH, SCREEN_HEIGHT);
 
 		//Prepare Renderer for a new frame

@@ -2,13 +2,10 @@
 #define _SDL_MANAGER_H_
 
 #include <iostream>
-#include <SDL.h>
-#include <SDL_image.h>
+
+#include "Texture_Manager.h"
 
 class SDL_Manager {
-
-private:
-	void printError(std::ostream &os, const std::string &msg);
 
 public:
 	SDL_Manager();
@@ -17,8 +14,11 @@ public:
 	SDL_Renderer *createRenderer(SDL_Window *w);
 	SDL_Surface *createSurface(const char *c, SDL_Window *window, SDL_Renderer *renderer);
 
-
 	void SetRenderColor(SDL_Renderer *renderer, int r, int g, int b, int a);
 	void ClearRender(SDL_Renderer *renderer);
+
+private:
+	void printError(std::ostream &os, const std::string &msg);
+
 };
 #endif
