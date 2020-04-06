@@ -85,7 +85,7 @@ int GameManager::play(std::string name) {
 	coords.y = 100;	
 	
 	//Freeing the RGB surface
-	//SDL_FreeSurface(surface);
+	SDL_FreeSurface(surface);
 
 	//Create Textures
 
