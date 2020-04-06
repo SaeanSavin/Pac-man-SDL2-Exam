@@ -2,8 +2,8 @@
 #define _SDL_MANAGER_H_
 
 #include <iostream>
-#include <SDL.h>
-#include <SDL_image.h>
+
+#include "Texture_Manager.h"
 
 class SDL_Manager {
 

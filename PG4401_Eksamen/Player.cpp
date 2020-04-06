@@ -25,23 +25,27 @@ void Player::movePlayer(const Uint8 *keys, SDL_Rect &coords, SDL_Surface *surfac
 	else {
 
 		//Make sure image dont move out of bounds
-		if (coords.x > SCREEN_WIDTH - surface->w) {
-			coords.x = SCREEN_HEIGHT - surface->w;
+		if (coords.x > SCREEN_WIDTH - coords.w) {
+			coords.x = SCREEN_WIDTH - coords.w;
+			//std::cout << "Out of bounds" << std::endl;
 			direction = 'i';
 		}
 
-		if (coords.y > SCREEN_WIDTH - surface->h) {
-			coords.y = SCREEN_HEIGHT - surface->h;
+		if (coords.y > SCREEN_HEIGHT - coords.h) {
+			coords.y = SCREEN_HEIGHT - coords.h;
+			//std::cout << "Out of bounds" << std::endl;
 			direction = 'i';
 		}
 
 		if (coords.x < 0) {
 			coords.x = 0;
+			//std::cout << "Out of bounds" << std::endl;
 			direction = 'i';
 		}
 
 		if (coords.y < 0) {
 			coords.y = 0;
+			//std::cout << "Out of bounds" << std::endl;
 			direction = 'i';
 		}
 	}
