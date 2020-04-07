@@ -2,11 +2,11 @@
 
 #include "SDL_Manager.h"
 
+SDL_Manager::SDL_Manager() {}
+
 void SDL_Manager::printError(std::ostream &os, const std::string &msg) {
 	os << msg << " error " << SDL_GetError() << std::endl;
 }
-
-SDL_Manager::SDL_Manager() {}
 
 SDL_Window *SDL_Manager::createWindow(const char *c, const int w, const int h) {
 	
@@ -26,8 +26,8 @@ SDL_Window *SDL_Manager::createWindow(const char *c, const int w, const int h) {
 	return window;
 }
 
-SDL_Renderer *SDL_Manager::createRenderer(SDL_Window *w) {
-	SDL_Renderer *renderer = SDL_CreateRenderer(w, -1, SDL_RENDERER_ACCELERATED);
+SDL_Renderer *SDL_Manager::createRenderer(SDL_Window *w, int index) {
+	SDL_Renderer *renderer = SDL_CreateRenderer(w, index, SDL_RENDERER_ACCELERATED);
 
 	if (renderer == nullptr) {
 		printError(std::cout, "Cannot create renederer ");
@@ -58,4 +58,38 @@ void SDL_Manager::SetRenderColor(SDL_Renderer *renderer, int r, int g, int b, in
 
 void SDL_Manager::ClearRender(SDL_Renderer *renderer) {
 	SDL_RenderClear(renderer);
+}
+
+bool SDL_Manager::checkCollision(SDL_Rect a, SDL_Rect b) {
+	int leftA = a.x;
+	int leftB = b.x;
+	int rightA = a.x + a.w;
+	int rightB = b.x + b.h;
+	int topA = a.y;
+	int topB = b.y;
+	int bottomA = a.y + a.w;
+	int bottomB = b.y + b.h;
+
+	if (bottomA <= topB) {
+		std::cout << "Collided" << std::endl;
+		return false;
+	}
+	
+	if (topA >= bottomB) {
+		std::cout << "Collided" << std::endl;
+		return false;
+	}
+
+	if (leftA >= rightB) {
+		std::cout << "Collided" << std::endl;
+		return false;
+	}
+
+	if (rightA <= leftB) {
+		std::cout << "Collided" << std::endl;
+		return false;
+	}
+	//Did not collide with wall
+	std::cout << "Did not collide" << std::endl;
+	return true;
 }

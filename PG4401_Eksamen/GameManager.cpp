@@ -11,7 +11,7 @@
 
 //Window size
 int SCREEN_WIDTH = 450;
-int SCREEN_HEIGHT = 500;
+int SCREEN_HEIGHT = 550;
 
 void GameManager::setFramerate(const int FPS) {
 	const int frameDelay = 1000 / FPS;
@@ -50,7 +50,7 @@ int GameManager::play(std::string name) {
 	}
 
 	SDL_Window *window = sdl_manager->createWindow("Pac-man", SCREEN_WIDTH, SCREEN_HEIGHT);
-	SDL_Renderer *renderer = sdl_manager->createRenderer(window);
+	SDL_Renderer *renderer = sdl_manager->createRenderer(window, -1);
 
 	//draws background
 	sdl_manager->SetRenderColor(renderer, 0, 0, 0, 255);
@@ -74,6 +74,7 @@ int GameManager::play(std::string name) {
 	SDL_Texture* corner_bottom_right = texture_manager->loadTexture("../images/mapTiles/wall_corner_br_single.png", renderer);
 	SDL_Texture* corner_bottom_left = texture_manager->loadTexture("../images/mapTiles/wall_corner_bl_single.png", renderer);
 
+	//Det er nå 200 linjer (Deal or no deal with it)
 	bool isRunning = true;
 	const Uint8* keys = nullptr;
 	int numKeys;
@@ -103,6 +104,7 @@ int GameManager::play(std::string name) {
 		//Keys input for movement
 		p1->movePlayer(keys, coords, surface, SCREEN_WIDTH, SCREEN_HEIGHT);
 
+
 		//Prepare Renderer for a new frame
 		SDL_RenderCopy(renderer, drawable, nullptr, &coords);
 
@@ -113,6 +115,8 @@ int GameManager::play(std::string name) {
 		mapRect.h = 16;
 		mapRect.x = 0;
 		mapRect.y = 0;
+
+		std::vector<SDL_Rect> walls{};
 
 		for (auto& row : map) {
 			for (auto& c : row) {
@@ -148,6 +152,12 @@ int GameManager::play(std::string name) {
 				case ' ':
 				case '-':
 					break;
+				case 'S':
+				case 's':
+					coords.x = mapRect.x;
+					coords.y = mapRect.y;
+					c = ' ';
+					break;
 				}
 				mapRect.x += 16;
 			}
@@ -155,6 +165,12 @@ int GameManager::play(std::string name) {
 			mapRect.y += 16;
 		}
 
+		bool collided = sdl_manager->checkCollision(coords, mapRect);
+		
+		if (!collided) {
+			
+		}
+		
 		SDL_RenderPresent(renderer);
 		SDL_RenderClear(renderer);
 	}

@@ -9,8 +9,8 @@ SDL_Texture *Texture_Manager::draw(SDL_Renderer *r, SDL_Surface *s) {
 
 SDL_Rect Texture_Manager::setCoords(SDL_Surface *s) {
 	SDL_Rect coords;
-	coords.h = 16;
-	coords.w = 16;
+	coords.h = 22;
+	coords.w = 22;
 	coords.x = 0;
 	coords.y = 0;
 	return coords;
