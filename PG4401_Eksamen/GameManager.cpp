@@ -133,6 +133,10 @@ int GameManager::play(std::string name) {
 		mapRect.y += 16;
 	}
 
+	for (size_t i = 0; i < walls.size(); i++) {
+		std::cout << walls[i].x << ", " << walls[i].y << std::endl;
+	}
+
 	//Game Loop
 	while (isRunning) {
 
@@ -215,6 +219,8 @@ int GameManager::play(std::string name) {
 			std::cout << "Collided" << std::endl;
 			p1->setDirection('i');
 		}
+
+		std::cout << "x: " << p1->getCoords()->x << ", Y: " << p1->getCoords()->y << std::endl;
 		
 		SDL_RenderPresent(renderer);
 		SDL_RenderClear(renderer);
