@@ -87,6 +87,52 @@ int GameManager::play(std::string name) {
 	//movement variables
 	char direction = 'i';
 
+	//Wall vector
+	//Use to check collison with walls
+	std::vector<SDL_Rect> walls{};
+	SDL_Rect mapRect;
+	mapRect.w = 16;
+	mapRect.h = 16;
+	mapRect.x = 0;
+	mapRect.y = 0;
+
+	for (auto &row : map) {
+		for (auto &c : row) {
+
+			switch (c) {
+				case '1':
+					walls.emplace_back(mapRect);
+					break;
+				case '3':
+					walls.emplace_back(mapRect);
+					break;
+				case '7':
+					walls.emplace_back(mapRect);
+					break;
+				case '9':
+					walls.emplace_back(mapRect);
+					break;
+				case '2':
+					walls.emplace_back(mapRect);
+					break;
+				case '4':
+					walls.emplace_back(mapRect);
+					break;
+				case '6':
+					walls.emplace_back(mapRect);
+					break;
+				case '8':
+					walls.emplace_back(mapRect);
+					break;
+				default:
+					break;
+			}
+			mapRect.x += 16;
+		}
+		mapRect.x = 0;
+		mapRect.y += 16;
+	}
+
 	//Game Loop
 	while (isRunning) {
 
@@ -109,16 +155,13 @@ int GameManager::play(std::string name) {
 
 		//Prepare Renderer for a new frame
 		SDL_RenderCopy(renderer, p1->getTexture(), nullptr, p1->getCoords());
-
+		
 		//render map
-
 		SDL_Rect mapRect;
 		mapRect.w = 16;
 		mapRect.h = 16;
 		mapRect.x = 0;
 		mapRect.y = 0;
-
-		std::vector<SDL_Rect> walls{};
 
 		for (auto& row : map) {
 			for (auto& c : row) {
@@ -129,35 +172,27 @@ int GameManager::play(std::string name) {
 					break;
 				case '1':
 					SDL_RenderCopy(renderer, corner_bottom_left, nullptr, &mapRect);
-					walls.emplace_back(mapRect);
 					break;
 				case '3':
 					SDL_RenderCopy(renderer, corner_bottom_right, nullptr, &mapRect);
-					walls.emplace_back(mapRect);
 					break;
 				case '7':
 					SDL_RenderCopy(renderer, corner_top_left, nullptr, &mapRect);
-					walls.emplace_back(mapRect);
 					break;
 				case '9':
 					SDL_RenderCopy(renderer, corner_top_right, nullptr, &mapRect);
-					walls.emplace_back(mapRect);
 					break;
 				case '2':
 					SDL_RenderCopy(renderer, wall_bottom, nullptr, &mapRect);
-					walls.emplace_back(mapRect);
 					break;
 				case '4':
 					SDL_RenderCopy(renderer, wall_left, nullptr, &mapRect);
-					walls.emplace_back(mapRect);
 					break;
 				case '6':
 					SDL_RenderCopy(renderer, wall_right, nullptr, &mapRect);
-					walls.emplace_back(mapRect);
 					break;
 				case '8':
 					SDL_RenderCopy(renderer, wall_top, nullptr, &mapRect);
-					walls.emplace_back(mapRect);
 					break;
 				case ' ':
 				case '-':
@@ -175,10 +210,6 @@ int GameManager::play(std::string name) {
 		}
 
 		bool collided = sdl_manager->checkCollision(*p1->getCoords(), walls);
-
-		for (size_t i = 0; i < walls.size(); i++) {
-			std::cout << walls[i].x << ", " << walls[i].y << std::endl;
-		}
 		
 		if (collided) {
 			std::cout << "Collided" << std::endl;
