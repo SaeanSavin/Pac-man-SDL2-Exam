@@ -32,7 +32,6 @@ GameManager::GameManager() {}
 
 int GameManager::play(std::string name) {
 
-	auto p1 = std::make_unique<Player>();
 	auto sdl_manager = std::make_unique<SDL_Manager>();
 	auto texture_manager = std::make_unique<Texture_Manager>();
 	
@@ -41,7 +40,7 @@ int GameManager::play(std::string name) {
 	std::vector<std::vector<char>> map{};
 	loadMap(name, map);
 
-	//for debug
+	//prints map to console (FOR DEBUGGING)
 	for (auto& row : map) {
 		for (auto& c : row) {
 			std::cout << c;
@@ -56,9 +55,13 @@ int GameManager::play(std::string name) {
 	sdl_manager->SetRenderColor(renderer, 0, 0, 0, 255);
 	sdl_manager->ClearRender(renderer);
 
+	//create pacman
 	SDL_Surface *surface = sdl_manager->createSurface("../images/pacman.png", window, renderer);
 	SDL_Texture *drawable = texture_manager->draw(renderer, surface);
-	SDL_Rect coords = texture_manager->setCoords(surface);
+
+	auto p1 = std::make_unique<Player>(drawable);
+	p1->setPos(0, 0);
+	p1->setSize(32, 32);
  
 	//Freeing the RGB surface
 	SDL_FreeSurface(surface);
@@ -102,11 +105,10 @@ int GameManager::play(std::string name) {
 		}
 
 		//Keys input for movement
-		p1->movePlayer(keys, coords, surface, SCREEN_WIDTH, SCREEN_HEIGHT);
-
+		p1->movePlayer(keys, surface, SCREEN_WIDTH, SCREEN_HEIGHT);
 
 		//Prepare Renderer for a new frame
-		SDL_RenderCopy(renderer, drawable, nullptr, &coords);
+		SDL_RenderCopy(renderer, p1->getTexture(), nullptr, p1->getCoords());
 
 		//render map
 
@@ -154,8 +156,7 @@ int GameManager::play(std::string name) {
 					break;
 				case 'S':
 				case 's':
-					coords.x = mapRect.x;
-					coords.y = mapRect.y;
+					p1->setPos(mapRect.x, mapRect.y);
 					c = ' ';
 					break;
 				}
@@ -165,7 +166,7 @@ int GameManager::play(std::string name) {
 			mapRect.y += 16;
 		}
 
-		bool collided = sdl_manager->checkCollision(coords, mapRect);
+		bool collided = sdl_manager->checkCollision(*p1->getCoords(), mapRect);
 		
 		if (!collided) {
 			

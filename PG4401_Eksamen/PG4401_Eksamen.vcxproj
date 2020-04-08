@@ -146,12 +146,14 @@
     <ClCompile Include="GameManager.cpp" />
     <ClCompile Include="Player.cpp" />
     <ClCompile Include="SDL_Manager.cpp" />
+    <ClCompile Include="Animation.cpp" />
     <ClCompile Include="Texture_Manager.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Animation.h" />
     <ClInclude Include="Character.h" />
     <ClInclude Include="GameManager.h" />
     <ClInclude Include="Player.h" />

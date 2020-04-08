@@ -1,7 +1,19 @@
 #include "Player.h"
 
+Player::Player(SDL_Texture* t) {
+	texture = t;
+	coords.h = 0;
+	coords.w = 0;
+	coords.x = 0;
+	coords.y = 0;
+}
+Player::Player(SDL_Texture* t, SDL_Rect c) {
+	texture = t;
+	coords = c;
+}
+
 //movement function
-void Player::movePlayer(const Uint8 *keys, SDL_Rect &coords, SDL_Surface *surface, int &SCREEN_WIDTH, int &SCREEN_HEIGHT) {
+void Player::movePlayer(const Uint8 *keys, SDL_Surface *surface, int &SCREEN_WIDTH, int &SCREEN_HEIGHT) {
 
 	SDL_PumpEvents();
 	//if idle, check input
@@ -63,3 +75,21 @@ void Player::movePlayer(const Uint8 *keys, SDL_Rect &coords, SDL_Surface *surfac
 		break;
 	}
 }
+
+SDL_Texture* Player::getTexture() {
+	return texture;
+}
+
+SDL_Rect* Player::getCoords() {
+	return &coords;
+}
+
+void Player::setPos(int x, int y) {
+	coords.x = x;
+	coords.y = y;
+}
+
+void Player::setSize(int h, int w) {
+	coords.h = h;
+	coords.w = w;
+};
