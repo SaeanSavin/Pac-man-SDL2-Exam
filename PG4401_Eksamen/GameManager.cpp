@@ -129,27 +129,35 @@ int GameManager::play(std::string name) {
 					break;
 				case '1':
 					SDL_RenderCopy(renderer, corner_bottom_left, nullptr, &mapRect);
+					walls.emplace_back(mapRect);
 					break;
 				case '3':
 					SDL_RenderCopy(renderer, corner_bottom_right, nullptr, &mapRect);
+					walls.emplace_back(mapRect);
 					break;
 				case '7':
 					SDL_RenderCopy(renderer, corner_top_left, nullptr, &mapRect);
+					walls.emplace_back(mapRect);
 					break;
 				case '9':
 					SDL_RenderCopy(renderer, corner_top_right, nullptr, &mapRect);
+					walls.emplace_back(mapRect);
 					break;
 				case '2':
 					SDL_RenderCopy(renderer, wall_bottom, nullptr, &mapRect);
+					walls.emplace_back(mapRect);
 					break;
 				case '4':
 					SDL_RenderCopy(renderer, wall_left, nullptr, &mapRect);
+					walls.emplace_back(mapRect);
 					break;
 				case '6':
 					SDL_RenderCopy(renderer, wall_right, nullptr, &mapRect);
+					walls.emplace_back(mapRect);
 					break;
 				case '8':
 					SDL_RenderCopy(renderer, wall_top, nullptr, &mapRect);
+					walls.emplace_back(mapRect);
 					break;
 				case ' ':
 				case '-':
@@ -166,10 +174,15 @@ int GameManager::play(std::string name) {
 			mapRect.y += 16;
 		}
 
-		bool collided = sdl_manager->checkCollision(*p1->getCoords(), mapRect);
+		bool collided = sdl_manager->checkCollision(*p1->getCoords(), walls);
+
+		for (size_t i = 0; i < walls.size(); i++) {
+			std::cout << walls[i].x << ", " << walls[i].y << std::endl;
+		}
 		
-		if (!collided) {
-			
+		if (collided) {
+			std::cout << "Collided" << std::endl;
+			p1->setDirection('i');
 		}
 		
 		SDL_RenderPresent(renderer);

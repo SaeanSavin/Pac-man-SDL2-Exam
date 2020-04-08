@@ -1,5 +1,3 @@
-#include <iostream>
-
 #include "SDL_Manager.h"
 
 SDL_Manager::SDL_Manager() {}
@@ -35,7 +33,6 @@ SDL_Renderer *SDL_Manager::createRenderer(SDL_Window *w, int index) {
 		SDL_Quit();
 		return nullptr;
 	}
-
 	return renderer;
 }
 
@@ -60,36 +57,26 @@ void SDL_Manager::ClearRender(SDL_Renderer *renderer) {
 	SDL_RenderClear(renderer);
 }
 
-bool SDL_Manager::checkCollision(SDL_Rect a, SDL_Rect b) {
-	int leftA = a.x;
-	int leftB = b.x;
-	int rightA = a.x + a.w;
-	int rightB = b.x + b.h;
-	int topA = a.y;
-	int topB = b.y;
-	int bottomA = a.y + a.w;
-	int bottomB = b.y + b.h;
+bool SDL_Manager::checkCollision(SDL_Rect a, std::vector<SDL_Rect> &b) {
 
-	if (bottomA <= topB) {
-		std::cout << "Collided" << std::endl;
-		return false;
-	}
-	
-	if (topA >= bottomB) {
-		std::cout << "Collided" << std::endl;
-		return false;
-	}
+	for (auto &wall : b) {
+		if (a.y + a.h <= wall.y) {
+			return false;
+		}
 
-	if (leftA >= rightB) {
-		std::cout << "Collided" << std::endl;
-		return false;
-	}
+		if (a.y >= wall.y + wall.h) {
+			return false;
+		}
 
-	if (rightA <= leftB) {
-		std::cout << "Collided" << std::endl;
-		return false;
+		if (a.x >= wall.x + wall.w) {
+			return false;
+		}
+
+		if (a.x + a.w <= wall.x) {
+			return false;
+		}
+		//Did not collide with wall
+		std::cout << "Did not collide" << std::endl;
+		return true;
 	}
-	//Did not collide with wall
-	std::cout << "Did not collide" << std::endl;
-	return true;
 }

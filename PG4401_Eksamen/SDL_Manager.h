@@ -2,6 +2,7 @@
 #define _SDL_MANAGER_H_
 
 #include <iostream>
+#include <vector>
 
 #include "Texture_Manager.h"
 
@@ -17,7 +18,7 @@ public:
 	void SetRenderColor(SDL_Renderer *renderer, int r, int g, int b, int a);
 	void ClearRender(SDL_Renderer *renderer);
 
-	bool checkCollision(SDL_Rect a, SDL_Rect b);
+	bool checkCollision(SDL_Rect a, std::vector<SDL_Rect> &b);
 
 private:
 	void printError(std::ostream &os, const std::string &msg);
