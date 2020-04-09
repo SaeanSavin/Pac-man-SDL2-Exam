@@ -44,7 +44,7 @@ int GameManager::play(std::string name) {
 		}
 		std::cout << std::endl;
 	}
-	SCREEN_HEIGHT = map.size() * 16 + 200;
+	SCREEN_HEIGHT = map.size() * 16 + 100;
 	SCREEN_WIDTH = map[0].size() * 16;
 
 	SDL_Window *window = sdl_manager->createWindow("Pac-man", SCREEN_WIDTH, SCREEN_HEIGHT);
@@ -93,7 +93,7 @@ int GameManager::play(std::string name) {
 	mapRect.w = 16;
 	mapRect.h = 16;
 	mapRect.x = 0;
-	mapRect.y = 0;
+	mapRect.y = 50;
 
 	for (auto &row : map) {
 		for (auto &c : row) {
@@ -154,6 +154,9 @@ int GameManager::play(std::string name) {
 			}
 		}
 
+		//Render text
+
+
 		//Keys input for movement
 		p1->movePlayer(keys, surface, SCREEN_WIDTH, SCREEN_HEIGHT, walls);
 
@@ -165,7 +168,7 @@ int GameManager::play(std::string name) {
 		mapRect.w = 16;
 		mapRect.h = 16;
 		mapRect.x = 0;
-		mapRect.y = 0;
+		mapRect.y = 50;
 
 		for (auto& row : map) {
 			for (auto& c : row) {
