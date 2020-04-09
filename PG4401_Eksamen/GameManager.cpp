@@ -7,8 +7,8 @@
 #include "SDL_Manager.h"
 
 //Window size
-int SCREEN_WIDTH = 450;
-int SCREEN_HEIGHT = 550;
+int SCREEN_WIDTH = 0;
+int SCREEN_HEIGHT = 0;
 
 void GameManager::setFramerate(const int FPS) {
 	const int frameDelay = 1000 / FPS;
@@ -44,6 +44,8 @@ int GameManager::play(std::string name) {
 		}
 		std::cout << std::endl;
 	}
+	SCREEN_HEIGHT = map.size() * 16 + 200;
+	SCREEN_WIDTH = map[0].size() * 16;
 
 	SDL_Window *window = sdl_manager->createWindow("Pac-man", SCREEN_WIDTH, SCREEN_HEIGHT);
 	SDL_Renderer *renderer = sdl_manager->createRenderer(window, -1);
