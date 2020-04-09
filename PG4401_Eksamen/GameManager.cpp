@@ -90,6 +90,11 @@ int GameManager::play(std::string name) {
 	//Use to check collison with walls
 	std::vector<SDL_Rect> walls{};
 	SDL_Rect mapRect;
+
+	//pellet vector
+	//Use to check collision on pellets
+	std::vector<SDL_Rect> pellets{};
+
 	mapRect.w = 16;
 	mapRect.h = 16;
 	mapRect.x = 0;
@@ -123,6 +128,8 @@ int GameManager::play(std::string name) {
 				case '8':
 					walls.emplace_back(mapRect);
 					break;
+				case 'x':
+					pellets.emplace_back(mapRect);
 				default:
 					break;
 			}
@@ -158,7 +165,7 @@ int GameManager::play(std::string name) {
 
 
 		//Keys input for movement
-		p1->movePlayer(keys, surface, SCREEN_WIDTH, SCREEN_HEIGHT, walls);
+		p1->movePlayer(keys, surface, SCREEN_WIDTH, SCREEN_HEIGHT, map, walls, pellets);
 
 		//Prepare Renderer for a new frame
 		SDL_RenderCopy(renderer, p1->getTexture(), nullptr, p1->getCoords());
@@ -215,8 +222,6 @@ int GameManager::play(std::string name) {
 			mapRect.x = 0;
 			mapRect.y += 16;
 		}
-
-		std::cout << "x: " << p1->getCoords()->x << ", Y: " << p1->getCoords()->y << std::endl;
 
 		SDL_RenderPresent(renderer);
 		SDL_RenderClear(renderer);

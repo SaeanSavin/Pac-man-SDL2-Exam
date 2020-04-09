@@ -8,7 +8,7 @@ class Character
 {
 public:
 
-	virtual void movePlayer(const Uint8* keys, SDL_Surface* surface, int& SCREEN_WIDTH, int& SCREEN_HEIGHT, std::vector<SDL_Rect>& walls) = 0;
+	virtual void movePlayer(const Uint8* keys, SDL_Surface* surface, int& SCREEN_WIDTH, int& SCREEN_HEIGHT, std::vector<std::vector<char>> &map, std::vector<SDL_Rect> &walls, std::vector<SDL_Rect> &pellets) = 0;
 
 	virtual SDL_Texture* getTexture() = 0;
 

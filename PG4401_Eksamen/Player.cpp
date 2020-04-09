@@ -13,7 +13,7 @@ Player::Player(SDL_Texture* t, SDL_Rect c) {
 }
 
 //movement function
-void Player::movePlayer(const Uint8 *keys, SDL_Surface *surface, int &SCREEN_WIDTH, int &SCREEN_HEIGHT, std::vector<SDL_Rect>& walls) {
+void Player::movePlayer(const Uint8 *keys, SDL_Surface *surface, int &SCREEN_WIDTH, int &SCREEN_HEIGHT, std::vector<std::vector<char>>& map, std::vector<SDL_Rect>& walls, std::vector<SDL_Rect>& pellets) {
 
 	checkWallCollision(walls, 0, 0);
 
@@ -140,6 +140,7 @@ void Player::movePlayer(const Uint8 *keys, SDL_Surface *surface, int &SCREEN_WID
 	default:
 		break;
 	}
+	checkPelletCollision(pellets, map);
 }
 
 SDL_Texture* Player::getTexture() {
@@ -168,11 +169,22 @@ bool Player::checkWallCollision(std::vector<SDL_Rect>& walls, int x_offset, int 
 				if (direction != 'i') {
 					collided = direction;
 				}
-				std::cout << "collided: " << collided << std::endl;
 				return true;
 			}
 		}
 	}
-	std::cout << "direction: " << direction << std::endl;
 	return false;
 };
+
+bool Player::checkPelletCollision(std::vector<SDL_Rect>& pellets, std::vector<std::vector<char>> &map) {
+
+	for (auto& pellet : pellets) {
+		if (coords.y == pellet.y) {
+			if (coords.x == pellet.x) {
+				std::cout << "hit pellet" << collided << std::endl;
+				map[pellet.y / 16][pellet.x / 16] = '-';
+				return true;
+			}
+		}
+	}
+}
