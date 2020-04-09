@@ -4,6 +4,7 @@
 #include "Character.h"
 
 #include <iostream>
+#include <vector>
 #include <SDL.h>
 
 class Player : public Character
@@ -28,6 +29,9 @@ public:
 	void setDirection(char d) {
 		direction = d;
 	}
+
+	bool checkWallCollision(std::vector<SDL_Rect> &walls);
+
 private:
 	SDL_Texture* texture;
 	SDL_Rect coords;

@@ -56,27 +56,3 @@ void SDL_Manager::SetRenderColor(SDL_Renderer *renderer, int r, int g, int b, in
 void SDL_Manager::ClearRender(SDL_Renderer *renderer) {
 	SDL_RenderClear(renderer);
 }
-
-bool SDL_Manager::checkCollision(SDL_Rect a, std::vector<SDL_Rect> &b) {
-
-	for (auto &wall : b) {
-		if (a.y + a.h <= wall.y) {
-			return false;
-		}
-
-		if (a.y >= wall.y + wall.h) {
-			return false;
-		}
-
-		if (a.x >= wall.x + wall.w) {
-			return false;
-		}
-
-		if (a.x + a.w <= wall.x) {
-			return false;
-		}
-		//Did not collide with wall
-		std::cout << "Did not collide" << std::endl;
-		return true;
-	}
-}

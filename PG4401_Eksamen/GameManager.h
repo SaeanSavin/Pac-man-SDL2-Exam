@@ -2,6 +2,7 @@
 #define _GAMEMANAGER_H_
 
 #include <vector>
+#include "Player.h"
 
 class GameManager {
 

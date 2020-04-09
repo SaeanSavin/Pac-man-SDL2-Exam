@@ -92,4 +92,35 @@ void Player::setPos(int x, int y) {
 void Player::setSize(int h, int w) {
 	coords.h = h;
 	coords.w = w;
+}
+bool Player::checkWallCollision(std::vector<SDL_Rect> &walls) {
+	
+	bool hitWall = false;
+	
+	for (auto &wall : walls) {
+		if (coords.y + coords.h <= wall.y) {
+			hitWall = false;
+			//break;
+		}
+
+		if (coords.y >= wall.y + wall.h) {
+			hitWall = false;
+			//break;
+		}
+
+		if (coords.x >= wall.x + wall.w) {
+			hitWall = false;
+			//break;
+		}
+
+		if (coords.x + coords.w <= wall.x) {
+			hitWall = false;
+			//break;
+		}
+		else {
+			hitWall = true;
+		}
+		
+	}
+	return hitWall;
 };

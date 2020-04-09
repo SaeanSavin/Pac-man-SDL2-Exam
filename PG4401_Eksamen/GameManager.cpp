@@ -2,12 +2,9 @@
 #include <fstream>
 #include <sstream>
 #include <string>
-#include <vector>
 
 #include "GameManager.h"
 #include "SDL_Manager.h"
-
-#include "Player.h"
 
 //Window size
 int SCREEN_WIDTH = 450;
@@ -61,7 +58,7 @@ int GameManager::play(std::string name) {
 
 	auto p1 = std::make_unique<Player>(drawable);
 	p1->setPos(0, 0);
-	p1->setSize(32, 32);
+	p1->setSize(16, 16);
  
 	//Freeing the RGB surface
 	SDL_FreeSurface(surface);
@@ -133,6 +130,7 @@ int GameManager::play(std::string name) {
 		mapRect.y += 16;
 	}
 
+	//Debug
 	for (size_t i = 0; i < walls.size(); i++) {
 		std::cout << walls[i].x << ", " << walls[i].y << std::endl;
 	}
@@ -212,12 +210,13 @@ int GameManager::play(std::string name) {
 			mapRect.x = 0;
 			mapRect.y += 16;
 		}
+		bool collided = p1->checkWallCollision(walls);
 
-		bool collided = sdl_manager->checkCollision(*p1->getCoords(), walls);
-		
 		if (collided) {
-			std::cout << "Collided" << std::endl;
+			std::cout << "Wall hit" << std::endl;
 			p1->setDirection('i');
+		} else {
+			std::cout << "Didnt hit a wall" << std::endl;
 		}
 
 		std::cout << "x: " << p1->getCoords()->x << ", Y: " << p1->getCoords()->y << std::endl;
