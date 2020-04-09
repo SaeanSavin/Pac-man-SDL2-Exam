@@ -17,19 +17,19 @@ void Player::movePlayer(const Uint8 *keys, SDL_Surface *surface, int &SCREEN_WID
 
 	SDL_PumpEvents();
 	//if idle, check input
-	if (keys[SDL_SCANCODE_W]) {
+	if (keys[SDL_SCANCODE_W] && collided != 'w') {
 		direction = 'w';
 	}
 
-	if (keys[SDL_SCANCODE_S]) {
+	if (keys[SDL_SCANCODE_S] && collided != 's') {
 		direction = 's';
 	}
 
-	if (keys[SDL_SCANCODE_A]) {
+	if (keys[SDL_SCANCODE_A] && collided != 'a') {
 		direction = 'a';
 	}
 
-	if (keys[SDL_SCANCODE_D]) {
+	if (keys[SDL_SCANCODE_D] && collided != 'd') {
 		direction = 'd';
 	}
 
@@ -61,15 +61,19 @@ void Player::movePlayer(const Uint8 *keys, SDL_Surface *surface, int &SCREEN_WID
 	switch (direction) {
 	case 'w':
 		coords.y -= speed;
+		collided = 'n';
 		break;
 	case 's':
 		coords.y += speed;
+		collided = 'n';
 		break;
 	case 'a':
 		coords.x -= speed;
+		collided = 'n';
 		break;
 	case 'd':
 		coords.x += speed;
+		collided = 'n';
 		break;
 	default:
 		break;
@@ -94,33 +98,18 @@ void Player::setSize(int h, int w) {
 	coords.w = w;
 }
 bool Player::checkWallCollision(std::vector<SDL_Rect> &walls) {
-	
-	bool hitWall = false;
-	
 	for (auto &wall : walls) {
-		if (coords.y + coords.h <= wall.y) {
-			hitWall = false;
-			//break;
+		if (coords.y + coords.h >= wall.y && coords.y <= wall.y + wall.h) {
+			if (coords.x + coords.w >= wall.x && coords.x <= wall.x + wall.w) {
+				if (direction != 'i') {
+					collided = direction;
+				}
+				direction = 'i';
+				std::cout << "collided: " << collided << std::endl;
+				return true;
+			}
 		}
-
-		if (coords.y >= wall.y + wall.h) {
-			hitWall = false;
-			//break;
-		}
-
-		if (coords.x >= wall.x + wall.w) {
-			hitWall = false;
-			//break;
-		}
-
-		if (coords.x + coords.w <= wall.x) {
-			hitWall = false;
-			//break;
-		}
-		else {
-			hitWall = true;
-		}
-		
 	}
-	return hitWall;
+	std::cout << "direction: " << direction << std::endl;
+	return false;
 };

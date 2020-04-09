@@ -210,17 +210,21 @@ int GameManager::play(std::string name) {
 			mapRect.x = 0;
 			mapRect.y += 16;
 		}
-		bool collided = p1->checkWallCollision(walls);
+		p1->checkWallCollision(walls);
 
+		/*
+		bool collided = p1->checkWallCollision(walls);
+	
 		if (collided) {
-			std::cout << "Wall hit" << std::endl;
+			//std::cout << "Wall hit" << std::endl;
 			p1->setDirection('i');
 		} else {
-			std::cout << "Didnt hit a wall" << std::endl;
+			//std::cout << "Didnt hit a wall" << std::endl;
 		}
 
-		std::cout << "x: " << p1->getCoords()->x << ", Y: " << p1->getCoords()->y << std::endl;
-		
+		//std::cout << "x: " << p1->getCoords()->x << ", Y: " << p1->getCoords()->y << std::endl;
+		*/
+
 		SDL_RenderPresent(renderer);
 		SDL_RenderClear(renderer);
 	}

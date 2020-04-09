@@ -36,6 +36,7 @@ private:
 	SDL_Texture* texture;
 	SDL_Rect coords;
 	char direction = 'i';
+	char collided = 'n';
 	int speed = 2;
 };
 
