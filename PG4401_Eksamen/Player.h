@@ -29,6 +29,9 @@ public:
 	void setDirection(char d) {
 		direction = d;
 	}
+	int getScore() {
+		return score;
+	}
 
 	bool checkWallCollision(std::vector<SDL_Rect> &walls, int x_offset, int y_offset);
 
@@ -41,6 +44,7 @@ private:
 	char next_direction = 'n';
 	char collided = 'n';
 	int speed = 1;
+	int score = 0;
 };
 
 #endif

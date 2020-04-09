@@ -160,6 +160,7 @@ void Player::setSize(int h, int w) {
 	coords.h = h;
 	coords.w = w;
 }
+
 bool Player::checkWallCollision(std::vector<SDL_Rect>& walls, int x_offset, int y_offset) {
 	int x = coords.x + x_offset;
 	int y = coords.y + y_offset;
@@ -181,8 +182,9 @@ bool Player::checkPelletCollision(std::vector<SDL_Rect>& pellets, std::vector<st
 	for (auto& pellet : pellets) {
 		if (coords.y == pellet.y) {
 			if (coords.x == pellet.x) {
-				std::cout << "ate a pellet" << std::endl;
+				//std::cout << "ate a pellet" << std::endl;
 				map[(pellet.y - 50) / 16][pellet.x / 16] = '-';
+				score++;
 				return true;
 			}
 		}

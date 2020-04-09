@@ -1,4 +1,3 @@
-//#include <iostream>
 #include <fstream>
 #include <sstream>
 #include <string>
@@ -162,10 +161,20 @@ int GameManager::play(std::string name) {
 		}
 
 		//Render text
+		/*
+		SDL_Texture *text = texture_manager->loadTexture("../images/text.png", renderer);
+		SDL_Rect textRect;
+		textRect.w = 16;
+		textRect.h = 16;
+		textRect.x = 0;
+		textRect.y = 0;
 
+		SDL_RenderCopy(renderer, text, nullptr, &textRect);
+		*/
 
 		//Keys input for movement
 		p1->movePlayer(keys, surface, SCREEN_WIDTH, SCREEN_HEIGHT, map, walls, pellets);
+		//std::cout << p1->getScore() << std::endl;
 
 		//Prepare Renderer for a new frame
 		SDL_RenderCopy(renderer, p1->getTexture(), nullptr, p1->getCoords());
