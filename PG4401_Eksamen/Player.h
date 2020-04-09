@@ -13,7 +13,7 @@ public:
 	Player(SDL_Texture* t);
 	Player(SDL_Texture* t, SDL_Rect c);
 
-	void movePlayer(const Uint8 *keys, SDL_Surface *surface, int &SCREEN_WIDTH, int &SCREEN_HEIGHT) override;
+	void movePlayer(const Uint8 *keys, SDL_Surface *surface, int &SCREEN_WIDTH, int &SCREEN_HEIGHT, std::vector<SDL_Rect>& walls) override;
 
 	SDL_Texture* getTexture() override;
 
@@ -30,14 +30,15 @@ public:
 		direction = d;
 	}
 
-	bool checkWallCollision(std::vector<SDL_Rect> &walls);
+	bool checkWallCollision(std::vector<SDL_Rect> &walls, int x_offset, int y_offset);
 
 private:
 	SDL_Texture* texture;
 	SDL_Rect coords;
 	char direction = 'i';
+	char next_direction = 'n';
 	char collided = 'n';
-	int speed = 2;
+	int speed = 1;
 };
 
 #endif

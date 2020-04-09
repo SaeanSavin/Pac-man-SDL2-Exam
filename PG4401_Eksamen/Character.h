@@ -2,12 +2,13 @@
 #define _CHARACTER_H_
 
 #include <SDL.h>
+#include <vector>
 
 class Character
 {
 public:
 
-	virtual void movePlayer(const Uint8* keys, SDL_Surface* surface, int& SCREEN_WIDTH, int& SCREEN_HEIGHT) = 0;
+	virtual void movePlayer(const Uint8* keys, SDL_Surface* surface, int& SCREEN_WIDTH, int& SCREEN_HEIGHT, std::vector<SDL_Rect>& walls) = 0;
 
 	virtual SDL_Texture* getTexture() = 0;
 
