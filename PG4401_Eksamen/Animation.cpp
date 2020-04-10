@@ -10,9 +10,7 @@ Animation::Animation(SDL_Renderer* r, std::string path, int tick_rate) {
 		if (entry.path().has_extension()) {
 			frames.emplace_back(tm->loadTexture(&(entry.path().string())[0], r));
 		}
-
 	}
-
 }
 
 SDL_Texture* Animation::getFrame() {

@@ -54,10 +54,14 @@ int GameManager::play(std::string name) {
 	sdl_manager->ClearRender(renderer);
 
 	//create pacman
-	SDL_Surface *surface = sdl_manager->createSurface("../images/pacman.png", window, renderer);
-	SDL_Texture *drawable = texture_manager->draw(renderer, surface);
+	SDL_Surface *surface = sdl_manager->createSurface("../images/pacman/move/1.png", window, renderer);
+	SDL_Texture *player = texture_manager->draw(renderer, surface);
 
-	auto p1 = std::make_unique<Player>(drawable, renderer);
+	//Text 
+	SDL_Surface *textSurface = sdl_manager->createSurface("../images/text.png", window, renderer);
+	SDL_Texture *text = texture_manager->draw(renderer, textSurface);
+
+	auto p1 = std::make_unique<Player>(player, renderer);
 	p1->setPos(0, 0);
 	p1->setSize(16, 16);
 
@@ -67,6 +71,7 @@ int GameManager::play(std::string name) {
  
 	//Freeing the RGB surface
 	SDL_FreeSurface(surface);
+	SDL_FreeSurface(textSurface);
 
 	//Create Textures
 	SDL_Texture* pellet = texture_manager->loadTexture("../images/mapTiles/pellet.png", renderer);
@@ -79,7 +84,6 @@ int GameManager::play(std::string name) {
 	SDL_Texture* corner_bottom_right = texture_manager->loadTexture("../images/mapTiles/wall_corner_br_single.png", renderer);
 	SDL_Texture* corner_bottom_left = texture_manager->loadTexture("../images/mapTiles/wall_corner_bl_single.png", renderer);
 
-	//Det er nå 200 linjer (Deal or no deal with it)
 	bool isRunning = true;
 	const Uint8* keys = nullptr;
 	int numKeys;
@@ -163,18 +167,53 @@ int GameManager::play(std::string name) {
 				isRunning = false;
 			}
 		}
+		
+		//Prints out 8x8 from text.png
+		//S
+		SDL_Rect dest;
+		dest.w = 8;
+		dest.h = 8;
+		dest.x = 24;
+		dest.y = 8;
 
-		//Render text
-		/*
-		SDL_Texture *text = texture_manager->loadTexture("../images/text.png", renderer);
 		SDL_Rect textRect;
 		textRect.w = 16;
 		textRect.h = 16;
 		textRect.x = 0;
 		textRect.y = 0;
 
-		SDL_RenderCopy(renderer, text, nullptr, &textRect);
-		*/
+		//C
+		SDL_RenderCopy(renderer, text, &dest, &textRect);
+		textRect.x += 16;
+		dest.x = 16;
+		dest.y = 0;
+
+		//O
+		SDL_RenderCopy(renderer, text, &dest, &textRect);
+		textRect.x += 16;
+		dest.x = 112;
+		dest.y = 0;
+		
+		//R
+		SDL_RenderCopy(renderer, text, &dest, &textRect);
+		textRect.x += 16;
+		dest.x = 16;
+		dest.y = 8;
+
+		//E
+		SDL_RenderCopy(renderer, text, &dest, &textRect);
+		textRect.x += 16;
+		dest.x = 32;
+		dest.y = 0;
+
+		//Space
+		SDL_RenderCopy(renderer, text, &dest, &textRect);
+		textRect.x += 32;
+		dest.x = 0;
+		dest.y = 16;
+		
+		// 0
+		SDL_RenderCopy(renderer, text, &dest, &textRect);
 
 		//Keys input for movement
 		p1->movePlayer(keys, surface, SCREEN_WIDTH, SCREEN_HEIGHT, map, walls, pellets);
