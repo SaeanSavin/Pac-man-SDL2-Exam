@@ -7,13 +7,19 @@
 #include <vector>
 #include <SDL.h>
 
+#include "Animation.h"
+
 class Player : public Character
 {
 public:
-	Player(SDL_Texture* t);
-	Player(SDL_Texture* t, SDL_Rect c);
+	Player(SDL_Texture* t, SDL_Renderer* r);
+	Player(SDL_Texture* t, SDL_Rect c, SDL_Renderer* r);
 
 	void movePlayer(const Uint8 *keys, SDL_Surface *surface, int &SCREEN_WIDTH, int &SCREEN_HEIGHT, std::vector<std::vector<char>>& map, std::vector<SDL_Rect>& walls, std::vector<SDL_Rect>& pellets) override;
+
+	void animate(Animation a);
+
+	void renderTexture();
 
 	SDL_Texture* getTexture() override;
 
@@ -33,11 +39,17 @@ public:
 		return score;
 	}
 
+	void setMoveAnimation(std::shared_ptr<Animation> animation) {
+		move = animation;
+	}
+
 	bool checkWallCollision(std::vector<SDL_Rect> &walls, int x_offset, int y_offset);
 
 	bool checkPelletCollision(std::vector<SDL_Rect> &pellets, std::vector<std::vector<char>> &map);
 
 private:
+	SDL_Renderer* renderer;
+	std::shared_ptr<Animation> move;
 	SDL_Texture* texture;
 	SDL_Rect coords;
 	char direction = 'i';

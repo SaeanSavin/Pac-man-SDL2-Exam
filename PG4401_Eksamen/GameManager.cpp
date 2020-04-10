@@ -57,9 +57,13 @@ int GameManager::play(std::string name) {
 	SDL_Surface *surface = sdl_manager->createSurface("../images/pacman.png", window, renderer);
 	SDL_Texture *drawable = texture_manager->draw(renderer, surface);
 
-	auto p1 = std::make_unique<Player>(drawable);
+	auto p1 = std::make_unique<Player>(drawable, renderer);
 	p1->setPos(0, 0);
 	p1->setSize(16, 16);
+
+	//create pacman animations
+	auto pacman_move = std::make_shared<Animation>(renderer, "../images/Pacman/move", 12);
+	p1->setMoveAnimation(pacman_move);
  
 	//Freeing the RGB surface
 	SDL_FreeSurface(surface);
@@ -177,7 +181,7 @@ int GameManager::play(std::string name) {
 		//std::cout << p1->getScore() << std::endl;
 
 		//Prepare Renderer for a new frame
-		SDL_RenderCopy(renderer, p1->getTexture(), nullptr, p1->getCoords());
+		//SDL_RenderCopy(renderer, p1->getTexture(), nullptr, p1->getCoords());
 		
 		//render map
 		SDL_Rect mapRect;

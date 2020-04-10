@@ -1,14 +1,16 @@
 #include "Player.h"
 
-Player::Player(SDL_Texture* t) {
+Player::Player(SDL_Texture* t, SDL_Renderer* r) {
 	texture = t;
+	renderer = r;
 	coords.h = 0;
 	coords.w = 0;
 	coords.x = 0;
 	coords.y = 0;
 }
-Player::Player(SDL_Texture* t, SDL_Rect c) {
+Player::Player(SDL_Texture* t, SDL_Rect c, SDL_Renderer* r) {
 	texture = t;
+	renderer = r;
 	coords = c;
 }
 
@@ -116,24 +118,28 @@ void Player::movePlayer(const Uint8 *keys, SDL_Surface *surface, int &SCREEN_WID
 	case 'w':
 		if (!checkWallCollision(walls, 0, -1)) {
 			coords.y -= speed;
+			animate(*move);
 		}
 		collided = 'n';
 		break;
 	case 's':
 		if (!checkWallCollision(walls, 0, 1)) {
 			coords.y += speed;
+			animate(*move);
 		}
 		collided = 'n';
 		break;
 	case 'a':
 		if (!checkWallCollision(walls, -1, 0)) {
 			coords.x -= speed;
+			animate(*move);
 		}
 		collided = 'n';
 		break;
 	case 'd':
 		if (!checkWallCollision(walls, 1, 0)) {
 			coords.x += speed;
+			animate(*move);
 		}
 		collided = 'n';
 		break;
@@ -161,6 +167,14 @@ void Player::setSize(int h, int w) {
 	coords.w = w;
 }
 
+void Player::animate(Animation a) {
+	SDL_RenderCopy(renderer, a.getFrame(), nullptr, &coords);
+}
+
+void Player::renderTexture() {
+	SDL_RenderCopy(renderer, texture, nullptr, &coords);
+}
+
 bool Player::checkWallCollision(std::vector<SDL_Rect>& walls, int x_offset, int y_offset) {
 	int x = coords.x + x_offset;
 	int y = coords.y + y_offset;
@@ -169,6 +183,7 @@ bool Player::checkWallCollision(std::vector<SDL_Rect>& walls, int x_offset, int 
 			if (x + coords.w > wall.x && x < wall.x + wall.w) {
 				if (direction != 'i') {
 					collided = direction;
+					renderTexture();
 				}
 				return true;
 			}

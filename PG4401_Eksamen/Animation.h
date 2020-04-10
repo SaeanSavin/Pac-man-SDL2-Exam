@@ -3,11 +3,20 @@
 
 #include <SDL.h>
 
+#include <iostream>
+#include <filesystem>
+
+#include "Texture_Manager.h"
+
 class Animation {
 public:
-
+	Animation(SDL_Renderer *r, std::string path, int tick_rate);
+	SDL_Texture* getFrame();
 private:
-	int FPS;
+	int rate;
+	int length;
+	Uint32 startTime;
+	std::vector<SDL_Texture*> frames;
 };
 
 #endif
