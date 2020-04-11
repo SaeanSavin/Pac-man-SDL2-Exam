@@ -19,6 +19,8 @@ public:
 
 	void animate(Animation a);
 
+	void animateEx(Animation a, char direction);
+
 	void renderTexture();
 
 	SDL_Texture* getTexture() override;

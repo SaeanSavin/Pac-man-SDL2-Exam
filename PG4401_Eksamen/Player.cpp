@@ -118,21 +118,21 @@ void Player::movePlayer(const Uint8 *keys, SDL_Surface *surface, int &SCREEN_WID
 	case 'w':
 		if (!checkWallCollision(walls, 0, -1)) {
 			coords.y -= speed;
-			animate(*move);
+			animateEx(*move, 'w');
 		}
 		collided = 'n';
 		break;
 	case 's':
 		if (!checkWallCollision(walls, 0, 1)) {
 			coords.y += speed;
-			animate(*move);
+			animateEx(*move, 's');
 		}
 		collided = 'n';
 		break;
 	case 'a':
 		if (!checkWallCollision(walls, -1, 0)) {
 			coords.x -= speed;
-			animate(*move);
+			animateEx(*move, 'a');
 		}
 		collided = 'n';
 		break;
@@ -169,6 +169,22 @@ void Player::setSize(int h, int w) {
 
 void Player::animate(Animation a) {
 	SDL_RenderCopy(renderer, a.getFrame(), nullptr, &coords);
+}
+
+void Player::animateEx(Animation a, char direction) {
+	SDL_RendererFlip flipType = SDL_FLIP_NONE;
+	double rotation = 0;
+	if (direction == 'a') {
+		flipType = SDL_FLIP_HORIZONTAL;
+	}
+	else if (direction == 'w') {
+		flipType = SDL_FLIP_VERTICAL;
+		rotation = 270;
+	}
+	else if (direction == 's') {
+		rotation = 90;
+	}
+	SDL_RenderCopyEx(renderer, a.getFrame(), nullptr, &coords, rotation, NULL, flipType);
 }
 
 void Player::renderTexture() {
