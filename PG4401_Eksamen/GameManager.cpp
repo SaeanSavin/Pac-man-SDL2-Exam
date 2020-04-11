@@ -158,9 +158,11 @@ int GameManager::play(std::string name) {
 
 	SDL_AudioSpec wavSpec;
 	SDL_AudioDeviceID deviceID = SDL_OpenAudioDevice(NULL, 0, &wavSpec, NULL, 0);
+	Uint8* wavBuffer;
 
-	auto pacEat = std::make_shared<Sound>("../audio/eat.wav", &wavSpec, &deviceID);
+	auto pacEat = std::make_shared<Sound>("../audio/eat.wav", &wavSpec, &deviceID, wavBuffer);
 	pacEat->play();
+	SDL_PauseAudioDevice(deviceID, 0);
 
 	//Game Loop
 	while (isRunning) {
