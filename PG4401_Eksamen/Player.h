@@ -12,17 +12,30 @@
 class Player : public Character
 {
 public:
+	//constructors
 	Player(SDL_Texture* t, SDL_Renderer* r);
 	Player(SDL_Texture* t, SDL_Rect c, SDL_Renderer* r);
 
+	//movement
 	void movePlayer(const Uint8 *keys, SDL_Surface *surface, int &SCREEN_WIDTH, int &SCREEN_HEIGHT, std::vector<std::vector<char>>& map, std::vector<SDL_Rect>& walls, std::vector<SDL_Rect>& pellets) override;
+
+	//collision
+	bool checkWallCollision(std::vector<SDL_Rect>& walls, int x_offset, int y_offset);
+
+	bool checkPelletCollision(std::vector<SDL_Rect>& pellets, std::vector<std::vector<char>>& map);
+
+	//animation 
+	void renderTexture();
 
 	void animate(Animation a);
 
 	void animateEx(Animation a, char direction);
 
-	void renderTexture();
+	void setMoveAnimation(std::shared_ptr<Animation> animation) {
+		move = animation;
+	}
 
+	//getters and setters
 	SDL_Texture* getTexture() override;
 
 	SDL_Rect* getCoords() override;
@@ -40,14 +53,6 @@ public:
 	int getScore() {
 		return score;
 	}
-
-	void setMoveAnimation(std::shared_ptr<Animation> animation) {
-		move = animation;
-	}
-
-	bool checkWallCollision(std::vector<SDL_Rect> &walls, int x_offset, int y_offset);
-
-	bool checkPelletCollision(std::vector<SDL_Rect> &pellets, std::vector<std::vector<char>> &map);
 
 private:
 	SDL_Renderer* renderer;

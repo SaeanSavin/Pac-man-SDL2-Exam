@@ -4,6 +4,7 @@
 
 #include "GameManager.h"
 #include "SDL_Manager.h"
+#include "Sound.h"
 
 //Window size
 int SCREEN_WIDTH = 0;
@@ -14,7 +15,7 @@ void GameManager::setFramerate(const int FPS) {
 
 	Uint32 frameStart;
 	int frameTime;
-
+	
 	frameStart = SDL_GetTicks();
 
 	frameTime = SDL_GetTicks() - frameStart;
@@ -27,6 +28,8 @@ void GameManager::setFramerate(const int FPS) {
 GameManager::GameManager() {}
 
 int GameManager::play(std::string name) {
+
+	SDL_Init(SDL_INIT_AUDIO);
 
 	auto sdl_manager = std::make_unique<SDL_Manager>();
 	auto texture_manager = std::make_unique<Texture_Manager>();
@@ -150,6 +153,14 @@ int GameManager::play(std::string name) {
 	for (size_t i = 0; i < walls.size(); i++) {
 		std::cout << walls[i].x << ", " << walls[i].y << std::endl;
 	}
+
+	//audio setup
+
+	SDL_AudioSpec wavSpec;
+	SDL_AudioDeviceID deviceID = SDL_OpenAudioDevice(NULL, 0, &wavSpec, NULL, 0);
+
+	auto pacEat = std::make_shared<Sound>("../audio/eat.wav", &wavSpec, &deviceID);
+	pacEat->play();
 
 	//Game Loop
 	while (isRunning) {
@@ -280,6 +291,8 @@ int GameManager::play(std::string name) {
 	}
 
 	//Program exit 
+	SDL_CloseAudioDevice(deviceID);
+
 	SDL_DestroyWindow(window);
 	IMG_Quit();
 	SDL_Quit();
