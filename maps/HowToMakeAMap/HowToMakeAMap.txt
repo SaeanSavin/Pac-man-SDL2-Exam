@@ -13,5 +13,3 @@ Space = Air
 P = Power Ups
 - = Out of bounds
 S = Start Player
-
-More mayde added later...

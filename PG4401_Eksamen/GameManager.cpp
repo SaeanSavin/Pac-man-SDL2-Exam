@@ -61,7 +61,7 @@ int GameManager::play(std::string name) {
 	SDL_Texture *player = texture_manager->draw(renderer, surface);
 
 	//Text 
-	SDL_Surface *textSurface = sdl_manager->createSurface("../images/text.png", window, renderer);
+	SDL_Surface *textSurface = sdl_manager->createSurface("../images/TextTiles/text.png", window, renderer);
 	SDL_Texture *text = texture_manager->draw(renderer, textSurface);
 
 	auto p1 = std::make_unique<Player>(player, renderer);
@@ -149,13 +149,7 @@ int GameManager::play(std::string name) {
 		mapRect.y += 16;
 	}
 
-	//Debug
-	for (size_t i = 0; i < walls.size(); i++) {
-		std::cout << walls[i].x << ", " << walls[i].y << std::endl;
-	}
-
 	//audio setup
-
 	SDL_AudioSpec wavSpec;
 	SDL_AudioDeviceID deviceID = SDL_OpenAudioDevice(NULL, 0, &wavSpec, NULL, 0);
 	Uint8* wavBuffer;
@@ -182,59 +176,26 @@ int GameManager::play(std::string name) {
 		}
 		
 		//Prints out 8x8 from text.png
-		//S
-		SDL_Rect dest;
-		dest.w = 8;
-		dest.h = 8;
-		dest.x = 24;
-		dest.y = 8;
+		SDL_Rect text_src;
+		text_src.w = 8;
+		text_src.h = 8;
+		text_src.x = 0;
+		text_src.y = 0;
 
-		SDL_Rect textRect;
-		textRect.w = 16;
-		textRect.h = 16;
-		textRect.x = 0;
-		textRect.y = 0;
+		SDL_Rect text_dst;
+		text_dst.w = 16;
+		text_dst.h = 16;
+		text_dst.x = 0;
+		text_dst.y = 25;
 
-		//C
-		SDL_RenderCopy(renderer, text, &dest, &textRect);
-		textRect.x += 16;
-		dest.x = 16;
-		dest.y = 0;
-
-		//O
-		SDL_RenderCopy(renderer, text, &dest, &textRect);
-		textRect.x += 16;
-		dest.x = 112;
-		dest.y = 0;
-		
-		//R
-		SDL_RenderCopy(renderer, text, &dest, &textRect);
-		textRect.x += 16;
-		dest.x = 16;
-		dest.y = 8;
-
-		//E
-		SDL_RenderCopy(renderer, text, &dest, &textRect);
-		textRect.x += 16;
-		dest.x = 32;
-		dest.y = 0;
-
-		//Space
-		SDL_RenderCopy(renderer, text, &dest, &textRect);
-		textRect.x += 32;
-		dest.x = 0;
-		dest.y = 16;
-		
-		// 0
-		SDL_RenderCopy(renderer, text, &dest, &textRect);
+		//Write in caps only
+		sdl_manager->printFromTiles("SCORE ", renderer, text, text_dst, text_src);
+		sdl_manager->printPlayerScore(p1->getScore(), renderer, text, text_dst, text_src);
 
 		//Keys input for movement
 		p1->movePlayer(keys, surface, SCREEN_WIDTH, SCREEN_HEIGHT, map, walls, pellets);
-		//std::cout << p1->getScore() << std::endl;
+		std::cout << p1->getScore() << std::endl;
 
-		//Prepare Renderer for a new frame
-		//SDL_RenderCopy(renderer, p1->getTexture(), nullptr, p1->getCoords());
-		
 		//render map
 		SDL_Rect mapRect;
 		mapRect.w = 16;
@@ -324,5 +285,3 @@ void GameManager::loadMap(std::string map, std::vector<std::vector<char>> &mapVe
 
 	fIn.close();
 }
-
-void GameManager::drawMap(std::vector<std::vector<char>> &mapVector) {}

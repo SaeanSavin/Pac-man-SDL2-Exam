@@ -56,3 +56,50 @@ void SDL_Manager::SetRenderColor(SDL_Renderer *renderer, int r, int g, int b, in
 void SDL_Manager::ClearRender(SDL_Renderer *renderer) {
 	SDL_RenderClear(renderer);
 }
+
+void SDL_Manager::printFromTiles(std::string name, SDL_Renderer *r, SDL_Texture *t, SDL_Rect &dst, SDL_Rect &src) {
+
+	for (size_t i = 0; i < name.size(); i++) {
+		
+		if (name[i] == ' ') {
+			dst.x += 16;
+			continue;
+		}
+		
+		int x = name[i] - 65;
+		int y = 0;
+
+		//Goto next line in text.png
+		if (x > 14) {
+			x -= 15;
+			y = 1;
+		}
+
+		src.x = x * 8;
+		src.y = y * 8;
+		dst.x += 16;
+
+		SDL_RenderCopy(r, t, &src, &dst);
+	}
+}
+
+void SDL_Manager::printPlayerScore(int score, SDL_Renderer *r, SDL_Texture *t, SDL_Rect &dst, SDL_Rect &src) {
+
+
+	int x = score;
+	src.y = 2 * 8;
+	for (size_t i = 0; i <= score / 10; i++) {
+		
+		if (x > 9) {
+			x = 1;
+			src.x = x * 8;
+			SDL_RenderCopy(r, t, &src, &dst);
+			dst.x += 16;
+			continue;
+		}
+		
+		src.x = x * 8;
+		SDL_RenderCopy(r, t, &src, &dst);
+		dst.x += 16;
+	}
+}
