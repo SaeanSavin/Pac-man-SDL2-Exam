@@ -71,7 +71,15 @@ int GameManager::play(std::string name) {
 	//create pacman animations
 	auto pacman_move = std::make_shared<Animation>(renderer, "../images/Pacman/move", 12);
 	p1->setMoveAnimation(pacman_move);
- 
+
+	//CREATE GHOSTS
+	surface = sdl_manager->createSurface("../images/Ghosts/Shadow/shadow.png", window, renderer);
+	SDL_Texture* shadow = texture_manager->draw(renderer, surface);
+
+	//auto shadow = std::make_unique<Ghost>(shadow, renderer);
+	//shadow->setPos(0, 0);
+	//shadow->setSize(16, 16);
+
 	//Freeing the RGB surface
 	SDL_FreeSurface(surface);
 	SDL_FreeSurface(textSurface);

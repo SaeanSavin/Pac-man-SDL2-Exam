@@ -3,6 +3,7 @@
 
 #include <vector>
 #include "Player.h"
+#include "Ghost.h"
 
 class GameManager {
 
