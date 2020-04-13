@@ -87,19 +87,19 @@ void SDL_Manager::printPlayerScore(int score, SDL_Renderer *r, SDL_Texture *t, S
 
 
 	int x = score;
+	int length = 1;
 	src.y = 2 * 8;
-	for (size_t i = 0; i <= score / 10; i++) {
-		
-		if (x > 9) {
-			x = 1;
-			src.x = x * 8;
-			SDL_RenderCopy(r, t, &src, &dst);
-			dst.x += 16;
-			continue;
-		}
-		
-		src.x = x * 8;
+
+	while (x / 10 != 0 && x % 10 != 0) {
+
+		int rest = x / 10;
+		src.x = rest * 8;
 		SDL_RenderCopy(r, t, &src, &dst);
+		x -= 10;
 		dst.x += 16;
 	}
+
+	src.x = x * 8;
+	SDL_RenderCopy(r, t, &src, &dst);
+	dst.x += 16;
 }
