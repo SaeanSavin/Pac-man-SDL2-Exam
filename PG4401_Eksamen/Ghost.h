@@ -17,7 +17,7 @@ public:
 	Ghost(SDL_Texture* t, SDL_Rect c, SDL_Renderer* r);
 
 	//movement
-	void movePlayer(const Uint8* keys, SDL_Surface* surface, int& SCREEN_WIDTH, int& SCREEN_HEIGHT, std::vector<std::vector<char>>& map, std::vector<SDL_Rect>& walls, std::vector<SDL_Rect>& pellets) override;
+	void move(const Uint8* keys, SDL_Surface* surface, int& SCREEN_WIDTH, int& SCREEN_HEIGHT, std::vector<std::vector<char>>& map, std::vector<SDL_Rect>& walls, std::vector<SDL_Rect>& pellets) override;
 
 	//collision
 	bool checkWallCollision(std::vector<SDL_Rect>& walls, int x_offset, int y_offset);
@@ -29,8 +29,8 @@ public:
 
 	void animateEx(Animation a, char direction);
 
-	void setMoveAnimation(std::shared_ptr<Animation> animation) {
-		move = animation;
+	void setAnimation(std::string name, std::shared_ptr<Animation> animation) {
+		animations[name] = animation;
 	}
 
 	//getters and setters
@@ -51,7 +51,7 @@ public:
 
 private:
 	SDL_Renderer* renderer;
-	std::shared_ptr<Animation> move;
+	std::map<std::string, std::shared_ptr<Animation>> animations;
 	SDL_Texture* texture;
 	SDL_Rect coords;
 	char direction = 'i';

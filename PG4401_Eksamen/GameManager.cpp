@@ -28,6 +28,22 @@ GameManager::GameManager() {}
 
 int GameManager::play(std::string name) {
 
+
+	/*   MAP SETUP   */
+
+	std::cout << "loading map..." << std::endl;
+
+	std::vector<std::vector<char>> map{};
+	loadMap(name, map);
+
+	SCREEN_HEIGHT = map.size() * 16 + 100;
+	SCREEN_WIDTH = map[0].size() * 16;
+
+
+	/*   SDL SETUP   */
+
+	std::cout << "initializing SDL..." << std::endl;
+
 	SDL_Init(SDL_INIT_AUDIO);
 
 	auto sdl_manager = std::make_unique<SDL_Manager>();
@@ -35,35 +51,32 @@ int GameManager::play(std::string name) {
 	
 	const int FPS = 60;
 
-	std::vector<std::vector<char>> map{};
-	loadMap(name, map);
-
-	//prints map to console (FOR DEBUGGING)
-	for (auto& row : map) {
-		for (auto& c : row) {
-			std::cout << c;
-		}
-		std::cout << std::endl;
-	}
-	SCREEN_HEIGHT = map.size() * 16 + 100;
-	SCREEN_WIDTH = map[0].size() * 16;
-
-	SDL_Window *window = sdl_manager->createWindow("Pac-man", SCREEN_WIDTH, SCREEN_HEIGHT);
-	SDL_Renderer *renderer = sdl_manager->createRenderer(window, -1);
+	SDL_Window* window = sdl_manager->createWindow("Pac-man", SCREEN_WIDTH, SCREEN_HEIGHT);
+	SDL_Renderer* renderer = sdl_manager->createRenderer(window, -1);
 
 	//draws background
 	sdl_manager->SetRenderColor(renderer, 0, 0, 0, 255);
 	sdl_manager->ClearRender(renderer);
 
-	//Create Text 
+
+	/*   HUD SETUP   */
+
+	std::cout << "building HUD..." << std::endl;
+
+	//Text 
 	SDL_Surface *textSurface = sdl_manager->createSurface("../images/TextTiles/text.png", window, renderer);
 	SDL_Texture *text = texture_manager->draw(renderer, textSurface);
 
-	//Create HP 
+	//HP 
 	SDL_Surface *hpSurface = sdl_manager->createSurface("../images/Pacman/move/2.png", window, renderer);
 	SDL_Texture *hpTexture = texture_manager->draw(renderer, hpSurface);
 
-	//create pacman
+
+	/* CHARACTER SETUP  */
+
+	std::cout << "building characters..." << std::endl;
+
+	//pacman
 	SDL_Surface *surface = sdl_manager->createSurface("../images/pacman/move/1.png", window, renderer);
 	SDL_Texture *player = texture_manager->draw(renderer, surface);
 
@@ -71,20 +84,51 @@ int GameManager::play(std::string name) {
 	p1->setPos(0, 0);
 	p1->setSize(16, 16);
 
-	//create pacman animations
 	auto pacman_move = std::make_shared<Animation>(renderer, "../images/Pacman/move", 12);
-	p1->setMoveAnimation(pacman_move);
+	p1->setAnimation("move", pacman_move);
 
-	//CREATE GHOSTS
+	//shadow
 	SDL_Texture *shadow_texture = texture_manager->loadTexture("../images/Ghosts/Shadow/shadow.png", renderer);
 
 	auto shadow = std::make_unique<Ghost>(shadow_texture, renderer);
-	shadow->setPos(0, 0);
+	shadow->setPos(1, 0);
 	shadow->setSize(16, 16);
+
+	auto shadow_up = std::make_shared<Animation>(renderer, "../images/Ghosts/Shadow/move/up", 12);
+	auto shadow_down = std::make_shared<Animation>(renderer, "../images/Ghosts/Shadow/move/down", 12);
+	auto shadow_left = std::make_shared<Animation>(renderer, "../images/Ghosts/Shadow/move/left", 12);
+	auto shadow_right = std::make_shared<Animation>(renderer, "../images/Ghosts/Shadow/move/right", 12);
+
+	shadow->setAnimation("up", shadow_up);
+	shadow->setAnimation("down", shadow_down);
+	shadow->setAnimation("left", shadow_left);
+	shadow->setAnimation("right", shadow_right);
+
+	//clyde
+	SDL_Texture* pokey_texture = texture_manager->loadTexture("../images/Ghosts/Shadow/shadow.png", renderer);
+
+	auto pokey = std::make_unique<Ghost>(pokey_texture, renderer);
+	pokey->setPos(2, 0);
+	pokey->setSize(16, 16);
+
+	auto pokey_up = std::make_shared<Animation>(renderer, "../images/Ghosts/Pokey/move/up", 12);
+	auto pokey_down = std::make_shared<Animation>(renderer, "../images/Ghosts/Pokey/move/down", 12);
+	auto pokey_left = std::make_shared<Animation>(renderer, "../images/Ghosts/Pokey/move/left", 12);
+	auto pokey_right = std::make_shared<Animation>(renderer, "../images/Ghosts/Pokey/move/right", 12);
+
+	pokey->setAnimation("up", pokey_up);
+	pokey->setAnimation("down", pokey_down);
+	pokey->setAnimation("left", pokey_left);
+	pokey->setAnimation("right", pokey_right);
 
 	//Freeing the RGB surface
 	SDL_FreeSurface(surface);
 	SDL_FreeSurface(textSurface);
+
+
+	/*   TEXTURE SETUP   */
+	
+	std::cout << "loading assets..." << std::endl;
 
 	//Create Textures
 	SDL_Texture* pellet = texture_manager->loadTexture("../images/mapTiles/pellet.png", renderer);
@@ -97,19 +141,20 @@ int GameManager::play(std::string name) {
 	SDL_Texture* corner_bottom_right = texture_manager->loadTexture("../images/mapTiles/wall_corner_br_single.png", renderer);
 	SDL_Texture* corner_bottom_left = texture_manager->loadTexture("../images/mapTiles/wall_corner_bl_single.png", renderer);
 
+
+	/*    VARIABLES   */
+
 	bool isRunning = true;
+	
+	//input
 	const Uint8* keys = nullptr;
 	int numKeys;
 	keys = SDL_GetKeyboardState(&numKeys);
 	SDL_Event evt;
 
-	//movement variables
-	char direction = 'i';
-
 	//Wall vector
 	//Use to check collison with walls
 	std::vector<SDL_Rect> walls{};
-	
 
 	//pellet vector
 	//Use to check collision on pellets
@@ -156,7 +201,11 @@ int GameManager::play(std::string name) {
 		mapRect.y += 16;
 	}
 
-	//audio setup
+
+	/*   AUDIO SETUP   */
+
+	std::cout << "preparing audio..." << std::endl;
+
 	SDL_AudioSpec wavSpec;
 	Uint32 wavLength;
 	Uint8* wavBuffer;
@@ -168,36 +217,35 @@ int GameManager::play(std::string name) {
 	int success = SDL_QueueAudio(deviceID, wavBuffer, wavLength);
 	SDL_PauseAudioDevice(deviceID, 0);
 
-	SDL_Delay(8000);
+	//SDL_Delay(8000);
 
-	//Game Loop
+
+	/*   GAME LOOP   */
+
 	while (isRunning) {
 
 		setFramerate(FPS);
 
-		//Checks if Escape is press or X in the window
+		//Close on ESC
 		if (SDL_PollEvent(&evt)) {
 			if (evt.type == SDL_KEYDOWN) {
 				if (evt.key.keysym.sym == SDLK_ESCAPE) {
 					isRunning = false;
 				}
 			}
-			else if (evt.type == SDL_QUIT) {
-				isRunning = false;
-			}
 		}
 		
-		//Prints out 8x8 from text.png
+		//Print score
 		SDL_Rect text_src = sdl_manager->createRect(8, 8, 0, 0);
 		SDL_Rect text_dst = sdl_manager->createRect(16,16, 0, 25);
 
-		//Write in caps only
 		sdl_manager->printFromTiles("SCORE ", renderer, text, text_dst, text_src);
 		sdl_manager->printPlayerScore(p1->getScore(), renderer, text, text_dst, text_src);
 
-		//Keys input for movement
-		p1->movePlayer(keys, surface, SCREEN_WIDTH, SCREEN_HEIGHT, map, walls, pellets);
-		std::cout << p1->getScore() << std::endl;
+		//Move characters
+		p1->move(keys, surface, SCREEN_WIDTH, SCREEN_HEIGHT, map, walls, pellets);
+		shadow->move(keys, surface, SCREEN_WIDTH, SCREEN_HEIGHT, map, walls, pellets);
+		pokey->move(keys, surface, SCREEN_WIDTH, SCREEN_HEIGHT, map, walls, pellets);
 
 		//render map
 		SDL_Rect mapRect = sdl_manager->createRect(16, 16, 0, 50);
@@ -239,6 +287,14 @@ int GameManager::play(std::string name) {
 				case 'S':
 				case 's':
 					p1->setPos(mapRect.x, mapRect.y);
+					c = ' ';
+					break;
+				case 'G':
+					shadow->setPos(mapRect.x, mapRect.y);
+					c = ' ';
+					break;
+				case 'H':
+					pokey->setPos(mapRect.x, mapRect.y);
 					c = ' ';
 					break;
 				}

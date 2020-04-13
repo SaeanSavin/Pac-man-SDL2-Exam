@@ -13,7 +13,7 @@ Player::Player(SDL_Texture* t, SDL_Rect c, SDL_Renderer* r)
 {}
 
 //movement function
-void Player::movePlayer(const Uint8 *keys, SDL_Surface *surface, int &SCREEN_WIDTH, int &SCREEN_HEIGHT, std::vector<std::vector<char>>& map, std::vector<SDL_Rect>& walls, std::vector<SDL_Rect>& pellets) {
+void Player::move(const Uint8 *keys, SDL_Surface *surface, int &SCREEN_WIDTH, int &SCREEN_HEIGHT, std::vector<std::vector<char>>& map, std::vector<SDL_Rect>& walls, std::vector<SDL_Rect>& pellets) {
 
 	checkWallCollision(walls, 0, 0);
 
@@ -87,28 +87,24 @@ void Player::movePlayer(const Uint8 *keys, SDL_Surface *surface, int &SCREEN_WID
 		}
 	}
 
-	//if out of bounds, set to idle
+	//if out of bounds, re-enter on the opposite side
 	else {
 
 		//Make sure image dont move out of bounds
-		if (coords.x > SCREEN_WIDTH - coords.w) {
-			coords.x = SCREEN_WIDTH - coords.w;
-			direction = 'i';
+		if (coords.x > SCREEN_WIDTH && direction == 'd') {
+			coords.x = -coords.w;
 		}
 
-		if (coords.y > SCREEN_HEIGHT - coords.h) {
-			coords.y = SCREEN_HEIGHT - coords.h;
-			direction = 'i';
+		if (coords.y > SCREEN_HEIGHT && direction == 's') {
+			coords.y = -coords.h;
 		}
 
-		if (coords.x < 0) {
-			coords.x = 0;
-			direction = 'i';
+		if (coords.x < -coords.w && direction == 'a') {
+			coords.x = SCREEN_WIDTH;
 		}
 
-		if (coords.y < 0) {
-			coords.y = 0;
-			direction = 'i';
+		if (coords.y < -coords.h && direction == 'w') {
+			coords.y = SCREEN_HEIGHT;
 		}
 	}
 	//decide movement
@@ -116,28 +112,28 @@ void Player::movePlayer(const Uint8 *keys, SDL_Surface *surface, int &SCREEN_WID
 	case 'w':
 		if (!checkWallCollision(walls, 0, -1)) {
 			coords.y -= speed;
-			animateEx(*move, 'w');
+			animateEx(*animations["move"], 'w');
 		}
 		collided = 'n';
 		break;
 	case 's':
 		if (!checkWallCollision(walls, 0, 1)) {
 			coords.y += speed;
-			animateEx(*move, 's');
+			animateEx(*animations["move"], 's');
 		}
 		collided = 'n';
 		break;
 	case 'a':
 		if (!checkWallCollision(walls, -1, 0)) {
 			coords.x -= speed;
-			animateEx(*move, 'a');
+			animateEx(*animations["move"], 'a');
 		}
 		collided = 'n';
 		break;
 	case 'd':
 		if (!checkWallCollision(walls, 1, 0)) {
 			coords.x += speed;
-			animate(*move);
+			animate(*animations["move"]);
 		}
 		collided = 'n';
 		break;
@@ -212,7 +208,7 @@ bool Player::checkPelletCollision(std::vector<SDL_Rect>& pellets, std::vector<st
 
 	for (auto& pellet : pellets) {
 		if (coords.y == pellet.y) {
-			if (coords.x == pellet.x) {
+			if (coords.x == pellet.x && map[(pellet.y - 50) / 16][pellet.x / 16] == 'x') {
 				//std::cout << "ate a pellet" << std::endl;
 				map[(pellet.y - 50) / 16][pellet.x / 16] = '-';
 				score+= 10;
