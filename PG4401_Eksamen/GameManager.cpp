@@ -73,12 +73,11 @@ int GameManager::play(std::string name) {
 	p1->setMoveAnimation(pacman_move);
 
 	//CREATE GHOSTS
-	surface = sdl_manager->createSurface("../images/Ghosts/Shadow/shadow.png", window, renderer);
-	SDL_Texture* shadow = texture_manager->draw(renderer, surface);
+	SDL_Texture *shadow_texture = texture_manager->loadTexture("../images/Ghosts/Shadow/shadow.png", renderer);
 
-	//auto shadow = std::make_unique<Ghost>(shadow, renderer);
-	//shadow->setPos(0, 0);
-	//shadow->setSize(16, 16);
+	auto shadow = std::make_unique<Ghost>(shadow_texture, renderer);
+	shadow->setPos(0, 0);
+	shadow->setSize(16, 16);
 
 	//Freeing the RGB surface
 	SDL_FreeSurface(surface);
@@ -159,12 +158,17 @@ int GameManager::play(std::string name) {
 
 	//audio setup
 	SDL_AudioSpec wavSpec;
-	SDL_AudioDeviceID deviceID = SDL_OpenAudioDevice(NULL, 0, &wavSpec, NULL, 0);
+	Uint32 wavLength;
 	Uint8* wavBuffer;
 
-	auto pacEat = std::make_shared<Sound>("../audio/eat.wav", &wavSpec, &deviceID, wavBuffer);
-	pacEat->play();
+	SDL_LoadWAV("../audio/intro.wav", &wavSpec, &wavBuffer, &wavLength);
+
+	SDL_AudioDeviceID deviceID = SDL_OpenAudioDevice(NULL, 0, &wavSpec, NULL, 0);
+
+	int success = SDL_QueueAudio(deviceID, wavBuffer, wavLength);
 	SDL_PauseAudioDevice(deviceID, 0);
+
+	SDL_Delay(8000);
 
 	//Game Loop
 	while (isRunning) {

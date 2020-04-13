@@ -15,7 +15,6 @@ Ghost::Ghost(SDL_Texture* t, SDL_Rect c, SDL_Renderer* r) {
 }
 
 void Ghost::movePlayer(const Uint8* keys, SDL_Surface* surface, int& SCREEN_WIDTH, int& SCREEN_HEIGHT, std::vector<std::vector<char>>& map, std::vector<SDL_Rect>& walls, std::vector<SDL_Rect>& pellets) {
-
 }
 
 SDL_Texture* Ghost::getTexture() {

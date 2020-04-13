@@ -1,18 +1,16 @@
 #include "Player.h"
 
-Player::Player(SDL_Texture* t, SDL_Renderer* r) {
-	texture = t;
-	renderer = r;
+Player::Player(SDL_Texture* t, SDL_Renderer* r)
+:texture(t), renderer(r)
+{
 	coords.h = 0;
 	coords.w = 0;
 	coords.x = 0;
 	coords.y = 0;
 }
-Player::Player(SDL_Texture* t, SDL_Rect c, SDL_Renderer* r) {
-	texture = t;
-	renderer = r;
-	coords = c;
-}
+Player::Player(SDL_Texture* t, SDL_Rect c, SDL_Renderer* r)
+	:texture(t), renderer(r), coords(c)
+{}
 
 //movement function
 void Player::movePlayer(const Uint8 *keys, SDL_Surface *surface, int &SCREEN_WIDTH, int &SCREEN_HEIGHT, std::vector<std::vector<char>>& map, std::vector<SDL_Rect>& walls, std::vector<SDL_Rect>& pellets) {
@@ -143,6 +141,8 @@ void Player::movePlayer(const Uint8 *keys, SDL_Surface *surface, int &SCREEN_WID
 		}
 		collided = 'n';
 		break;
+	case ' ':
+		renderTexture();
 	default:
 		break;
 	}

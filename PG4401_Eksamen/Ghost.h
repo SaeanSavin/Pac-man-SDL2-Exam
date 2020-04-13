@@ -9,7 +9,7 @@
 
 #include "Animation.h"
 
-class Ghost : Character
+class Ghost : public Character
 {
 public:
 	//constructors
@@ -21,8 +21,6 @@ public:
 
 	//collision
 	bool checkWallCollision(std::vector<SDL_Rect>& walls, int x_offset, int y_offset);
-
-	//bool checkPelletCollision(std::vector<SDL_Rect>& pellets, std::vector<std::vector<char>>& map);
 
 	//animation 
 	void renderTexture();
@@ -60,7 +58,6 @@ private:
 	char next_direction = 'n';
 	char collided = 'n';
 	int speed = 1;
-	int score = 0;
 };
 
 #endif _GHOST_H_

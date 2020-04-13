@@ -59,7 +59,7 @@ private:
 	std::shared_ptr<Animation> move;
 	SDL_Texture* texture;
 	SDL_Rect coords;
-	char direction = 'i';
+	char direction = ' ';
 	char next_direction = 'n';
 	char collided = 'n';
 	int speed = 1;
