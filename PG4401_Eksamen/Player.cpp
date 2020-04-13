@@ -215,7 +215,7 @@ bool Player::checkPelletCollision(std::vector<SDL_Rect>& pellets, std::vector<st
 			if (coords.x == pellet.x) {
 				//std::cout << "ate a pellet" << std::endl;
 				map[(pellet.y - 50) / 16][pellet.x / 16] = '-';
-				score++;
+				score+= 10;
 				return true;
 			}
 		}

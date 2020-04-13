@@ -4,6 +4,7 @@
 #include <vector>
 #include "Player.h"
 #include "Ghost.h"
+#include "Sound.h"
 
 class GameManager {
 
