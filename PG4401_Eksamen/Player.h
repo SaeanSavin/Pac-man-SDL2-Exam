@@ -53,6 +53,10 @@ public:
 	int getScore() {
 		return score;
 	}
+	int getHP() {
+		return hp;
+	}
+
 
 private:
 	SDL_Renderer* renderer;
@@ -64,6 +68,7 @@ private:
 	char collided = 'n';
 	int speed = 1;
 	int score = 0;
+	int hp = 3;
 };
 
 #endif

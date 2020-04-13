@@ -14,6 +14,7 @@ public:
 	SDL_Window *createWindow(const char *c, const int w, const int h);
 	SDL_Renderer *createRenderer(SDL_Window *w, int index);
 	SDL_Surface *createSurface(const char *c, SDL_Window *window, SDL_Renderer *renderer);
+	SDL_Rect createRect(int w, int h, int x, int y);
 
 	void SetRenderColor(SDL_Renderer *renderer, int r, int g, int b, int a);
 	void ClearRender(SDL_Renderer *renderer);

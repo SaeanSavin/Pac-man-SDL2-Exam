@@ -49,6 +49,17 @@ SDL_Surface *SDL_Manager::createSurface(const char *c, SDL_Window *window, SDL_R
 	return surface;
 }
 
+SDL_Rect SDL_Manager::createRect(int w, int h, int x, int y) {
+	
+	SDL_Rect rect;
+	rect.w = w;
+	rect.h = h;
+	rect.x = x;
+	rect.y = y;
+	
+	return rect;
+}
+
 void SDL_Manager::SetRenderColor(SDL_Renderer *renderer, int r, int g, int b, int a) {
 	SDL_SetRenderDrawColor(renderer, r, g, b, 255);
 }
@@ -81,25 +92,28 @@ void SDL_Manager::printFromTiles(std::string name, SDL_Renderer *r, SDL_Texture 
 
 		SDL_RenderCopy(r, t, &src, &dst);
 	}
+	dst.x += 16;
 }
 
 void SDL_Manager::printPlayerScore(int score, SDL_Renderer *r, SDL_Texture *t, SDL_Rect &dst, SDL_Rect &src) {
-
-
-	int x = score;
-	int length = 1;
+	
 	src.y = 2 * 8;
+	int digit = score / 10;
+	std::vector<int> digits{};
 
-	while (x / 10 != 0 && x % 10 != 0) {
-
-		int rest = x / 10;
-		src.x = rest * 8;
+	while (score > 9) {
+		
+		digits.emplace_back(digit % 10);
+		printPlayerScore(digit, r, t, dst, src);
+		break;
+	}
+	
+	for (size_t i = 0; i < digits.size(); i++) {
+		src.x = digits[i] * 8;
 		SDL_RenderCopy(r, t, &src, &dst);
-		x -= 10;
 		dst.x += 16;
 	}
 
-	src.x = x * 8;
+	src.x = 0;
 	SDL_RenderCopy(r, t, &src, &dst);
-	dst.x += 16;
 }

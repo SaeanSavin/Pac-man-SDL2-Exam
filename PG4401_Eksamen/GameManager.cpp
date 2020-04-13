@@ -4,11 +4,10 @@
 
 #include "GameManager.h"
 #include "SDL_Manager.h"
-#include "Sound.h"
 
 //Window size
-int SCREEN_WIDTH = 0;
-int SCREEN_HEIGHT = 0;
+int SCREEN_WIDTH{};
+int SCREEN_HEIGHT{};
 
 void GameManager::setFramerate(const int FPS) {
 	const int frameDelay = 1000 / FPS;
@@ -56,13 +55,17 @@ int GameManager::play(std::string name) {
 	sdl_manager->SetRenderColor(renderer, 0, 0, 0, 255);
 	sdl_manager->ClearRender(renderer);
 
+	//Create Text 
+	SDL_Surface *textSurface = sdl_manager->createSurface("../images/TextTiles/text.png", window, renderer);
+	SDL_Texture *text = texture_manager->draw(renderer, textSurface);
+
+	//Create HP 
+	SDL_Surface *hpSurface = sdl_manager->createSurface("../images/Pacman/move/2.png", window, renderer);
+	SDL_Texture *hpTexture = texture_manager->draw(renderer, hpSurface);
+
 	//create pacman
 	SDL_Surface *surface = sdl_manager->createSurface("../images/pacman/move/1.png", window, renderer);
 	SDL_Texture *player = texture_manager->draw(renderer, surface);
-
-	//Text 
-	SDL_Surface *textSurface = sdl_manager->createSurface("../images/TextTiles/text.png", window, renderer);
-	SDL_Texture *text = texture_manager->draw(renderer, textSurface);
 
 	auto p1 = std::make_unique<Player>(player, renderer);
 	p1->setPos(0, 0);
@@ -107,16 +110,13 @@ int GameManager::play(std::string name) {
 	//Wall vector
 	//Use to check collison with walls
 	std::vector<SDL_Rect> walls{};
-	SDL_Rect mapRect;
+	
 
 	//pellet vector
 	//Use to check collision on pellets
 	std::vector<SDL_Rect> pellets{};
 
-	mapRect.w = 16;
-	mapRect.h = 16;
-	mapRect.x = 0;
-	mapRect.y = 50;
+	SDL_Rect mapRect = sdl_manager->createRect(16, 16, 0, 50);
 
 	for (auto &row : map) {
 		for (auto &c : row) {
@@ -184,17 +184,8 @@ int GameManager::play(std::string name) {
 		}
 		
 		//Prints out 8x8 from text.png
-		SDL_Rect text_src;
-		text_src.w = 8;
-		text_src.h = 8;
-		text_src.x = 0;
-		text_src.y = 0;
-
-		SDL_Rect text_dst;
-		text_dst.w = 16;
-		text_dst.h = 16;
-		text_dst.x = 0;
-		text_dst.y = 25;
+		SDL_Rect text_src = sdl_manager->createRect(8, 8, 0, 0);
+		SDL_Rect text_dst = sdl_manager->createRect(16,16, 0, 25);
 
 		//Write in caps only
 		sdl_manager->printFromTiles("SCORE ", renderer, text, text_dst, text_src);
@@ -205,11 +196,7 @@ int GameManager::play(std::string name) {
 		std::cout << p1->getScore() << std::endl;
 
 		//render map
-		SDL_Rect mapRect;
-		mapRect.w = 16;
-		mapRect.h = 16;
-		mapRect.x = 0;
-		mapRect.y = 50;
+		SDL_Rect mapRect = sdl_manager->createRect(16, 16, 0, 50);
 
 		for (auto& row : map) {
 			for (auto& c : row) {
