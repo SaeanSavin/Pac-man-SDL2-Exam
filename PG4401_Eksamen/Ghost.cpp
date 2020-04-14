@@ -14,76 +14,53 @@ Ghost::Ghost(SDL_Texture* t, SDL_Rect c, SDL_Renderer* r) {
 	coords = c;
 }
 
-void Ghost::move(const Uint8* keys, SDL_Surface* surface, int& SCREEN_WIDTH, int& SCREEN_HEIGHT, std::vector<std::vector<char>>& map, std::vector<SDL_Rect>& walls, std::vector<SDL_Rect>& pellets) {
-	checkWallCollision(walls, 0, 0);
+void Ghost::move(const Uint8* keys, SDL_Surface* surface, int& SCREEN_WIDTH, int& SCREEN_HEIGHT, std::vector<std::vector<char>>& map, std::vector<SDL_Rect>& walls, std::pair<int, int> target) {
+	//checkWallCollision(walls, 0, 0);
 
 	SDL_PumpEvents();
 
-	//check if we can go to the next direction from user input
-	if (next_direction != 'n' && next_direction != direction) {
-		if (next_direction == 'w' && collided != 'w') {
-			if (!checkWallCollision(walls, 0, -1)) {
-				direction = 'w';
-			}
+
+	//calculate direction based on target
+
+	double closestDir = 0;
+
+	std::cout << "distance from pacman: " << std::sqrt(std::pow(std::abs(target.first - coords.x), 2) + std::pow(std::abs(target.second - coords.y), 2)) << std::endl;
+	//check up
+	if (direction != 's') {
+		if (!checkWallCollision(walls, 0, -16)) {
+			closestDir = std::sqrt(std::pow(std::abs(target.first - coords.x), 2) + std::pow(std::abs(target.second - coords.y - 16), 2));
+			direction = 'w';
 		}
 
-		if (next_direction == 's' && collided != 's') {
-			if (!checkWallCollision(walls, 0, 1)) {
-				direction = 's';
-			}
-		}
+	}
 
-		if (next_direction == 'a' && collided != 'a') {
-			if (!checkWallCollision(walls, -1, 0)) {
-				direction = 'a';
-			}
-		}
-
-		if (next_direction == 'd' && collided != 'd') {
-			if (!checkWallCollision(walls, 1, 0)) {
+	//check right
+	if (direction != 'a') {
+		if (!checkWallCollision(walls, 16, 0)) {
+			if (closestDir > std::sqrt(std::pow(std::abs(target.first - coords.x + 16), 2) + std::pow(std::abs(target.second - coords.y), 2)) || closestDir == 0) {
+				closestDir = std::sqrt(std::pow(std::abs(target.first - coords.x + 16), 2) + std::pow(std::abs(target.second - coords.y), 2));
 				direction = 'd';
 			}
 		}
 	}
 
-	//if idle, check input
-	if (keys[SDL_SCANCODE_W] && collided != 'w') {
-		if (!checkWallCollision(walls, 0, -1)) {
-			direction = 'w';
-			next_direction = 'n';
-		}
-		else {
-			next_direction = 'w';
-		}
-	}
-
-	if (keys[SDL_SCANCODE_S] && collided != 's') {
-		if (!checkWallCollision(walls, 0, 1)) {
-			direction = 's';
-			next_direction = 'n';
-		}
-		else {
-			next_direction = 's';
+	//check down
+	if (direction != 'w'){
+		if (!checkWallCollision(walls, 0, 16)) {
+			if (closestDir > std::sqrt(std::pow(std::abs(target.first - coords.x), 2) + std::pow(std::abs(target.second - coords.y + 16), 2)) || closestDir == 0) {
+				closestDir = std::sqrt(std::pow(std::abs(target.first - coords.x), 2) + std::pow(std::abs(target.second - coords.y + 16), 2));
+				direction = 's';
+			}
 		}
 	}
 
-	if (keys[SDL_SCANCODE_A] && collided != 'a') {
-		if (!checkWallCollision(walls, -1, 0)) {
-			direction = 'a';
-			next_direction = 'n';
-		}
-		else {
-			next_direction = 'a';
-		}
-	}
-
-	if (keys[SDL_SCANCODE_D] && collided != 'd') {
-		if (!checkWallCollision(walls, 1, 0)) {
-			direction = 'd';
-			next_direction = 'n';
-		}
-		else {
-			next_direction = 'd';
+	//check left
+	if (direction != 'd') {
+		if (!checkWallCollision(walls, -16, 0)) {
+			if (closestDir > std::sqrt(std::pow(std::abs(target.first - coords.x - 16), 2) + std::pow(std::abs(target.second - coords.y), 2)) || closestDir == 0) {
+				closestDir = std::sqrt(std::pow(std::abs(target.first - coords.x - 16), 2) + std::pow(std::abs(target.second - coords.y), 2));
+				direction = 'a';
+			}
 		}
 	}
 

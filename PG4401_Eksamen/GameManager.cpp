@@ -26,6 +26,13 @@ void GameManager::setFramerate(const int FPS) {
 
 GameManager::GameManager() {}
 
+enum TargetType {
+	AGRESSIVE,
+	SUPPORTIVE,
+	AMBUSH,
+	EVASIVE
+};
+
 int GameManager::play(std::string name) {
 
 
@@ -105,7 +112,7 @@ int GameManager::play(std::string name) {
 	shadow->setAnimation("right", shadow_right);
 
 	//clyde
-	SDL_Texture* pokey_texture = texture_manager->loadTexture("../images/Ghosts/Shadow/shadow.png", renderer);
+	SDL_Texture* pokey_texture = texture_manager->loadTexture("../images/Ghosts/Pokey/pokey.png", renderer);
 
 	auto pokey = std::make_unique<Ghost>(pokey_texture, renderer);
 	pokey->setPos(2, 0);
@@ -252,8 +259,8 @@ int GameManager::play(std::string name) {
 
 		//Move characters
 		p1->move(keys, surface, SCREEN_WIDTH, SCREEN_HEIGHT, map, walls, pellets);
-		shadow->move(keys, surface, SCREEN_WIDTH, SCREEN_HEIGHT, map, walls, pellets);
-		pokey->move(keys, surface, SCREEN_WIDTH, SCREEN_HEIGHT, map, walls, pellets);
+		shadow->move(keys, surface, SCREEN_WIDTH, SCREEN_HEIGHT, map, walls, getTarget(AGRESSIVE, p1->getCoords()));
+		pokey->move(keys, surface, SCREEN_WIDTH, SCREEN_HEIGHT, map, walls, getTarget(AGRESSIVE, p1->getCoords()));
 
 		//render map
 		SDL_Rect mapRect = sdl_manager->createRect(16, 16, 0, 50);
@@ -351,4 +358,14 @@ void GameManager::loadMap(std::string map, std::vector<std::vector<char>> &mapVe
 	}
 
 	fIn.close();
+}
+
+std::pair<int, int> GameManager::getTarget(TargetType mode, SDL_Rect *enemy) {
+	std::pair<int, int> target;
+	switch (mode) {
+	case AGRESSIVE:
+		target.first = enemy->x;
+		target.second = enemy->y;
+		return target;
+	}
 }

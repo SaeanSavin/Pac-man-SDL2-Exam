@@ -15,6 +15,5 @@ Animation::Animation(SDL_Renderer* r, std::string path, int tick_rate) {
 
 SDL_Texture* Animation::getFrame() {
 	int frame = ((SDL_GetTicks() - startTime) * rate / 1000) % length;
-	std::cout << "rendering frame :" << frame << std::endl;
 	return frames[frame];
 }

@@ -15,6 +15,7 @@ public:
 
 private:
 	void setFramerate(const int FPS);
+	std::pair<int, int> getTarget(enum TargetType, SDL_Rect *enemy);
 
 };
 #endif
