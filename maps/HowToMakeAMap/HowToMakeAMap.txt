@@ -13,3 +13,4 @@ Space = Air
 P = Power Ups
 - = Out of bounds
 S = Start Player
+C = Cherry

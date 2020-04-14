@@ -59,13 +59,17 @@ public:
 
 
 private:
-	SDL_Renderer* renderer;
+	
 	std::map<std::string, std::shared_ptr<Animation>> animations;
+	
+	SDL_Renderer* renderer;
 	SDL_Texture* texture;
 	SDL_Rect coords;
+	
 	char direction = ' ';
 	char next_direction = 'n';
 	char collided = 'n';
+	
 	int speed = 1;
 	int score = 0;
 	int hp = 3;

@@ -1,6 +1,6 @@
 #include <fstream>
 #include <sstream>
-#include <string>
+//#include <string>
 
 #include "GameManager.h"
 #include "SDL_Manager.h"
@@ -131,15 +131,16 @@ int GameManager::play(std::string name) {
 	std::cout << "loading assets..." << std::endl;
 
 	//Create Textures
-	SDL_Texture* pellet = texture_manager->loadTexture("../images/mapTiles/pellet.png", renderer);
-	SDL_Texture* wall_bottom = texture_manager->loadTexture("../images/mapTiles/wall_bottom_single.png", renderer);
-	SDL_Texture* wall_top = texture_manager->loadTexture("../images/mapTiles/wall_top_single.png", renderer);
-	SDL_Texture* wall_left = texture_manager->loadTexture("../images/mapTiles/wall_left_single.png", renderer);
-	SDL_Texture* wall_right = texture_manager->loadTexture("../images/mapTiles/wall_right_single.png", renderer);
-	SDL_Texture* corner_top_right = texture_manager->loadTexture("../images/mapTiles/wall_corner_tr_single.png", renderer);
-	SDL_Texture* corner_top_left = texture_manager->loadTexture("../images/mapTiles/wall_corner_tl_single.png", renderer);
-	SDL_Texture* corner_bottom_right = texture_manager->loadTexture("../images/mapTiles/wall_corner_br_single.png", renderer);
-	SDL_Texture* corner_bottom_left = texture_manager->loadTexture("../images/mapTiles/wall_corner_bl_single.png", renderer);
+	SDL_Texture *pellet = texture_manager->loadTexture("../images/mapTiles/pellet.png", renderer);
+	SDL_Texture *cherry = texture_manager->loadTexture("../images/mapTiles/cherry.png", renderer);
+	SDL_Texture *wall_bottom = texture_manager->loadTexture("../images/mapTiles/wall_bottom_single.png", renderer);
+	SDL_Texture *wall_top = texture_manager->loadTexture("../images/mapTiles/wall_top_single.png", renderer);
+	SDL_Texture *wall_left = texture_manager->loadTexture("../images/mapTiles/wall_left_single.png", renderer);
+	SDL_Texture *wall_right = texture_manager->loadTexture("../images/mapTiles/wall_right_single.png", renderer);
+	SDL_Texture *corner_top_right = texture_manager->loadTexture("../images/mapTiles/wall_corner_tr_single.png", renderer);
+	SDL_Texture *corner_top_left = texture_manager->loadTexture("../images/mapTiles/wall_corner_tl_single.png", renderer);
+	SDL_Texture *corner_bottom_right = texture_manager->loadTexture("../images/mapTiles/wall_corner_br_single.png", renderer);
+	SDL_Texture *corner_bottom_left = texture_manager->loadTexture("../images/mapTiles/wall_corner_bl_single.png", renderer);
 
 
 	/*    VARIABLES   */
@@ -220,7 +221,7 @@ int GameManager::play(std::string name) {
 	//SDL_Delay(8000);
 
 
-	/*   GAME LOOP   */
+	/*   GAME LOOP START  */
 
 	while (isRunning) {
 
@@ -239,8 +240,15 @@ int GameManager::play(std::string name) {
 		SDL_Rect text_src = sdl_manager->createRect(8, 8, 0, 0);
 		SDL_Rect text_dst = sdl_manager->createRect(16,16, 0, 25);
 
-		sdl_manager->printFromTiles("SCORE ", renderer, text, text_dst, text_src);
-		sdl_manager->printPlayerScore(p1->getScore(), renderer, text, text_dst, text_src);
+		texture_manager->printFromTiles("SCORE ", renderer, text, text_dst, text_src);
+		texture_manager->printPlayerScore(p1->getScore(), renderer, text, text_dst, text_src);
+
+		SDL_Rect hp_dst = sdl_manager->createRect(16, 16, 0, SCREEN_HEIGHT - 25);
+		texture_manager->printFromTiles("LIVES ", renderer, text, hp_dst, text_src);
+		for (size_t i = 0; i < p1->getHP(); i++) {
+			SDL_RenderCopy(renderer, hpTexture, nullptr, &hp_dst);
+			hp_dst.x += 20;
+		}
 
 		//Move characters
 		p1->move(keys, surface, SCREEN_WIDTH, SCREEN_HEIGHT, map, walls, pellets);
@@ -256,6 +264,9 @@ int GameManager::play(std::string name) {
 				switch (c) {
 				case 'x':
 					SDL_RenderCopy(renderer, pellet, nullptr, &mapRect);
+					break;
+				case 'C':
+					SDL_RenderCopy(renderer, cherry, nullptr, &mapRect);
 					break;
 				case '1':
 					SDL_RenderCopy(renderer, corner_bottom_left, nullptr, &mapRect);
@@ -285,7 +296,6 @@ int GameManager::play(std::string name) {
 				case '-':
 					break;
 				case 'S':
-				case 's':
 					p1->setPos(mapRect.x, mapRect.y);
 					c = ' ';
 					break;
@@ -307,6 +317,8 @@ int GameManager::play(std::string name) {
 		SDL_RenderPresent(renderer);
 		SDL_RenderClear(renderer);
 	}
+
+	/*   GAME LOOP END   */
 
 	//Program exit 
 	SDL_CloseAudioDevice(deviceID);
