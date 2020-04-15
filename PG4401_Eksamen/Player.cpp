@@ -209,7 +209,7 @@ bool Player::checkPelletCollision(std::vector<SDL_Rect>& pellets, std::vector<st
 	for (auto& pellet : pellets) {
 		if (coords.y == pellet.y) {
 			if (coords.x == pellet.x && map[(pellet.y - 50) / 16][pellet.x / 16] == 'x') {
-				map[(pellet.y - 50) / 16][pellet.x / 16] = '-';
+				map[(pellet.y - 50) / 16][pellet.x / 16] = ' ';
 				score+= 10;
 				return true;
 			}

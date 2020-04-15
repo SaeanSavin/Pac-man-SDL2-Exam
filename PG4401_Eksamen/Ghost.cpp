@@ -30,10 +30,12 @@ void Ghost::move(const Uint8 *keys, SDL_Surface *surface, int &SCREEN_WIDTH, int
 		if (direction != 'd' && collided != 'a' && !checkWallCollision(walls, -1, 0)) {
 			closestDir = std::pow(abs((coords.x - 16) - target.first),2) + std::pow(abs((coords.y) - target.second),2);
 			newDirection = 'a';
+			collided = 'n';
 			std::cout << "set direction to a, collided: " << collided << std::endl;
 		}
 
 		if (direction != 'w' && collided != 's' && !checkWallCollision(walls, 0, 1)) {
+			collided = 'n';
 			newDir = std::pow(abs((coords.x) - target.first), 2) + std::pow(abs((coords.y + 16) - target.second), 2);
 			if (newDir <= closestDir) {
 				closestDir = newDir;
@@ -42,6 +44,7 @@ void Ghost::move(const Uint8 *keys, SDL_Surface *surface, int &SCREEN_WIDTH, int
 		}
 
 		if (direction != 'a' && collided != 'd' && !checkWallCollision(walls, 1, 0)) {
+			collided = 'n';
 			newDir = std::pow(abs((coords.x + 16) - target.first), 2) + std::pow(abs((coords.y) - target.second), 2);
 			if (newDir <= closestDir) {
 				closestDir = newDir;
@@ -51,6 +54,7 @@ void Ghost::move(const Uint8 *keys, SDL_Surface *surface, int &SCREEN_WIDTH, int
 		}
 
 		if (direction != 's' && collided != 'w' && !checkWallCollision(walls, 0, -1)) {
+			collided = 'n';
 			newDir = std::pow(abs((coords.x) - target.first), 2) + std::pow(abs((coords.y + 16) - target.second), 2);
 			if (newDir <= closestDir) {
 				closestDir = newDir;
