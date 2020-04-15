@@ -28,7 +28,7 @@ void GameManager::setFramerate(const int FPS) {
 
 GameManager::GameManager() {}
 
-enum TargetType {
+enum class TargetType {
 	AGRESSIVE,
 	SUPPORTIVE,
 	AMBUSH,
@@ -273,7 +273,28 @@ int GameManager::play(std::string name) {
 
 		SDL_Rect hp_dst = sdl_manager->createRect(16, 16, 0, SCREEN_HEIGHT - 25);
 		texture_manager->printFromTiles("LIVES ", renderer, text, hp_dst, text_src);
-		for (size_t i = 0; i < p1->getHP(); i++) {
+		
+		int pCoordsLeft = p1->getCoords()->x;
+		int pCoordsRight = p1->getCoords()->x + p1->getCoords()->w;
+		int pCoordsUp = p1->getCoords()->y;
+		int pCoordsDown = p1->getCoords()->y + p1->getCoords()->h;
+
+		int gCoordsLeft = pokey->getCoords()->x;
+		int gCoordsRight = pokey->getCoords()->x + pokey->getCoords()->w;
+		int gCoordsUp = pokey->getCoords()->y;
+		int gCoordsDown = pokey->getCoords()->y + pokey->getCoords()->h;
+
+		if (pCoordsLeft < gCoordsRight && pCoordsRight > gCoordsLeft) {
+			if (pCoordsUp < gCoordsDown && pCoordsDown > gCoordsUp) {
+				p1->hitByGhost();
+				SDL_Delay(2000);
+				if (p1->getHP() <= 0) {
+					isRunning = false;
+				}
+			}
+		}
+
+		for (int i = 0; i < p1->getHP(); i++) {
 			SDL_RenderCopy(renderer, hpTexture, nullptr, &hp_dst);
 			hp_dst.x += 20;
 		}
@@ -281,7 +302,7 @@ int GameManager::play(std::string name) {
 		//Move characters
 		p1->move(keys, surface, SCREEN_WIDTH, SCREEN_HEIGHT, map, walls, pellets);
 		//shadow->move(keys, surface, SCREEN_WIDTH, SCREEN_HEIGHT, map, walls, walkable, getTarget(AGRESSIVE, p1->getCoords()));
-		pokey->move(keys, surface, SCREEN_WIDTH, SCREEN_HEIGHT, map, walls, walkable, getTarget(AGRESSIVE, p1->getCoords()));
+		pokey->move(surface, SCREEN_WIDTH, SCREEN_HEIGHT, map, walls, walkable, getTarget(TargetType::AGRESSIVE, p1->getCoords()));
 
 		//render map
 		SDL_Rect mapRect = sdl_manager->createRect(16, 16, 0, 50);
@@ -325,6 +346,7 @@ int GameManager::play(std::string name) {
 					break;
 				case 'S':
 					p1->setPos(mapRect.x, mapRect.y);
+					p1->setSpawnPos(mapRect.x, mapRect.y);
 					c = ' ';
 					break;
 				case 'G':
@@ -384,7 +406,7 @@ void GameManager::loadMap(std::string map, std::vector<std::vector<char>> &mapVe
 std::pair<int, int> GameManager::getTarget(TargetType mode, SDL_Rect *enemy) {
 	std::pair<int, int> target;
 	switch (mode) {
-	case AGRESSIVE:
+		case TargetType::AGRESSIVE:
 		target.first = enemy->x;
 		target.second = enemy->y;
 		return target;

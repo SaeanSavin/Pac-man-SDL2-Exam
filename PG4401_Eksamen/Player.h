@@ -42,6 +42,8 @@ public:
 
 	void setPos(int x, int y) override;
 
+	void setSpawnPos(int x, int y);
+
 	void setSize(int h, int w) override;
 
 	char getDirection() {
@@ -57,6 +59,15 @@ public:
 		return hp;
 	}
 
+	SDL_Rect getSpawnPos() {
+		return startCoords;
+	}
+
+	void hitByGhost() {
+		hp--;
+		coords.x = startCoords.x;
+		coords.y = startCoords.y;
+	}
 
 private:
 	
@@ -65,6 +76,7 @@ private:
 	SDL_Renderer* renderer;
 	SDL_Texture* texture;
 	SDL_Rect coords;
+	SDL_Rect startCoords;
 	
 	char direction = ' ';
 	char next_direction = 'n';

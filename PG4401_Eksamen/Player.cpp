@@ -158,6 +158,11 @@ void Player::setPos(int x, int y) {
 	coords.y = y;
 }
 
+void Player::setSpawnPos(int x, int y) {
+	startCoords.x = x;
+	startCoords.y = y;
+}
+
 void Player::setSize(int h, int w) {
 	coords.h = h;
 	coords.w = w;
