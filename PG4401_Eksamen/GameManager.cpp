@@ -37,6 +37,7 @@ enum TargetType {
 
 int GameManager::play(std::string name) {
 
+	const int FPS = 60;
 
 	/*   MAP SETUP   */
 
@@ -61,8 +62,6 @@ int GameManager::play(std::string name) {
 	auto sdl_manager = std::make_unique<SDL_Manager>();
 	auto texture_manager = std::make_unique<Texture_Manager>();
 	
-	const int FPS = 60;
-
 	SDL_Window* window = sdl_manager->createWindow("Pac-man", SCREEN_WIDTH, SCREEN_HEIGHT);
 	SDL_Renderer* renderer = sdl_manager->createRenderer(window, -1);
 
