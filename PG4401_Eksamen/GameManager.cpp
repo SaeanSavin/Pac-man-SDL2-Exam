@@ -8,6 +8,8 @@
 //Window size
 int SCREEN_WIDTH{};
 int SCREEN_HEIGHT{};
+int GAME_OFFSET_Y{};
+int GAME_OFFSET_X{};
 
 void GameManager::setFramerate(const int FPS) {
 	const int frameDelay = 1000 / FPS;
@@ -43,8 +45,11 @@ int GameManager::play(std::string name) {
 	std::vector<std::vector<char>> map{};
 	loadMap(name, map);
 
-	SCREEN_HEIGHT = map.size() * 16 + 100;
-	SCREEN_WIDTH = map[0].size() * 16;
+	GAME_OFFSET_Y = 100;
+	GAME_OFFSET_X = 0;
+
+	SCREEN_HEIGHT = map.size() * 16 + GAME_OFFSET_Y;
+	SCREEN_WIDTH = map[0].size() * 16 + GAME_OFFSET_X;
 
 
 	/*   SDL SETUP   */
@@ -168,6 +173,9 @@ int GameManager::play(std::string name) {
 	//Use to check collision on pellets
 	std::vector<SDL_Rect> pellets{};
 
+	//walkable vector
+	std::vector<SDL_Rect> walkable{};
+
 	SDL_Rect mapRect = sdl_manager->createRect(16, 16, 0, 50);
 
 	for (auto &row : map) {
@@ -200,6 +208,14 @@ int GameManager::play(std::string name) {
 					break;
 				case 'x':
 					pellets.emplace_back(mapRect);
+					walkable.emplace_back(mapRect);
+					break;
+				case ' ': 
+					walkable.emplace_back(mapRect);
+					break;
+				case 'G': case 'H': case 'O': case 'S': case 'P': case 'C':
+					walkable.emplace_back(mapRect);
+					break;
 				default:
 					break;
 			}
@@ -259,8 +275,8 @@ int GameManager::play(std::string name) {
 
 		//Move characters
 		p1->move(keys, surface, SCREEN_WIDTH, SCREEN_HEIGHT, map, walls, pellets);
-		shadow->move(keys, surface, SCREEN_WIDTH, SCREEN_HEIGHT, map, walls, getTarget(AGRESSIVE, p1->getCoords()));
-		pokey->move(keys, surface, SCREEN_WIDTH, SCREEN_HEIGHT, map, walls, getTarget(AGRESSIVE, p1->getCoords()));
+		//shadow->move(keys, surface, SCREEN_WIDTH, SCREEN_HEIGHT, map, walls, walkable, getTarget(AGRESSIVE, p1->getCoords()));
+		pokey->move(keys, surface, SCREEN_WIDTH, SCREEN_HEIGHT, map, walls, walkable, getTarget(AGRESSIVE, p1->getCoords()));
 
 		//render map
 		SDL_Rect mapRect = sdl_manager->createRect(16, 16, 0, 50);

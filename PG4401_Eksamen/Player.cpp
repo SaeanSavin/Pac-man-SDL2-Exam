@@ -46,7 +46,7 @@ void Player::move(const Uint8 *keys, SDL_Surface *surface, int &SCREEN_WIDTH, in
 		}
 	}
 
-	//if idle, check input
+	//check input
 	if (keys[SDL_SCANCODE_W] && collided != 'w') {
 		if (!checkWallCollision(walls, 0, -1)) {
 			direction = 'w';

@@ -17,7 +17,9 @@ public:
 	Ghost(SDL_Texture* t, SDL_Rect c, SDL_Renderer* r);
 
 	//movement
-	void move(const Uint8* keys, SDL_Surface* surface, int& SCREEN_WIDTH, int& SCREEN_HEIGHT, std::vector<std::vector<char>>& map, std::vector<SDL_Rect>& walls, std::pair<int, int> target);
+	void move(const Uint8* keys, SDL_Surface* surface, int& SCREEN_WIDTH, int& SCREEN_HEIGHT, std::vector<std::vector<char>>& map, std::vector<SDL_Rect>& walls, std::vector<SDL_Rect>& walkable, std::pair<int, int> target);
+
+	bool checkTileEntered(std::vector<SDL_Rect>& map);
 
 	//collision
 	bool checkWallCollision(std::vector<SDL_Rect>& walls, int x_offset, int y_offset);
@@ -56,6 +58,7 @@ private:
 	SDL_Texture* texture;
 	SDL_Rect coords;
 	char direction = 'i';
+	char next_direction = 'n';
 	char collided = 'n';
 	int speed = 1;
 };

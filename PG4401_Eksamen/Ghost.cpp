@@ -14,7 +14,7 @@ Ghost::Ghost(SDL_Texture* t, SDL_Rect c, SDL_Renderer* r) {
 	coords = c;
 }
 
-void Ghost::move(const Uint8* keys, SDL_Surface* surface, int& SCREEN_WIDTH, int& SCREEN_HEIGHT, std::vector<std::vector<char>>& map, std::vector<SDL_Rect>& walls, std::pair<int, int> target) {
+void Ghost::move(const Uint8 *keys, SDL_Surface *surface, int &SCREEN_WIDTH, int &SCREEN_HEIGHT, std::vector<std::vector<char>> &map, std::vector<SDL_Rect> &walls, std::vector<SDL_Rect> &walkable, std::pair<int, int> target) {
 	//checkWallCollision(walls, 0, 0);
 
 	SDL_PumpEvents();
@@ -22,46 +22,48 @@ void Ghost::move(const Uint8* keys, SDL_Surface* surface, int& SCREEN_WIDTH, int
 
 	//calculate direction based on target
 
-	double closestDir = 0;
+	if (checkTileEntered(walkable)) {
 
-	std::cout << "distance from pacman: " << std::sqrt(std::pow(std::abs(target.first - coords.x), 2) + std::pow(std::abs(target.second - coords.y), 2)) << std::endl;
-	//check up
-	if (direction != 's') {
-		if (!checkWallCollision(walls, 0, -16)) {
-			closestDir = std::sqrt(std::pow(std::abs(target.first - coords.x), 2) + std::pow(std::abs(target.second - coords.y - 16), 2));
-			direction = 'w';
+		double closestDir = 0;
+		int newDir = 0;
+		char newDirection = ' ';
+		if (collided != 'a' && !checkWallCollision(walls, -1, 0)) {
+			closestDir = std::pow(abs((coords.x - 16) - target.first),2) + std::pow(abs((coords.y) - target.second),2);
+			newDirection = 'a';
+			std::cout << "set direction to a, collided: " << collided << std::endl;
 		}
 
-	}
-
-	//check right
-	if (direction != 'a') {
-		if (!checkWallCollision(walls, 16, 0)) {
-			if (closestDir > std::sqrt(std::pow(std::abs(target.first - coords.x + 16), 2) + std::pow(std::abs(target.second - coords.y), 2)) || closestDir == 0) {
-				closestDir = std::sqrt(std::pow(std::abs(target.first - coords.x + 16), 2) + std::pow(std::abs(target.second - coords.y), 2));
-				direction = 'd';
+		if (collided != 's' && !checkWallCollision(walls, 0, 1)) {
+			newDir = std::pow(abs((coords.x) - target.first), 2) + std::pow(abs((coords.y + 16) - target.second), 2);
+			if (newDir <= closestDir) {
+				closestDir = newDir;
+				newDirection = 's';
 			}
 		}
-	}
 
-	//check down
-	if (direction != 'w'){
-		if (!checkWallCollision(walls, 0, 16)) {
-			if (closestDir > std::sqrt(std::pow(std::abs(target.first - coords.x), 2) + std::pow(std::abs(target.second - coords.y + 16), 2)) || closestDir == 0) {
-				closestDir = std::sqrt(std::pow(std::abs(target.first - coords.x), 2) + std::pow(std::abs(target.second - coords.y + 16), 2));
-				direction = 's';
+		if (collided != 'd' && !checkWallCollision(walls, 1, 0)) {
+			newDir = std::pow(abs((coords.x + 16) - target.first), 2) + std::pow(abs((coords.y) - target.second), 2);
+			if (newDir <= closestDir) {
+				closestDir = newDir;
+				newDirection = 'd';
+				std::cout << "set direction to d" << std::endl;
 			}
 		}
-	}
 
-	//check left
-	if (direction != 'd') {
-		if (!checkWallCollision(walls, -16, 0)) {
-			if (closestDir > std::sqrt(std::pow(std::abs(target.first - coords.x - 16), 2) + std::pow(std::abs(target.second - coords.y), 2)) || closestDir == 0) {
-				closestDir = std::sqrt(std::pow(std::abs(target.first - coords.x - 16), 2) + std::pow(std::abs(target.second - coords.y), 2));
-				direction = 'a';
+		if (collided != 'w' && !checkWallCollision(walls, 0, -1)) {
+			newDir = std::pow(abs((coords.x) - target.first), 2) + std::pow(abs((coords.y + 16) - target.second), 2);
+			if (newDir <= closestDir) {
+				closestDir = newDir;
+				newDirection = 'w';
 			}
 		}
+		direction = newDirection;
+
+		std::cout << "chose: " << newDirection
+			<< ", because left was " << std::pow(abs((coords.x - 16) - target.first), 2) + std::pow(abs((coords.y) - target.second), 2)
+			<< ", and right was: " << std::pow(abs((coords.x + 16) - target.first), 2) + std::pow(abs((coords.y) - target.second), 2);
+		
+		std::cout << "closest: " << closestDir << std::endl;
 	}
 
 	//if out of bounds, re-enter on the opposite side
@@ -121,6 +123,16 @@ void Ghost::move(const Uint8* keys, SDL_Surface* surface, int& SCREEN_WIDTH, int
 	}
 }
 
+bool Ghost::checkTileEntered(std::vector<SDL_Rect>& map) {
+
+	for (auto& mapTile : map) {
+		if (coords.y == mapTile.y && coords.x == mapTile.x) {
+			return true;
+		}
+	}
+	return false;
+}
+
 SDL_Texture* Ghost::getTexture() {
 	return texture;
 }
@@ -173,6 +185,7 @@ bool Ghost::checkWallCollision(std::vector<SDL_Rect>& walls, int x_offset, int y
 					collided = direction;
 					renderTexture();
 				}
+				std::cout << "collided" << std::endl;
 				return true;
 			}
 		}
