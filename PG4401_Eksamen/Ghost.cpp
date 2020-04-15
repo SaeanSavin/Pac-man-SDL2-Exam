@@ -24,28 +24,36 @@ void Ghost::move(const Uint8 *keys, SDL_Surface *surface, int &SCREEN_WIDTH, int
 
 	if (checkTileEntered(walkable)) {
 
-		double closestDir = 0;
-		int newDir = 0;
-		char newDirection = direction;
-		if (direction != 'd' && collided != 'a' && !checkWallCollision(walls, -1, 0)) {
-			closestDir = std::pow(abs((coords.x - 16) - target.first),2) + std::pow(abs((coords.y) - target.second),2);
-			newDirection = 'a';
-			collided = 'n';
-			std::cout << "set direction to a, collided: " << collided << std::endl;
+		if (isHome(walkable, map)) {
+			target.first = coords.x;
+			target.second = 0;
 		}
 
-		if (direction != 'w' && collided != 's' && !checkWallCollision(walls, 0, 1)) {
-			collided = 'n';
-			newDir = std::pow(abs((coords.x) - target.first), 2) + std::pow(abs((coords.y + 16) - target.second), 2);
+		//1: hvilke retninger er tilgjengelige (ikke vegger)
+		//2: hvilke(n) retning(er) er raskest
+		//3: hvilken retning er mest prioritert
+		//4: sett retningen
+
+		double closestDir = SCREEN_WIDTH > SCREEN_HEIGHT ? SCREEN_WIDTH * 2 : SCREEN_HEIGHT * 2;
+		double newDir = 0;
+		char newDirection = direction;
+
+		if (direction != 'd' && !checkWallCollision(walls, -1, 0)) {
+			closestDir = std::sqrt(std::pow(abs((coords.x - 16) - target.first),2) + std::pow(abs((coords.y) - target.second),2));
+			newDirection = 'a';
+			std::cout << "set direction to a, collided: " << collided << std::endl;
+		} 
+
+		if (direction != 'w' && !checkWallCollision(walls, 0, 1)) {
+			newDir = std::sqrt(std::pow(abs((coords.x) - target.first), 2) + std::pow(abs((coords.y + 16) - target.second), 2));
 			if (newDir <= closestDir) {
 				closestDir = newDir;
 				newDirection = 's';
 			}
 		}
 
-		if (direction != 'a' && collided != 'd' && !checkWallCollision(walls, 1, 0)) {
-			collided = 'n';
-			newDir = std::pow(abs((coords.x + 16) - target.first), 2) + std::pow(abs((coords.y) - target.second), 2);
+		if (direction != 'a' && !checkWallCollision(walls, 1, 0)) {
+			newDir = std::sqrt(std::pow(abs((coords.x + 16) - target.first), 2) + std::pow(abs((coords.y) - target.second), 2));
 			if (newDir <= closestDir) {
 				closestDir = newDir;
 				newDirection = 'd';
@@ -53,19 +61,22 @@ void Ghost::move(const Uint8 *keys, SDL_Surface *surface, int &SCREEN_WIDTH, int
 			}
 		}
 
-		if (direction != 's' && collided != 'w' && !checkWallCollision(walls, 0, -1)) {
-			collided = 'n';
-			newDir = std::pow(abs((coords.x) - target.first), 2) + std::pow(abs((coords.y + 16) - target.second), 2);
+		if (direction != 's' && !checkWallCollision(walls, 0, -1)) {
+			newDir = std::sqrt(std::pow(abs((coords.x) - target.first), 2) + std::pow(abs((coords.y - 16) - target.second), 2));
 			if (newDir <= closestDir) {
 				closestDir = newDir;
 				newDirection = 'w';
 			}
 		}
-		direction = newDirection;
 
-		std::cout << "chose: " << newDirection
-			<< ", because left was " << std::pow(abs((coords.x - 16) - target.first), 2) + std::pow(abs((coords.y) - target.second), 2)
-			<< ", and right was: " << std::pow(abs((coords.x + 16) - target.first), 2) + std::pow(abs((coords.y) - target.second), 2);
+		direction = newDirection;
+		collided = 'n';
+
+		std::cout << "chose: " << newDirection 
+			<< ", because left was: " << std::pow(abs((coords.x - 16) - target.first), 2) + std::pow(abs((coords.y) - target.second), 2)
+			<< ", right was: " << std::pow(abs((coords.x + 16) - target.first), 2) + std::pow(abs((coords.y) - target.second), 2)
+			<< ", up was: " << std::pow(abs((coords.x) - target.first), 2) + std::pow(abs((coords.y + 16) - target.second), 2)
+			<< ", and down was: " << std::pow(abs((coords.x) - target.first), 2) + std::pow(abs((coords.y + 16) - target.second), 2);
 		
 		std::cout << "closest: " << closestDir << std::endl;
 	}
@@ -127,10 +138,19 @@ void Ghost::move(const Uint8 *keys, SDL_Surface *surface, int &SCREEN_WIDTH, int
 	}
 }
 
-bool Ghost::checkTileEntered(std::vector<SDL_Rect>& map) {
+bool Ghost::checkTileEntered(std::vector<SDL_Rect>& walkable) {
 
-	for (auto& mapTile : map) {
+	for (auto& mapTile : walkable) {
 		if (coords.y == mapTile.y && coords.x == mapTile.x) {
+			return true;
+		}
+	}
+	return false;
+}
+
+bool Ghost::isHome(std::vector<SDL_Rect>& walkable, std::vector<std::vector<char>>& map) {
+	for (auto& mapTile : walkable) {
+		if (coords.y == mapTile.y && coords.x == mapTile.x && map[(coords.y - 50) / 16][coords.x / 16] == '~') {
 			return true;
 		}
 	}
@@ -187,10 +207,10 @@ bool Ghost::checkWallCollision(std::vector<SDL_Rect>& walls, int x_offset, int y
 			if (x + coords.w > wall.x && x < wall.x + wall.w) {
 				if (direction != 'i') {
 					collided = direction;
-					direction = 'i';
+					//direction = 'i';
 					renderTexture();
 				}
-				std::cout << "collided" << std::endl;
+				std::cout << "collided! " << coords.x << ", " << coords.y << std::endl;
 				return true;
 			}
 		}

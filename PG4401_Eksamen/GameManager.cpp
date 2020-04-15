@@ -32,7 +32,7 @@ enum TargetType {
 	AGRESSIVE,
 	SUPPORTIVE,
 	AMBUSH,
-	EVASIVE
+	EVASIVE,
 };
 
 int GameManager::play(std::string name) {
@@ -206,6 +206,12 @@ int GameManager::play(std::string name) {
 				case '8':
 					walls.emplace_back(mapRect);
 					break;
+				case '-':
+					walls.emplace_back(mapRect);
+					break;
+				case '~': 
+					walkable.emplace_back(mapRect);
+					break;
 				case 'x':
 					pellets.emplace_back(mapRect);
 					walkable.emplace_back(mapRect);
@@ -239,7 +245,7 @@ int GameManager::play(std::string name) {
 	SDL_AudioDeviceID deviceID = SDL_OpenAudioDevice(NULL, 0, &wavSpec, NULL, 0);
 
 	int success = SDL_QueueAudio(deviceID, wavBuffer, wavLength);
-	SDL_PauseAudioDevice(deviceID, 0);
+	//SDL_PauseAudioDevice(deviceID, 0);
 
 	//SDL_Delay(8000);
 
