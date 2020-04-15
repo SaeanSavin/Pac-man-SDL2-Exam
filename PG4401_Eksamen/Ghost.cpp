@@ -26,14 +26,14 @@ void Ghost::move(const Uint8 *keys, SDL_Surface *surface, int &SCREEN_WIDTH, int
 
 		double closestDir = 0;
 		int newDir = 0;
-		char newDirection = ' ';
-		if (collided != 'a' && !checkWallCollision(walls, -1, 0)) {
+		char newDirection = direction;
+		if (direction != 'd' && collided != 'a' && !checkWallCollision(walls, -1, 0)) {
 			closestDir = std::pow(abs((coords.x - 16) - target.first),2) + std::pow(abs((coords.y) - target.second),2);
 			newDirection = 'a';
 			std::cout << "set direction to a, collided: " << collided << std::endl;
 		}
 
-		if (collided != 's' && !checkWallCollision(walls, 0, 1)) {
+		if (direction != 'w' && collided != 's' && !checkWallCollision(walls, 0, 1)) {
 			newDir = std::pow(abs((coords.x) - target.first), 2) + std::pow(abs((coords.y + 16) - target.second), 2);
 			if (newDir <= closestDir) {
 				closestDir = newDir;
@@ -41,7 +41,7 @@ void Ghost::move(const Uint8 *keys, SDL_Surface *surface, int &SCREEN_WIDTH, int
 			}
 		}
 
-		if (collided != 'd' && !checkWallCollision(walls, 1, 0)) {
+		if (direction != 'a' && collided != 'd' && !checkWallCollision(walls, 1, 0)) {
 			newDir = std::pow(abs((coords.x + 16) - target.first), 2) + std::pow(abs((coords.y) - target.second), 2);
 			if (newDir <= closestDir) {
 				closestDir = newDir;
@@ -50,7 +50,7 @@ void Ghost::move(const Uint8 *keys, SDL_Surface *surface, int &SCREEN_WIDTH, int
 			}
 		}
 
-		if (collided != 'w' && !checkWallCollision(walls, 0, -1)) {
+		if (direction != 's' && collided != 'w' && !checkWallCollision(walls, 0, -1)) {
 			newDir = std::pow(abs((coords.x) - target.first), 2) + std::pow(abs((coords.y + 16) - target.second), 2);
 			if (newDir <= closestDir) {
 				closestDir = newDir;
@@ -116,7 +116,7 @@ void Ghost::move(const Uint8 *keys, SDL_Surface *surface, int &SCREEN_WIDTH, int
 		}
 		collided = 'n';
 		break;
-	case ' ':
+	case 'i':
 		renderTexture();
 	default:
 		break;
@@ -183,6 +183,7 @@ bool Ghost::checkWallCollision(std::vector<SDL_Rect>& walls, int x_offset, int y
 			if (x + coords.w > wall.x && x < wall.x + wall.w) {
 				if (direction != 'i') {
 					collided = direction;
+					direction = 'i';
 					renderTexture();
 				}
 				std::cout << "collided" << std::endl;
