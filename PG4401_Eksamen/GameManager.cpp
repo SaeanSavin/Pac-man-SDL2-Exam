@@ -177,7 +177,7 @@ int GameManager::play(std::string name) {
 	SDL_Texture *shadow_texture = texture_manager->loadTexture("../images/Ghosts/Shadow/shadow.png", renderer);
 
 	auto shadow = std::make_shared<Ghost>(shadow_texture, renderer, walkable);
-fixed	shadow->setPos(32, 0);
+    shadow->setPos(32, 0);
 	shadow->setSize(16, 16);
 
 	auto shadow_up = std::make_shared<Animation>(renderer, "../images/Ghosts/Shadow/move/up", 12);
