@@ -12,10 +12,12 @@ public:
 	GameManager();
 	int play(std::string name);
 	void loadMap(std::string map, std::vector<std::vector<char>> &mapVector);
+	void setTotalPlayerScore(int);
 
 private:
 	void setFramerate(const int FPS);
 	std::pair<int, int> getTarget(enum class TargetType, std::shared_ptr<Character> enemy);
+	int totalScore = 0;
 
 };
 #endif

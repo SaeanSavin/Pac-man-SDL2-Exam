@@ -97,8 +97,8 @@ int GameManager::play(std::string name) {
 	std::vector<SDL_Rect> walls{};
 
 	//pellet vector
-	//Use to check collision on pellets
-	std::vector<SDL_Rect> pellets{};
+	//Use to check collision on edible
+	std::vector<SDL_Rect> edible{};
 
 	//walkable vector
 	std::vector<SDL_Rect> walkable{};
@@ -140,13 +140,20 @@ int GameManager::play(std::string name) {
 				walkable.emplace_back(mapRect);
 				break;
 			case 'x':
-				pellets.emplace_back(mapRect);
+				edible.emplace_back(mapRect);
 				walkable.emplace_back(mapRect);
 				break;
+			case 'C':
+				edible.emplace_back(mapRect);
+				walkable.emplace_back(mapRect);
+				break;
+			case 'P':
+				edible.emplace_back(mapRect);
+				walkable.emplace_back(mapRect);
 			case ' ':
 				walkable.emplace_back(mapRect);
 				break;
-			case 'G': case 'H': case 'O': case 'S': case 'P': case 'C':
+			case 'G': case 'H': case 'O': case 'S':
 				walkable.emplace_back(mapRect);
 				break;
 			default:
@@ -166,7 +173,7 @@ int GameManager::play(std::string name) {
 	SDL_Surface *surface = sdl_manager->createSurface("../images/pacman/move/1.png", window, renderer);
 	SDL_Texture *pac_texture = texture_manager->draw(renderer, surface);
 
-	std::shared_ptr<Character> p1 = std::make_shared<Player>(pac_texture, renderer, keys, pellets);
+	std::shared_ptr<Character> p1 = std::make_shared<Player>(pac_texture, renderer, keys, edible);
 	p1->setPos(0, 0);
 	p1->setSize(16, 16);
 
@@ -217,8 +224,9 @@ int GameManager::play(std::string name) {
 	std::cout << "loading assets..." << std::endl;
 
 	//Create Textures
-	SDL_Texture *pellet = texture_manager->loadTexture("../images/mapTiles/pellet.png", renderer);
-	SDL_Texture *cherry = texture_manager->loadTexture("../images/mapTiles/cherry.png", renderer);
+	SDL_Texture *pellet = texture_manager->loadTexture("../images/Edible/pellet.png", renderer);
+	SDL_Texture *cherry = texture_manager->loadTexture("../images/Edible/cherry.png", renderer);
+	SDL_Texture *poweups = texture_manager->loadTexture("../images/Edible/powerup.png", renderer);
 	SDL_Texture *wall_bottom = texture_manager->loadTexture("../images/mapTiles/wall_bottom_single.png", renderer);
 	SDL_Texture *wall_top = texture_manager->loadTexture("../images/mapTiles/wall_top_single.png", renderer);
 	SDL_Texture *wall_left = texture_manager->loadTexture("../images/mapTiles/wall_left_single.png", renderer);
@@ -367,6 +375,10 @@ int GameManager::play(std::string name) {
 
 		SDL_RenderPresent(renderer);
 		SDL_RenderClear(renderer);
+
+		if (!isRunning) {
+			setTotalPlayerScore(p1->getScore());
+		}
 	}
 
 	/*   GAME LOOP END   */
@@ -402,6 +414,10 @@ void GameManager::loadMap(std::string map, std::vector<std::vector<char>> &mapVe
 	}
 
 	fIn.close();
+}
+
+void GameManager::setTotalPlayerScore(int playerScore) {
+	totalScore += playerScore;
 }
 
 std::pair<int, int> GameManager::getTarget(TargetType mode, std::shared_ptr<Character> enemy) {

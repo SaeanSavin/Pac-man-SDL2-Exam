@@ -142,7 +142,7 @@ void Player::move(SDL_Surface *surface, int &SCREEN_WIDTH, int &SCREEN_HEIGHT, s
 	default:
 		break;
 	}
-	checkPelletCollision(pellets, map);
+	checkEdibleCollision(pellets, map);
 }
 
 SDL_Texture* Player::getTexture() {
@@ -213,15 +213,22 @@ bool Player::checkWallCollision(std::vector<SDL_Rect>& walls, int x_offset, int 
 	return false;
 };
 
-bool Player::checkPelletCollision(std::vector<SDL_Rect>& pellets, std::vector<std::vector<char>> &map) {
+bool Player::checkEdibleCollision(std::vector<SDL_Rect>& edible, std::vector<std::vector<char>> &map) {
 
-	for (auto& pellet : pellets) {
-		if (coords.y == pellet.y) {
-			if (coords.x == pellet.x && map[(pellet.y - 50) / 16][pellet.x / 16] == 'x') {
-				map[(pellet.y - 50) / 16][pellet.x / 16] = ' ';
+	for (auto& e : edible) {
+		if (coords.y == e.y) {
+			if (coords.x == e.x && map[(e.y - 50) / 16][e.x / 16] == 'x') {
+				map[(e.y - 50) / 16][e.x / 16] = ' ';
 				score+= 10;
+				return true;
+			}
+
+			if (coords.x == e.x && map[(e.y - 50) / 16][e.x / 16] == 'C') {
+				map[(e.y - 50) / 16][e.x / 16] = ' ';
+				score += 100;
 				return true;
 			}
 		}
 	}
+	return false;
 }
