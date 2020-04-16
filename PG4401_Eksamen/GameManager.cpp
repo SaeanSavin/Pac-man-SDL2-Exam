@@ -102,7 +102,7 @@ int GameManager::play(std::string name) {
 	SDL_Texture *shadow_texture = texture_manager->loadTexture("../images/Ghosts/Shadow/shadow.png", renderer);
 
 	auto shadow = std::make_unique<Ghost>(shadow_texture, renderer);
-	shadow->setPos(1, 0);
+	shadow->setPos(32, 0);
 	shadow->setSize(16, 16);
 
 	auto shadow_up = std::make_shared<Animation>(renderer, "../images/Ghosts/Shadow/move/up", 12);
@@ -119,7 +119,7 @@ int GameManager::play(std::string name) {
 	SDL_Texture* pokey_texture = texture_manager->loadTexture("../images/Ghosts/Pokey/pokey.png", renderer);
 
 	auto pokey = std::make_unique<Ghost>(pokey_texture, renderer);
-	pokey->setPos(2, 0);
+	pokey->setPos(32, 0);
 	pokey->setSize(16, 16);
 
 	auto pokey_up = std::make_shared<Animation>(renderer, "../images/Ghosts/Pokey/move/up", 12);
@@ -287,7 +287,7 @@ int GameManager::play(std::string name) {
 		if (pCoordsLeft < gCoordsRight && pCoordsRight > gCoordsLeft) {
 			if (pCoordsUp < gCoordsDown && pCoordsDown > gCoordsUp) {
 				p1->hitByGhost();
-				SDL_Delay(2000);
+				SDL_Delay(1000);
 				if (p1->getHP() <= 0) {
 					isRunning = false;
 				}
