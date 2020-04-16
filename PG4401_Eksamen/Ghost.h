@@ -3,21 +3,15 @@
 
 #include "Character.h"
 
-#include <iostream>
-#include <vector>
-#include <SDL.h>
-
-#include "Animation.h"
-
 class Ghost : public Character
 {
 public:
 	//constructors
-	Ghost(SDL_Texture* t, SDL_Renderer* r);
-	Ghost(SDL_Texture* t, SDL_Rect c, SDL_Renderer* r);
+	Ghost(SDL_Texture* t, SDL_Renderer* r, std::vector<SDL_Rect>& w);
+	Ghost(SDL_Texture* t, SDL_Renderer* r, SDL_Rect c, std::vector<SDL_Rect>& w);
 
 	//movement
-	void move( SDL_Surface* surface, int& SCREEN_WIDTH, int& SCREEN_HEIGHT, std::vector<std::vector<char>>& map, std::vector<SDL_Rect>& walls, std::vector<SDL_Rect>& walkable, std::pair<int, int> target);
+	void move(SDL_Surface* surface, int& SCREEN_WIDTH, int& SCREEN_HEIGHT, std::vector<std::vector<char>>& map, std::vector<SDL_Rect>& walls) override;
 
 	bool checkTileEntered(std::vector<SDL_Rect>& walkable);
 
@@ -46,15 +40,25 @@ public:
 
 	void setSize(int h, int w) override;
 
-	char getDirection() {
+	void setTarget(std::pair<int, int> t);
+
+	char getDirection() override {
 		return direction;
 	}
 	void setDirection(char d) {
 		direction = d;
 	}
 
-private:
+	//virtual implementations
+	void hitByGhost() override {};
+	int getScore() override { return 0; };
+	int getHP() override { return 0; };
+	void setSpawnPos(int x, int y) {};
 
+private:
+	std::vector<SDL_Rect> walkable;
+
+	std::pair<int, int> target;
 	SDL_Renderer* renderer;
 	std::map<std::string, std::shared_ptr<Animation>> animations;
 	SDL_Texture* texture;

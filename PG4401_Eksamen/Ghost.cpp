@@ -1,21 +1,20 @@
 #include "Ghost.h"
 
-Ghost::Ghost(SDL_Texture* t, SDL_Renderer* r) {
-	texture = t;
-	renderer = r;
+Ghost::Ghost(SDL_Texture* t, SDL_Renderer* r, std::vector<SDL_Rect>& w) 
+	: texture(t), renderer(r), walkable(w)
+{
 	coords.h = 0;
 	coords.w = 0;
 	coords.x = 0;
 	coords.y = 0;
 }
-Ghost::Ghost(SDL_Texture* t, SDL_Rect c, SDL_Renderer* r) {
-	texture = t;
-	renderer = r;
-	coords = c;
-}
+Ghost::Ghost(SDL_Texture* t, SDL_Renderer* r, SDL_Rect c, std::vector<SDL_Rect>& w)
+	:texture(t), renderer(r), coords(c), walkable(w) {}
 
-void Ghost::move(SDL_Surface *surface, int &SCREEN_WIDTH, int &SCREEN_HEIGHT, std::vector<std::vector<char>> &map, std::vector<SDL_Rect> &walls, std::vector<SDL_Rect> &walkable, std::pair<int, int> target) {
+void Ghost::move(SDL_Surface *surface, int &SCREEN_WIDTH, int &SCREEN_HEIGHT, std::vector<std::vector<char>> &map, std::vector<SDL_Rect> &walls) {
 	//checkWallCollision(walls, 0, 0);
+
+	std::cout << target.first << " and " << target.second << std::endl;
 
 	SDL_PumpEvents();
 
@@ -24,7 +23,7 @@ void Ghost::move(SDL_Surface *surface, int &SCREEN_WIDTH, int &SCREEN_HEIGHT, st
 
 	if (checkTileEntered(walkable)) {
 
-		if (isHome(walkable, map)) {
+		if (isHome(walkable, map)) { 
 			target.first = coords.x;
 			target.second = 0;
 		}
@@ -140,6 +139,10 @@ bool Ghost::isHome(std::vector<SDL_Rect>& walkable, std::vector<std::vector<char
 		}
 	}
 	return false;
+}
+
+void Ghost::setTarget(std::pair<int, int> t) {
+	target = t;
 }
 
 SDL_Texture* Ghost::getTexture() {

@@ -3,21 +3,15 @@
 
 #include "Character.h"
 
-#include <iostream>
-#include <vector>
-#include <SDL.h>
-
-#include "Animation.h"
-
 class Player : public Character
 {
 public:
 	//constructors
-	Player(SDL_Texture* t, SDL_Renderer* r);
-	Player(SDL_Texture* t, SDL_Rect c, SDL_Renderer* r);
+	Player(SDL_Texture* t, SDL_Renderer* r, const Uint8* k, std::vector<SDL_Rect>& p);
+	Player(SDL_Texture* t, SDL_Rect c, SDL_Renderer* r, const Uint8* k, std::vector<SDL_Rect>& p);
 
 	//movement
-	void move(const Uint8 *keys, SDL_Surface *surface, int &SCREEN_WIDTH, int &SCREEN_HEIGHT, std::vector<std::vector<char>>& map, std::vector<SDL_Rect>& walls, std::vector<SDL_Rect>& pellets);
+	void move(SDL_Surface *surface, int &SCREEN_WIDTH, int &SCREEN_HEIGHT, std::vector<std::vector<char>>& map, std::vector<SDL_Rect>& walls) override;
 
 	//collision
 	bool checkWallCollision(std::vector<SDL_Rect>& walls, int x_offset, int y_offset);
@@ -42,20 +36,19 @@ public:
 
 	void setPos(int x, int y) override;
 
-	void setSpawnPos(int x, int y);
+	void setSpawnPos(int x, int y) override;
 
 	void setSize(int h, int w) override;
 
-	char getDirection() {
-		return direction;
-	}
+	char getDirection() override;
+
 	void setDirection(char d) {
 		direction = d;
 	}
 	int getScore() {
 		return score;
 	}
-	int getHP() {
+	int getHP() override {
 		return hp;
 	}
 
@@ -63,13 +56,16 @@ public:
 		return startCoords;
 	}
 
-	void hitByGhost() {
+	void hitByGhost() override {
 		hp--;
 		coords.x = startCoords.x;
 		coords.y = startCoords.y;
 	}
 
 private:
+	const Uint8* keys;
+
+	std::vector<SDL_Rect>& pellets;
 	
 	std::map<std::string, std::shared_ptr<Animation>> animations;
 	

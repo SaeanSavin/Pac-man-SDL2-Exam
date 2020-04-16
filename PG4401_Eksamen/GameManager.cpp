@@ -37,6 +37,12 @@ enum class TargetType {
 
 int GameManager::play(std::string name) {
 
+	//input
+	const Uint8* keys = nullptr;
+	int numKeys;
+	keys = SDL_GetKeyboardState(&numKeys);
+	SDL_Event evt;
+
 	const int FPS = 60;
 
 	/*   MAP SETUP   */
@@ -82,6 +88,75 @@ int GameManager::play(std::string name) {
 	SDL_Surface *hpSurface = sdl_manager->createSurface("../images/Pacman/move/2.png", window, renderer);
 	SDL_Texture *hpTexture = texture_manager->draw(renderer, hpSurface);
 
+	/*    VARIABLES   */
+
+	bool isRunning = true;
+
+	//Wall vector
+	//Use to check collison with walls
+	std::vector<SDL_Rect> walls{};
+
+	//pellet vector
+	//Use to check collision on pellets
+	std::vector<SDL_Rect> pellets{};
+
+	//walkable vector
+	std::vector<SDL_Rect> walkable{};
+
+	SDL_Rect mapRect = sdl_manager->createRect(16, 16, 0, 50);
+
+	for (auto& row : map) {
+		for (auto& c : row) {
+
+			switch (c) {
+			case '1':
+				walls.emplace_back(mapRect);
+				break;
+			case '3':
+				walls.emplace_back(mapRect);
+				break;
+			case '7':
+				walls.emplace_back(mapRect);
+				break;
+			case '9':
+				walls.emplace_back(mapRect);
+				break;
+			case '2':
+				walls.emplace_back(mapRect);
+				break;
+			case '4':
+				walls.emplace_back(mapRect);
+				break;
+			case '6':
+				walls.emplace_back(mapRect);
+				break;
+			case '8':
+				walls.emplace_back(mapRect);
+				break;
+			case '-':
+				walls.emplace_back(mapRect);
+				break;
+			case '~':
+				walkable.emplace_back(mapRect);
+				break;
+			case 'x':
+				pellets.emplace_back(mapRect);
+				walkable.emplace_back(mapRect);
+				break;
+			case ' ':
+				walkable.emplace_back(mapRect);
+				break;
+			case 'G': case 'H': case 'O': case 'S': case 'P': case 'C':
+				walkable.emplace_back(mapRect);
+				break;
+			default:
+				break;
+			}
+			mapRect.x += 16;
+		}
+		mapRect.x = 0;
+		mapRect.y += 16;
+	}
 
 	/* CHARACTER SETUP  */
 
@@ -89,9 +164,9 @@ int GameManager::play(std::string name) {
 
 	//pacman
 	SDL_Surface *surface = sdl_manager->createSurface("../images/pacman/move/1.png", window, renderer);
-	SDL_Texture *player = texture_manager->draw(renderer, surface);
+	SDL_Texture *pac_texture = texture_manager->draw(renderer, surface);
 
-	auto p1 = std::make_unique<Player>(player, renderer);
+	std::shared_ptr<Character> p1 = std::make_shared<Player>(pac_texture, renderer, keys, pellets);
 	p1->setPos(0, 0);
 	p1->setSize(16, 16);
 
@@ -101,7 +176,7 @@ int GameManager::play(std::string name) {
 	//shadow
 	SDL_Texture *shadow_texture = texture_manager->loadTexture("../images/Ghosts/Shadow/shadow.png", renderer);
 
-	auto shadow = std::make_unique<Ghost>(shadow_texture, renderer);
+	auto shadow = std::make_shared<Ghost>(shadow_texture, renderer, walkable);
 	shadow->setPos(1, 0);
 	shadow->setSize(16, 16);
 
@@ -118,7 +193,7 @@ int GameManager::play(std::string name) {
 	//clyde
 	SDL_Texture* pokey_texture = texture_manager->loadTexture("../images/Ghosts/Pokey/pokey.png", renderer);
 
-	auto pokey = std::make_unique<Ghost>(pokey_texture, renderer);
+	auto pokey = std::make_shared<Ghost>(pokey_texture, renderer, walkable);
 	pokey->setPos(2, 0);
 	pokey->setSize(16, 16);
 
@@ -152,84 +227,6 @@ int GameManager::play(std::string name) {
 	SDL_Texture *corner_top_left = texture_manager->loadTexture("../images/mapTiles/wall_corner_tl_single.png", renderer);
 	SDL_Texture *corner_bottom_right = texture_manager->loadTexture("../images/mapTiles/wall_corner_br_single.png", renderer);
 	SDL_Texture *corner_bottom_left = texture_manager->loadTexture("../images/mapTiles/wall_corner_bl_single.png", renderer);
-
-
-	/*    VARIABLES   */
-
-	bool isRunning = true;
-	
-	//input
-	const Uint8* keys = nullptr;
-	int numKeys;
-	keys = SDL_GetKeyboardState(&numKeys);
-	SDL_Event evt;
-
-	//Wall vector
-	//Use to check collison with walls
-	std::vector<SDL_Rect> walls{};
-
-	//pellet vector
-	//Use to check collision on pellets
-	std::vector<SDL_Rect> pellets{};
-
-	//walkable vector
-	std::vector<SDL_Rect> walkable{};
-
-	SDL_Rect mapRect = sdl_manager->createRect(16, 16, 0, 50);
-
-	for (auto &row : map) {
-		for (auto &c : row) {
-
-			switch (c) {
-				case '1':
-					walls.emplace_back(mapRect);
-					break;
-				case '3':
-					walls.emplace_back(mapRect);
-					break;
-				case '7':
-					walls.emplace_back(mapRect);
-					break;
-				case '9':
-					walls.emplace_back(mapRect);
-					break;
-				case '2':
-					walls.emplace_back(mapRect);
-					break;
-				case '4':
-					walls.emplace_back(mapRect);
-					break;
-				case '6':
-					walls.emplace_back(mapRect);
-					break;
-				case '8':
-					walls.emplace_back(mapRect);
-					break;
-				case '-':
-					walls.emplace_back(mapRect);
-					break;
-				case '~': 
-					walkable.emplace_back(mapRect);
-					break;
-				case 'x':
-					pellets.emplace_back(mapRect);
-					walkable.emplace_back(mapRect);
-					break;
-				case ' ': 
-					walkable.emplace_back(mapRect);
-					break;
-				case 'G': case 'H': case 'O': case 'S': case 'P': case 'C':
-					walkable.emplace_back(mapRect);
-					break;
-				default:
-					break;
-			}
-			mapRect.x += 16;
-		}
-		mapRect.x = 0;
-		mapRect.y += 16;
-	}
-
 
 	/*   AUDIO SETUP   */
 
@@ -300,9 +297,13 @@ int GameManager::play(std::string name) {
 		}
 
 		//Move characters
-		p1->move(keys, surface, SCREEN_WIDTH, SCREEN_HEIGHT, map, walls, pellets);
-		//shadow->move(keys, surface, SCREEN_WIDTH, SCREEN_HEIGHT, map, walls, walkable, getTarget(AGRESSIVE, p1->getCoords()));
-		pokey->move(surface, SCREEN_WIDTH, SCREEN_HEIGHT, map, walls, walkable, getTarget(TargetType::AGRESSIVE, p1->getCoords()));
+		p1->move(surface, SCREEN_WIDTH, SCREEN_HEIGHT, map, walls);
+
+		shadow->setTarget(getTarget(TargetType::AGRESSIVE, p1));
+		shadow->move(surface, SCREEN_WIDTH, SCREEN_HEIGHT, map, walls);
+
+		pokey->setTarget(getTarget(TargetType::AGRESSIVE, p1));
+		pokey->move(surface, SCREEN_WIDTH, SCREEN_HEIGHT, map, walls);
 
 		//render map
 		SDL_Rect mapRect = sdl_manager->createRect(16, 16, 0, 50);
@@ -403,12 +404,13 @@ void GameManager::loadMap(std::string map, std::vector<std::vector<char>> &mapVe
 	fIn.close();
 }
 
-std::pair<int, int> GameManager::getTarget(TargetType mode, SDL_Rect *enemy) {
+std::pair<int, int> GameManager::getTarget(TargetType mode, std::shared_ptr<Character> enemy) {
 	std::pair<int, int> target;
 	switch (mode) {
 		case TargetType::AGRESSIVE:
-		target.first = enemy->x;
-		target.second = enemy->y;
-		return target;
+			//target pacman directly
+			target.first = enemy->getCoords()->x;
+			target.second = enemy->getCoords()->y;
+			return target;
 	}
 }

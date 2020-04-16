@@ -1,19 +1,19 @@
 #include "Player.h"
 
-Player::Player(SDL_Texture* t, SDL_Renderer* r)
-:texture(t), renderer(r)
+Player::Player(SDL_Texture* t, SDL_Renderer* r, const Uint8* k, std::vector<SDL_Rect>& p)
+:texture(t), renderer(r), keys(k), pellets(p)
 {
 	coords.h = 0;
 	coords.w = 0;
 	coords.x = 0;
 	coords.y = 0;
 }
-Player::Player(SDL_Texture* t, SDL_Rect c, SDL_Renderer* r)
-	:texture(t), renderer(r), coords(c)
+Player::Player(SDL_Texture* t, SDL_Rect c, SDL_Renderer* r, const Uint8* k, std::vector<SDL_Rect>& p)
+	:texture(t), renderer(r), coords(c), keys(k), pellets(p)
 {}
 
 //movement function
-void Player::move(const Uint8 *keys, SDL_Surface *surface, int &SCREEN_WIDTH, int &SCREEN_HEIGHT, std::vector<std::vector<char>>& map, std::vector<SDL_Rect>& walls, std::vector<SDL_Rect>& pellets) {
+void Player::move(SDL_Surface *surface, int &SCREEN_WIDTH, int &SCREEN_HEIGHT, std::vector<std::vector<char>>& map, std::vector<SDL_Rect>& walls) {
 
 	checkWallCollision(walls, 0, 0);
 
@@ -166,6 +166,10 @@ void Player::setSpawnPos(int x, int y) {
 void Player::setSize(int h, int w) {
 	coords.h = h;
 	coords.w = w;
+}
+
+char Player::getDirection() {
+	return direction;
 }
 
 void Player::animate(Animation a) {
