@@ -284,7 +284,7 @@ int GameManager::play(std::string name) {
 		if (pCoordsLeft < gCoordsRight && pCoordsRight > gCoordsLeft) {
 			if (pCoordsUp < gCoordsDown && pCoordsDown > gCoordsUp) {
 				p1->hitByGhost();
-				SDL_Delay(2000);
+				SDL_Delay(1000);
 				if (p1->getHP() <= 0) {
 					isRunning = false;
 				}
