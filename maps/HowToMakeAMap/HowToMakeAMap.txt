@@ -1,5 +1,6 @@
 Use this in your map:
 
+//Walls
 1 = Buttom Left Corner
 2 = Buttom Wall
 3 = Button Right Corner
@@ -8,9 +9,13 @@ Use this in your map:
 7 = Top Left Corner
 8 = Top Wall
 9 = Top Right Corner
-x = Pellets
+
+//Void
 Space = Air
-P = Power Ups
 - = Out of bounds
+
+//Edible
+x = Pellets
 S = Start Player
 C = Cherry
+P = Power Ups

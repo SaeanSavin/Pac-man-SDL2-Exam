@@ -25,9 +25,17 @@ SDL_Texture *Texture_Manager::loadTexture(const char *c, SDL_Renderer *r) {
 }
 
 void Texture_Manager::printFromTiles(std::string name, SDL_Renderer *r, SDL_Texture *t, SDL_Rect &dst, SDL_Rect &src) {
-	for (size_t i = 0; i < name.size(); i++) {
+	for (int i = 0; i < name.length(); i++) {
 
 		if (name[i] == ' ') {
+			dst.x += 16;
+			continue;
+		}
+
+		if (name[i] == '!') {
+			src.x = 11 * 8;
+			src.y = 1 * 8;
+			SDL_RenderCopy(r, t, &src, &dst);
 			dst.x += 16;
 			continue;
 		}
@@ -35,7 +43,6 @@ void Texture_Manager::printFromTiles(std::string name, SDL_Renderer *r, SDL_Text
 		int x = name[i] - 65;
 		int y = 0;
 
-		//Goto next line in text.png
 		if (x > 14) {
 			x -= 15;
 			y = 1;
@@ -43,11 +50,9 @@ void Texture_Manager::printFromTiles(std::string name, SDL_Renderer *r, SDL_Text
 
 		src.x = x * 8;
 		src.y = y * 8;
-		dst.x += 16;
-
 		SDL_RenderCopy(r, t, &src, &dst);
+		dst.x += 16;
 	}
-	dst.x += 16;
 }
 
 void Texture_Manager::printPlayerScore(int score, SDL_Renderer *r, SDL_Texture *t, SDL_Rect &dst, SDL_Rect &src) {

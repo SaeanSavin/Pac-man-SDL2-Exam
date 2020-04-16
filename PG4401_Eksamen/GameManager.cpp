@@ -50,6 +50,8 @@ int GameManager::play(std::string name) {
 	keys = SDL_GetKeyboardState(&numKeys);
 	SDL_Event evt;
 
+	std::string startText = "READY!";
+
 	const int FPS = 60;
 
 	/*   MAP SETUP   */
@@ -236,8 +238,12 @@ int GameManager::play(std::string name) {
 	int success = SDL_QueueAudio(deviceID, wavBuffer, wavLength);
 	//SDL_PauseAudioDevice(deviceID, 0);
 
-	//SDL_Delay(8000);
-
+	SDL_Rect readyDst = sdl_manager->createRect(16, 16, SCREEN_WIDTH / 2 - (startText.length() * 8), SCREEN_HEIGHT / 2);
+	SDL_Rect readySrc = sdl_manager->createRect(8, 8, 0, 0);
+	texture_manager->printFromTiles(startText, renderer, text, readyDst, readySrc);
+	SDL_RenderPresent(renderer);
+	SDL_RenderClear(renderer);
+	SDL_Delay(2000);
 
 	/*   GAME LOOP START  */
 
