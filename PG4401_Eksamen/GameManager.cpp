@@ -173,7 +173,7 @@ int GameManager::play(std::string name) {
 	auto pacman_move = std::make_shared<Animation>(renderer, "../images/Pacman/move", 12);
 	p1->setAnimation("move", pacman_move);
 
-	//shadow
+	//shadow aka. Blinky
 	SDL_Texture *shadow_texture = texture_manager->loadTexture("../images/Ghosts/Shadow/shadow.png", renderer);
 
 	auto shadow = std::make_shared<Ghost>(shadow_texture, renderer, walkable);
@@ -190,7 +190,24 @@ int GameManager::play(std::string name) {
 	shadow->setAnimation("left", shadow_left);
 	shadow->setAnimation("right", shadow_right);
 
-	//clyde
+	//speedy aka. Pinky
+	SDL_Texture* speedy_texture = texture_manager->loadTexture("../images/Ghosts/Speedy/speedy.png", renderer);
+
+	auto speedy = std::make_shared<Ghost>(speedy_texture, renderer, walkable);
+	speedy->setPos(32, 0);
+	speedy->setSize(16, 16);
+
+	auto speedy_up = std::make_shared<Animation>(renderer, "../images/Ghosts/Speedy/move/up", 12);
+	auto speedy_down = std::make_shared<Animation>(renderer, "../images/Ghosts/Speedy/move/down", 12);
+	auto speedy_left = std::make_shared<Animation>(renderer, "../images/Ghosts/Speedy/move/left", 12);
+	auto speedy_right = std::make_shared<Animation>(renderer, "../images/Ghosts/Speedy/move/right", 12);
+
+	speedy->setAnimation("up", speedy_up);
+	speedy->setAnimation("down", speedy_down);
+	speedy->setAnimation("left", speedy_left);
+	speedy->setAnimation("right", speedy_right);
+
+	//pokey aka. Clyde
 	SDL_Texture* pokey_texture = texture_manager->loadTexture("../images/Ghosts/Pokey/pokey.png", renderer);
 
 	auto pokey = std::make_shared<Ghost>(pokey_texture, renderer, walkable);
@@ -302,8 +319,11 @@ int GameManager::play(std::string name) {
 		shadow->setTarget(getTarget(TargetType::AGRESSIVE, p1));
 		shadow->move(surface, SCREEN_WIDTH, SCREEN_HEIGHT, map, walls);
 
-		pokey->setTarget(getTarget(TargetType::AGRESSIVE, p1));
-		pokey->move(surface, SCREEN_WIDTH, SCREEN_HEIGHT, map, walls);
+		speedy->setTarget(getTarget(TargetType::AMBUSH, p1));
+		speedy->move(surface, SCREEN_WIDTH, SCREEN_HEIGHT, map, walls);
+
+		//pokey->setTarget(getTarget(TargetType::AMBUSH, p1));
+		//pokey->move(surface, SCREEN_WIDTH, SCREEN_HEIGHT, map, walls);
 
 		//render map
 		SDL_Rect mapRect = sdl_manager->createRect(16, 16, 0, 50);
@@ -355,6 +375,10 @@ int GameManager::play(std::string name) {
 					c = ' ';
 					break;
 				case 'H':
+					speedy->setPos(mapRect.x, mapRect.y);
+					c = ' ';
+					break;
+				case 'O':
 					pokey->setPos(mapRect.x, mapRect.y);
 					c = ' ';
 					break;
@@ -408,9 +432,37 @@ std::pair<int, int> GameManager::getTarget(TargetType mode, std::shared_ptr<Char
 	std::pair<int, int> target;
 	switch (mode) {
 		case TargetType::AGRESSIVE:
-			//target pacman directly
+			//target enemy directly
 			target.first = enemy->getCoords()->x;
 			target.second = enemy->getCoords()->y;
-			return target;
+			break;
+		case TargetType::AMBUSH:
+			//target 4x16 ahead of enemys current direction
+			target.first = enemy->getCoords()->x;
+			target.second = enemy->getCoords()->y;
+			switch (enemy->getDirection()) {
+				case 'w':
+					target.second -= 4 * 16;
+					std::cout << "set target w" << std::endl;
+					break;
+				case 's':
+					target.second += 4 * 16;
+					std::cout << "set target s" << std::endl;
+					break;
+				case 'a':
+					target.first -= 4 * 16;
+					std::cout << "set target a" << std::endl;
+					break;
+				case 'd':
+					target.first += 4 * 16;
+					std::cout << "set target d" << std::endl;
+					break;
+				case ' ':
+					target.first = 0;
+					target.second = 0;
+					break;
+			}
+			break;
 	}
+	return target;
 }
