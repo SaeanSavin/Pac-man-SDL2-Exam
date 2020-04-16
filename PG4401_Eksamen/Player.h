@@ -16,7 +16,7 @@ public:
 	//collision
 	bool checkWallCollision(std::vector<SDL_Rect>& walls, int x_offset, int y_offset);
 
-	bool checkEdibleCollision(std::vector<SDL_Rect>& pellets, std::vector<std::vector<char>>& map);
+	bool checkEdibleCollision(std::vector<SDL_Rect>& edible, std::vector<std::vector<char>>& map);
 
 	//animation 
 	void renderTexture();

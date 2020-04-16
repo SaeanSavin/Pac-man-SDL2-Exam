@@ -346,6 +346,9 @@ int GameManager::play(std::string name) {
 				case 'C':
 					SDL_RenderCopy(renderer, cherry, nullptr, &mapRect);
 					break;
+				case 'P':
+					SDL_RenderCopy(renderer, poweups, nullptr, &mapRect);
+					break;
 				case '1':
 					SDL_RenderCopy(renderer, corner_bottom_left, nullptr, &mapRect);
 					break;
