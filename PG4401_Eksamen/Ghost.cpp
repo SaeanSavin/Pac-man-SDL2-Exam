@@ -14,10 +14,7 @@ Ghost::Ghost(SDL_Texture* t, SDL_Renderer* r, SDL_Rect c, std::vector<SDL_Rect>&
 void Ghost::move(SDL_Surface *surface, int &SCREEN_WIDTH, int &SCREEN_HEIGHT, std::vector<std::vector<char>> &map, std::vector<SDL_Rect> &walls) {
 	//checkWallCollision(walls, 0, 0);
 
-	std::cout << target.first << " and " << target.second << std::endl;
-
 	SDL_PumpEvents();
-
 
 	//calculate direction based on target
 
