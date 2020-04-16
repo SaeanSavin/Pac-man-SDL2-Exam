@@ -177,7 +177,7 @@ int GameManager::play(std::string name) {
 	SDL_Texture *shadow_texture = texture_manager->loadTexture("../images/Ghosts/Shadow/shadow.png", renderer);
 
 	auto shadow = std::make_shared<Ghost>(shadow_texture, renderer, walkable);
-	shadow->setPos(1, 0);
+fixed	shadow->setPos(32, 0);
 	shadow->setSize(16, 16);
 
 	auto shadow_up = std::make_shared<Animation>(renderer, "../images/Ghosts/Shadow/move/up", 12);
@@ -194,7 +194,7 @@ int GameManager::play(std::string name) {
 	SDL_Texture* pokey_texture = texture_manager->loadTexture("../images/Ghosts/Pokey/pokey.png", renderer);
 
 	auto pokey = std::make_shared<Ghost>(pokey_texture, renderer, walkable);
-	pokey->setPos(2, 0);
+	pokey->setPos(32, 0);
 	pokey->setSize(16, 16);
 
 	auto pokey_up = std::make_shared<Animation>(renderer, "../images/Ghosts/Pokey/move/up", 12);
