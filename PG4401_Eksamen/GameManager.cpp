@@ -35,6 +35,13 @@ enum class TargetType {
 	EVASIVE,
 };
 
+enum class GhostType {
+	SHADOW,
+	SPEEDY,
+	BASHFUL,
+	POKEY
+};
+
 int GameManager::play(std::string name) {
 
 	//input
@@ -66,7 +73,7 @@ int GameManager::play(std::string name) {
 	SDL_Init(SDL_INIT_AUDIO);
 
 	auto sdl_manager = std::make_unique<SDL_Manager>();
-	auto texture_manager = std::make_unique<Texture_Manager>();
+	auto texture_manager = std::make_shared<Texture_Manager>();
 	
 	SDL_Window* window = sdl_manager->createWindow("Pac-man", SCREEN_WIDTH, SCREEN_HEIGHT);
 	SDL_Renderer* renderer = sdl_manager->createRenderer(window, -1);
@@ -181,55 +188,16 @@ int GameManager::play(std::string name) {
 	p1->setAnimation("move", pacman_move);
 
 	//shadow aka. Blinky
-	SDL_Texture *shadow_texture = texture_manager->loadTexture("../images/Ghosts/Shadow/shadow.png", renderer);
-
-	auto shadow = std::make_shared<Ghost>(shadow_texture, renderer, walkable);
-    shadow->setPos(32, 0);
-	shadow->setSize(16, 16);
-
-	auto shadow_up = std::make_shared<Animation>(renderer, "../images/Ghosts/Shadow/move/up", 12);
-	auto shadow_down = std::make_shared<Animation>(renderer, "../images/Ghosts/Shadow/move/down", 12);
-	auto shadow_left = std::make_shared<Animation>(renderer, "../images/Ghosts/Shadow/move/left", 12);
-	auto shadow_right = std::make_shared<Animation>(renderer, "../images/Ghosts/Shadow/move/right", 12);
-
-	shadow->setAnimation("up", shadow_up);
-	shadow->setAnimation("down", shadow_down);
-	shadow->setAnimation("left", shadow_left);
-	shadow->setAnimation("right", shadow_right);
+	auto shadow = makeGhost(texture_manager, renderer, walkable, GhostType::SHADOW);
 
 	//speedy aka. Pinky
-	SDL_Texture* speedy_texture = texture_manager->loadTexture("../images/Ghosts/Speedy/speedy.png", renderer);
+	auto speedy = makeGhost(texture_manager, renderer, walkable, GhostType::SPEEDY);
 
-	auto speedy = std::make_shared<Ghost>(speedy_texture, renderer, walkable);
-	speedy->setPos(32, 0);
-	speedy->setSize(16, 16);
-
-	auto speedy_up = std::make_shared<Animation>(renderer, "../images/Ghosts/Speedy/move/up", 12);
-	auto speedy_down = std::make_shared<Animation>(renderer, "../images/Ghosts/Speedy/move/down", 12);
-	auto speedy_left = std::make_shared<Animation>(renderer, "../images/Ghosts/Speedy/move/left", 12);
-	auto speedy_right = std::make_shared<Animation>(renderer, "../images/Ghosts/Speedy/move/right", 12);
-
-	speedy->setAnimation("up", speedy_up);
-	speedy->setAnimation("down", speedy_down);
-	speedy->setAnimation("left", speedy_left);
-	speedy->setAnimation("right", speedy_right);
+	//bashful aka. Inky
+	auto bashful = makeGhost(texture_manager, renderer, walkable, GhostType::BASHFUL);
 
 	//pokey aka. Clyde
-	SDL_Texture* pokey_texture = texture_manager->loadTexture("../images/Ghosts/Pokey/pokey.png", renderer);
-
-	auto pokey = std::make_shared<Ghost>(pokey_texture, renderer, walkable);
-	pokey->setPos(32, 0);
-	pokey->setSize(16, 16);
-
-	auto pokey_up = std::make_shared<Animation>(renderer, "../images/Ghosts/Pokey/move/up", 12);
-	auto pokey_down = std::make_shared<Animation>(renderer, "../images/Ghosts/Pokey/move/down", 12);
-	auto pokey_left = std::make_shared<Animation>(renderer, "../images/Ghosts/Pokey/move/left", 12);
-	auto pokey_right = std::make_shared<Animation>(renderer, "../images/Ghosts/Pokey/move/right", 12);
-
-	pokey->setAnimation("up", pokey_up);
-	pokey->setAnimation("down", pokey_down);
-	pokey->setAnimation("left", pokey_left);
-	pokey->setAnimation("right", pokey_right);
+	auto pokey = makeGhost(texture_manager, renderer, walkable, GhostType::POKEY);
 
 	//Freeing the RGB surface
 	SDL_FreeSurface(surface);
@@ -330,6 +298,9 @@ int GameManager::play(std::string name) {
 		speedy->setTarget(getTarget(TargetType::AMBUSH, p1));
 		speedy->move(surface, SCREEN_WIDTH, SCREEN_HEIGHT, map, walls);
 
+		bashful->setTarget(getTarget(TargetType::SUPPORTIVE, p1, shadow));
+		bashful->move(surface, SCREEN_WIDTH, SCREEN_HEIGHT, map, walls);
+
 		//pokey->setTarget(getTarget(TargetType::AMBUSH, p1));
 		//pokey->move(surface, SCREEN_WIDTH, SCREEN_HEIGHT, map, walls);
 
@@ -390,7 +361,7 @@ int GameManager::play(std::string name) {
 					c = ' ';
 					break;
 				case 'O':
-					pokey->setPos(mapRect.x, mapRect.y);
+					bashful->setPos(mapRect.x, mapRect.y);
 					c = ' ';
 					break;
 				}
@@ -447,6 +418,48 @@ void GameManager::setTotalPlayerScore(int playerScore) {
 	totalScore += playerScore;
 }
 
+std::shared_ptr<Ghost> GameManager::makeGhost(std::shared_ptr<Texture_Manager> texture_manager, SDL_Renderer* renderer, std::vector<SDL_Rect>& walkable, GhostType type) {
+	std::string ghost_path = "../images/Ghosts/";
+	std::string ghost_anim_path = "../images/Ghosts/";
+
+	switch (type) {
+		case GhostType::SHADOW:
+			ghost_path += "Shadow/shadow.png";
+			ghost_anim_path += "Shadow/";
+			break;
+		case GhostType::SPEEDY:
+			ghost_path += "Speedy/speedy.png";
+			ghost_anim_path += "Speedy/";
+			break;
+		case GhostType::BASHFUL:
+			ghost_path += "Bashful/bashful.png";
+			ghost_anim_path += "Bashful/";
+			break;
+		case GhostType::POKEY:
+			ghost_path += "Pokey/pokey.png";
+			ghost_anim_path += "Pokey/";
+			break;
+	}
+
+	SDL_Texture* ghost_texture = texture_manager->loadTexture(&ghost_path[0], renderer);
+
+	auto ghost = std::make_shared<Ghost>(ghost_texture, renderer, walkable);
+	ghost->setPos(32, 0);
+	ghost->setSize(16, 16);
+
+	auto ghost_up = std::make_shared<Animation>(renderer, (ghost_anim_path + "move/up"), 12);
+	auto ghost_down = std::make_shared<Animation>(renderer, (ghost_anim_path + "move/down"), 12);
+	auto ghost_left = std::make_shared<Animation>(renderer, (ghost_anim_path + "move/left"), 12);
+	auto ghost_right = std::make_shared<Animation>(renderer, (ghost_anim_path + "move/right"), 12);
+
+	ghost->setAnimation("up", ghost_up);
+	ghost->setAnimation("down", ghost_down);
+	ghost->setAnimation("left", ghost_left);
+	ghost->setAnimation("right", ghost_right);
+
+	return ghost;
+}
+
 std::pair<int, int> GameManager::getTarget(TargetType mode, std::shared_ptr<Character> enemy) {
 	std::pair<int, int> target;
 	switch (mode) {
@@ -477,11 +490,55 @@ std::pair<int, int> GameManager::getTarget(TargetType mode, std::shared_ptr<Char
 					std::cout << "set target d" << std::endl;
 					break;
 				case ' ':
-					target.first = 0;
-					target.second = 0;
+					target.first = enemy->getCoords()->x;
+					target.second = enemy->getCoords()->y;
 					break;
 			}
 			break;
+	}
+	return target;
+}
+
+//overloaded version of getTarget for SUPPORTIVE targetting behaviour
+std::pair<int, int> GameManager::getTarget(TargetType mode, std::shared_ptr<Character> enemy, std::shared_ptr<Ghost> ally) {
+	std::pair<int, int> target;
+	switch (mode) {
+		case TargetType::SUPPORTIVE:
+			//targeted tile is based on another ghosts position (originally blinkys)
+			target.first = enemy->getCoords()->x;
+			target.second = enemy->getCoords()->y;
+
+			//first, find tile 2x16 pixels ahead of pacmans current direction
+			switch (enemy->getDirection()) {
+			case 'w':
+				target.second -= 2 * 16;
+				std::cout << "set target w" << std::endl;
+				break;
+			case 's':
+				target.second += 2 * 16;
+				std::cout << "set target s" << std::endl;
+				break;
+			case 'a':
+				target.first -= 2 * 16;
+				std::cout << "set target a" << std::endl;
+				break;
+			case 'd':
+				target.first += 2 * 16;
+				std::cout << "set target d" << std::endl;
+				break;
+			case ' ':
+				target.first = enemy->getCoords()->x;
+				target.second = enemy->getCoords()->y;
+				return target;
+			}
+
+			//then, calculate vector from this position to ghost ally
+			int v_x = abs(ally->getCoords()->x - target.first);
+			int v_y = abs(ally->getCoords()->y - target.second);
+
+			//finally, rotate vector 180 degrees and set target to this position
+			target.first += v_x * -1;
+			target.second += v_y * -1;
 	}
 	return target;
 }
