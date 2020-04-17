@@ -1,6 +1,5 @@
 #include <fstream>
 #include <sstream>
-//#include <string>
 
 #include "GameManager.h"
 #include "SDL_Manager.h"
@@ -51,6 +50,8 @@ int GameManager::play(std::string name) {
 	SDL_Event evt;
 
 	std::string startText = "READY!";
+	std::string gameoverText = "GAME OVER!";
+	std::string levelcompletedText = "LEVEL COMPLETED!";
 
 	const int FPS = 60;
 
@@ -223,6 +224,7 @@ int GameManager::play(std::string name) {
 	SDL_Texture *corner_bottom_right = texture_manager->loadTexture("../images/mapTiles/wall_corner_br_single.png", renderer);
 	SDL_Texture *corner_bottom_left = texture_manager->loadTexture("../images/mapTiles/wall_corner_bl_single.png", renderer);
 
+	SDL_Rect text_src = sdl_manager->createRect(8, 8, 0, 0);
 	/*   AUDIO SETUP   */
 
 	std::cout << "preparing audio..." << std::endl;
@@ -239,10 +241,9 @@ int GameManager::play(std::string name) {
 	//SDL_PauseAudioDevice(deviceID, 0);
 
 	SDL_Rect readyDst = sdl_manager->createRect(16, 16, SCREEN_WIDTH / 2 - (startText.length() * 8), SCREEN_HEIGHT / 2);
-	SDL_Rect readySrc = sdl_manager->createRect(8, 8, 0, 0);
-	texture_manager->printFromTiles(startText, renderer, text, readyDst, readySrc);
-	SDL_RenderPresent(renderer);
-	SDL_RenderClear(renderer);
+	//SDL_Rect readySrc = sdl_manager->createRect(8, 8, 0, 0);
+	texture_manager->printFromTiles(startText, renderer, text, readyDst, text_src);
+	sdl_manager->ClearRender(renderer);
 	SDL_Delay(2000);
 
 	/*   GAME LOOP START  */
@@ -261,7 +262,7 @@ int GameManager::play(std::string name) {
 		}
 		
 		//Print score
-		SDL_Rect text_src = sdl_manager->createRect(8, 8, 0, 0);
+
 		SDL_Rect text_dst = sdl_manager->createRect(16,16, 0, 25);
 
 		texture_manager->printFromTiles("SCORE ", renderer, text, text_dst, text_src);
@@ -275,10 +276,10 @@ int GameManager::play(std::string name) {
 		int pCoordsUp = p1->getCoords()->y;
 		int pCoordsDown = p1->getCoords()->y + p1->getCoords()->h;
 
-		int gCoordsLeft = pokey->getCoords()->x;
-		int gCoordsRight = pokey->getCoords()->x + pokey->getCoords()->w;
-		int gCoordsUp = pokey->getCoords()->y;
-		int gCoordsDown = pokey->getCoords()->y + pokey->getCoords()->h;
+		int gCoordsLeft = shadow->getCoords()->x;
+		int gCoordsRight = shadow->getCoords()->x + shadow->getCoords()->w;
+		int gCoordsUp = shadow->getCoords()->y;
+		int gCoordsDown = shadow->getCoords()->y + shadow->getCoords()->h;
 
 		if (pCoordsLeft < gCoordsRight && pCoordsRight > gCoordsLeft) {
 			if (pCoordsUp < gCoordsDown && pCoordsDown > gCoordsUp) {
@@ -377,11 +378,21 @@ int GameManager::play(std::string name) {
 			mapRect.y += 16;
 		}
 
-		SDL_RenderPresent(renderer);
-		SDL_RenderClear(renderer);
+		sdl_manager->ClearRender(renderer);
 
-		if (!isRunning) {
+
+		if (!isRunning && p1->getHP() <= 0) {
 			setTotalPlayerScore(p1->getScore());
+			SDL_Rect gameoverDst = sdl_manager->createRect(16, 16, SCREEN_WIDTH / 2 - (gameoverText.length() * 8), SCREEN_HEIGHT / 2);
+			texture_manager->printFromTiles(gameoverText, renderer, text, gameoverDst, text_src);
+			sdl_manager->ClearRender(renderer);
+			SDL_Delay(2000);
+		}
+		if (!isRunning && p1->getHP() > 0) {
+			SDL_Rect levelcompletedDst = sdl_manager->createRect(16, 16, SCREEN_WIDTH / 2 - (levelcompletedText.length() * 8), SCREEN_HEIGHT / 2);
+			texture_manager->printFromTiles(levelcompletedText, renderer, text, levelcompletedDst, text_src);
+			sdl_manager->ClearRender(renderer);
+			SDL_Delay(2000);
 		}
 	}
 

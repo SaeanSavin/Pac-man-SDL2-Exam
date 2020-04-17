@@ -25,7 +25,7 @@ SDL_Texture *Texture_Manager::loadTexture(const char *c, SDL_Renderer *r) {
 }
 
 void Texture_Manager::printFromTiles(std::string name, SDL_Renderer *r, SDL_Texture *t, SDL_Rect &dst, SDL_Rect &src) {
-	for (int i = 0; i < name.length(); i++) {
+	for (size_t i = 0; i < name.length(); i++) {
 
 		if (name[i] == ' ') {
 			dst.x += 16;
@@ -78,5 +78,3 @@ void Texture_Manager::printPlayerScore(int score, SDL_Renderer *r, SDL_Texture *
 	SDL_RenderCopy(r, t, &src, &dst);
 
 }
-
-
