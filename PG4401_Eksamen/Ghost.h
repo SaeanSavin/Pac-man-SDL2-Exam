@@ -8,6 +8,8 @@ enum class TargetType {
 	SUPPORTIVE,
 	AMBUSH,
 	EVASIVE,
+	FRIGHTENED,
+	EYES
 };
 
 class Ghost : public Character

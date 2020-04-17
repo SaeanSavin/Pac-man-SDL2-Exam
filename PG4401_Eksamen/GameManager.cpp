@@ -566,6 +566,26 @@ std::pair<int, int> GameManager::getTarget(TargetType mode, std::shared_ptr<Char
 					break;
 			}
 			break;
+		case TargetType::FRIGHTENED:
+			//randomly choose target
+			int random = rand() % 4 + 1;
+			if (random == 4) {
+				target.first = 0;
+				target.second = 0;
+			}
+			else if (random == 3) {
+				target.first = SCREEN_WIDTH;
+				target.second = 0;
+			}
+			else if (random == 2) {
+				target.first = 0;
+				target.second = SCREEN_HEIGHT;
+			}
+			else {
+				target.first = SCREEN_WIDTH;
+				target.second = SCREEN_HEIGHT;
+			}
+			break;
 	}
 	return target;
 }
