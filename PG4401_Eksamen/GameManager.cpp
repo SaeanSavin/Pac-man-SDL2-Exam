@@ -34,7 +34,7 @@ enum class GhostType {
 	POKEY
 };
 
-int GameManager::play(std::string name) {
+void GameManager::play(std::string name) {
 
 	//input
 	const Uint8* keys = nullptr;
@@ -54,6 +54,8 @@ int GameManager::play(std::string name) {
 
 	std::vector<std::vector<char>> map{};
 	loadMap(name, map);
+
+	std::vector<std::vector<char>> defaultMap = map;
 
 	GAME_OFFSET_Y = 100;
 	GAME_OFFSET_X = 0;
@@ -76,7 +78,7 @@ int GameManager::play(std::string name) {
 
 	//draws background
 	sdl_manager->SetRenderColor(renderer, 0, 0, 0, 255);
-	sdl_manager->ClearRender(renderer);
+	sdl_manager->clearRenderer(renderer);
 
 
 	/*   HUD SETUP   */
@@ -102,7 +104,6 @@ int GameManager::play(std::string name) {
 	//pellet vector
 	//Use to check collision on edible
 	std::vector<SDL_Rect> edible{};
-
 	//walkable vector
 	std::vector<SDL_Rect> walkable{};
 
@@ -270,9 +271,8 @@ int GameManager::play(std::string name) {
 	//SDL_PauseAudioDevice(deviceID, 0);
 
 	SDL_Rect readyDst = sdl_manager->createRect(16, 16, SCREEN_WIDTH / 2 - (startText.length() * 8), SCREEN_HEIGHT / 2);
-	//SDL_Rect readySrc = sdl_manager->createRect(8, 8, 0, 0);
 	texture_manager->printFromTiles(startText, renderer, text, readyDst, text_src);
-	sdl_manager->ClearRender(renderer);
+	sdl_manager->clearAndUpdateRenderer(renderer);
 	SDL_Delay(2000);
 
 	/*   GAME LOOP START  */
@@ -348,12 +348,15 @@ int GameManager::play(std::string name) {
 		//render map
 		SDL_Rect mapRect = sdl_manager->createRect(16, 16, 0, 50);
 
+		int currentPellets = 0;
+
 		for (auto& row : map) {
 			for (auto& c : row) {
 
 				switch (c) {
 				case 'x':
 					SDL_RenderCopy(renderer, pellet, nullptr, &mapRect);
+					currentPellets++;
 					break;
 				case 'C':
 					SDL_RenderCopy(renderer, cherry, nullptr, &mapRect);
@@ -412,20 +415,25 @@ int GameManager::play(std::string name) {
 			mapRect.y += 16;
 		}
 
-		sdl_manager->ClearRender(renderer);
+		sdl_manager->clearAndUpdateRenderer(renderer);
 
+		std::cout << "Current Pellets: " << currentPellets << std::endl;
 
-		if (!isRunning && p1->getHP() <= 0) {
+		if (p1->getHP() <= 0) {
 			setTotalPlayerScore(p1->getScore());
 			SDL_Rect gameoverDst = sdl_manager->createRect(16, 16, SCREEN_WIDTH / 2 - (gameoverText.length() * 8), SCREEN_HEIGHT / 2);
 			texture_manager->printFromTiles(gameoverText, renderer, text, gameoverDst, text_src);
-			sdl_manager->ClearRender(renderer);
+			sdl_manager->clearAndUpdateRenderer(renderer);
+			isRunning = false;
 			SDL_Delay(2000);
 		}
-		if (!isRunning && p1->getHP() > 0) {
+
+		if (currentPellets <= 0 && p1->getHP() > 0) {
 			SDL_Rect levelcompletedDst = sdl_manager->createRect(16, 16, SCREEN_WIDTH / 2 - (levelcompletedText.length() * 8), SCREEN_HEIGHT / 2);
 			texture_manager->printFromTiles(levelcompletedText, renderer, text, levelcompletedDst, text_src);
-			sdl_manager->ClearRender(renderer);
+			sdl_manager->clearAndUpdateRenderer(renderer);
+			p1->setPos(p1->getSpawnPos().x, p1->getSpawnPos().y);
+			map = defaultMap;
 			SDL_Delay(2000);
 		}
 	}
@@ -438,7 +446,7 @@ int GameManager::play(std::string name) {
 	SDL_DestroyWindow(window);
 	IMG_Quit();
 	SDL_Quit();
-	return EXIT_SUCCESS;
+	return;
 }
 
 void GameManager::loadMap(std::string map, std::vector<std::vector<char>> &mapVector) {

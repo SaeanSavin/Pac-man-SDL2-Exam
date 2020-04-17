@@ -11,7 +11,7 @@ class GameManager {
 
 public:
 	GameManager();
-	int play(std::string name);
+	void play(std::string name);
 	void loadMap(std::string map, std::vector<std::vector<char>> &mapVector);
 	void setTotalPlayerScore(int);
 

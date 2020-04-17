@@ -78,5 +78,4 @@ private:
 	int score = 0;
 	int hp = 3;
 };
-
 #endif

@@ -14,7 +14,8 @@ public:
 	SDL_Rect createRect(int w, int h, int x, int y);
 
 	void SetRenderColor(SDL_Renderer *renderer, int r, int g, int b, int a);
-	void ClearRender(SDL_Renderer *renderer);
+	void clearAndUpdateRenderer(SDL_Renderer *renderer);
+	void clearRenderer(SDL_Renderer *renderer);
 
 private:
 	void printError(std::ostream &os, const std::string &msg);
