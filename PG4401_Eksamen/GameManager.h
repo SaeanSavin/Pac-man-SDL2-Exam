@@ -2,6 +2,7 @@
 #define _GAMEMANAGER_H_
 
 #include <vector>
+
 #include "Player.h"
 #include "Ghost.h"
 #include "Sound.h"
@@ -17,7 +18,7 @@ public:
 private:
 	void setFramerate(const int FPS);
 	std::pair<int, int> getTarget(enum class TargetType, std::shared_ptr<Character> enemy);
-	std::pair<int, int> getTarget(TargetType mode, std::shared_ptr<Character> enemy, std::shared_ptr<Ghost> ally);
+	std::pair<int, int> getTarget(TargetType mode, std::shared_ptr<Character> enemy, std::shared_ptr<Ghost> ghost);
 	std::shared_ptr<Ghost> makeGhost(std::shared_ptr<Texture_Manager> texture_manager, SDL_Renderer *renderer, std::vector<SDL_Rect> &walkable, enum class GhostType type);
 	int totalScore = 0;
 
