@@ -184,6 +184,9 @@ void GameManager::play(std::string name) {
 	auto pacman_move = std::make_shared<Animation>(renderer, "../images/Pacman/move", 12);
 	p1->setAnimation("move", pacman_move);
 
+	auto pacman_dead = std::make_shared<Animation>(renderer, "../images/Pacman/dead", 120);
+	p1->setAnimation("dead", pacman_dead);
+
 	//build ghosts and set spawn positions
 	std::vector<std::shared_ptr<Ghost>> ghosts;
 	int ghostNr = 1;
@@ -318,7 +321,7 @@ void GameManager::play(std::string name) {
 					for (auto& g : ghosts) {
 						g->respawn();
 					}
-					SDL_Delay(1000);
+					//SDL_Delay(1000);
 					if (p1->getHP() <= 0) {
 						isRunning = false;
 					}

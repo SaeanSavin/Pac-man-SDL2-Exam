@@ -17,3 +17,7 @@ SDL_Texture* Animation::getFrame() {
 	int frame = ((SDL_GetTicks() - startTime) * rate / 1000) % length;
 	return frames[frame];
 }
+
+void Animation::resetAnimation() {
+	startTime = SDL_GetTicks();
+}

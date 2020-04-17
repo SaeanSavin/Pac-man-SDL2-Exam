@@ -47,15 +47,27 @@ public:
 	void setDirection(char d) {
 		direction = d;
 	}
+
 	int getScore() {
 		return score;
 	}
+
 	int getHP() override {
 		return hp;
 	}
 
 	void hitByGhost() override {
 		hp--;
+		Animation a = *animations["dead"];
+		animations["dead"]->resetAnimation();
+		int length = a.getLength();
+		int rate = a.getRate();
+		SDL_Delay(rate * 3);
+		for (int i = 0; i < length - 3; i++) {
+			animate(*animations["dead"]);
+			SDL_RenderPresent(renderer);
+			SDL_Delay(rate);
+		}
 		respawn();
 	}
 
