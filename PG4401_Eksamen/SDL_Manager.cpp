@@ -65,5 +65,6 @@ void SDL_Manager::SetRenderColor(SDL_Renderer *renderer, int r, int g, int b, in
 }
 
 void SDL_Manager::ClearRender(SDL_Renderer *renderer) {
+	SDL_RenderPresent(renderer);
 	SDL_RenderClear(renderer);
 }
