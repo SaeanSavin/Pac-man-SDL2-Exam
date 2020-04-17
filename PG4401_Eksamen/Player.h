@@ -40,6 +40,8 @@ public:
 
 	void setSize(int h, int w) override;
 
+	void setScore(int s) override;
+
 	char getDirection() override;
 
 	void setDirection(char d) {
@@ -72,7 +74,7 @@ private:
 	SDL_Renderer* renderer;
 	SDL_Texture* texture;
 	SDL_Rect coords;
-	SDL_Rect startCoords;
+	SDL_Rect startCoords{};
 	
 	char direction = ' ';
 	char next_direction = 'n';
@@ -82,5 +84,4 @@ private:
 	int score = 0;
 	int hp = 3;
 };
-
 #endif

@@ -7,13 +7,12 @@
 #include <SDL.h>
 
 #include "Animation.h"
-class Character
-{
+class Character {
 public:
 
-	virtual SDL_Texture* getTexture() = 0;
+	virtual SDL_Texture *getTexture() = 0;
 
-	virtual SDL_Rect* getCoords() = 0;
+	virtual SDL_Rect *getCoords() = 0;
 
 	virtual void setPos(int x, int y) = 0;
 
@@ -23,15 +22,19 @@ public:
 
 	virtual void setAnimation(std::string name, std::shared_ptr<Animation> animation) = 0;
 
+	virtual void setScore(int) = 0;
+
 	virtual int getScore() = 0;
 
 	virtual void hitByGhost() = 0;
 
 	virtual int getHP() = 0;
 
-	virtual void move(SDL_Surface* surface, int& SCREEN_WIDTH, int& SCREEN_HEIGHT, std::vector<std::vector<char>>& map, std::vector<SDL_Rect>& walls) = 0;
+	virtual void move(SDL_Surface *surface, int &SCREEN_WIDTH, int &SCREEN_HEIGHT, std::vector<std::vector<char>> &map, std::vector<SDL_Rect> &walls) = 0;
 
 	virtual void setSpawnPos(int x, int y) = 0;
+
+	virtual SDL_Rect getSpawnPos() = 0;
 
 private:
 	int speed = 2;

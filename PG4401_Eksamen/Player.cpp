@@ -1,7 +1,7 @@
 #include "Player.h"
 
 Player::Player(SDL_Texture* t, SDL_Renderer* r, const Uint8* k, std::vector<SDL_Rect>& p)
-:texture(t), renderer(r), keys(k), pellets(p)
+	:texture(t), renderer(r), keys(k), pellets(p)
 {
 	coords.h = 0;
 	coords.w = 0;
@@ -166,6 +166,10 @@ void Player::setSpawnPos(int x, int y) {
 void Player::setSize(int h, int w) {
 	coords.h = h;
 	coords.w = w;
+}
+
+void Player::setScore(int s) {
+	score = s;
 }
 
 char Player::getDirection() {

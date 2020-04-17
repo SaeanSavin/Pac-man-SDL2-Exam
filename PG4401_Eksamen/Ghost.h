@@ -54,6 +54,8 @@ public:
 	int getScore() override { return 0; };
 	int getHP() override { return 0; };
 	void setSpawnPos(int x, int y) {};
+	SDL_Rect getSpawnPos() { return coords; };
+	void setScore(int) {};
 
 private:
 	std::vector<SDL_Rect> walkable;
