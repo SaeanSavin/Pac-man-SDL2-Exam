@@ -158,11 +158,6 @@ void Player::setPos(int x, int y) {
 	coords.y = y;
 }
 
-void Player::setSpawnPos(int x, int y) {
-	startCoords.x = x;
-	startCoords.y = y;
-}
-
 void Player::setSize(int h, int w) {
 	coords.h = h;
 	coords.w = w;
@@ -170,6 +165,16 @@ void Player::setSize(int h, int w) {
 
 char Player::getDirection() {
 	return direction;
+}
+
+void Player::setSpawnPos(int x, int y) {
+	spawn.first = x;
+	spawn.second = y;
+	setPos(x, y);
+}
+
+void Player::respawn() {
+	setPos(spawn.first, spawn.second);
 }
 
 void Player::animate(Animation a) {

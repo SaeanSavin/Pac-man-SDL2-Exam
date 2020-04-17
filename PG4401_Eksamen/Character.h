@@ -33,6 +33,8 @@ public:
 
 	virtual void setSpawnPos(int x, int y) = 0;
 
+	virtual void respawn() = 0;
+
 private:
 	int speed = 2;
 	//TODO: add move function

@@ -27,13 +27,6 @@ void GameManager::setFramerate(const int FPS) {
 
 GameManager::GameManager() {}
 
-enum class TargetType {
-	AGRESSIVE,
-	SUPPORTIVE,
-	AMBUSH,
-	EVASIVE,
-};
-
 enum class GhostType {
 	SHADOW,
 	SPEEDY,
@@ -163,7 +156,7 @@ int GameManager::play(std::string name) {
 			case ' ':
 				walkable.emplace_back(mapRect);
 				break;
-			case 'G': case 'H': case 'O': case 'S':
+			case 'G':
 				walkable.emplace_back(mapRect);
 				break;
 			default:
@@ -190,17 +183,53 @@ int GameManager::play(std::string name) {
 	auto pacman_move = std::make_shared<Animation>(renderer, "../images/Pacman/move", 12);
 	p1->setAnimation("move", pacman_move);
 
-	//shadow aka. Blinky
-	auto shadow = makeGhost(texture_manager, renderer, walkable, GhostType::SHADOW);
+	//build ghosts and set spawn positions
+	std::vector<std::shared_ptr<Ghost>> ghosts;
+	int ghostNr = 1;
+	int g_index = 0;
+	SDL_Rect m_position = sdl_manager->createRect(16, 16, 0, 50);
 
-	//speedy aka. Pinky
-	auto speedy = makeGhost(texture_manager, renderer, walkable, GhostType::SPEEDY);
-
-	//bashful aka. Inky
-	auto bashful = makeGhost(texture_manager, renderer, walkable, GhostType::BASHFUL);
-
-	//pokey aka. Clyde
-	auto pokey = makeGhost(texture_manager, renderer, walkable, GhostType::POKEY);
+	for (auto& row : map) {
+		for (auto& c : row) {
+			switch (c) {
+				case 'G':
+					switch (ghostNr) {
+						case 1:
+							ghosts.emplace_back(makeGhost(texture_manager, renderer, walkable, GhostType::SHADOW));
+							ghosts[g_index]->setSpawnPos(m_position.x, m_position.y);
+							ghostNr++;
+							g_index++;
+							break;
+						case 2:
+							ghosts.emplace_back(makeGhost(texture_manager, renderer, walkable, GhostType::SPEEDY));
+							ghosts[g_index]->setSpawnPos(m_position.x, m_position.y);
+							ghostNr++;
+							g_index++;
+							break;
+						case 3:
+							ghosts.emplace_back(makeGhost(texture_manager, renderer, walkable, GhostType::BASHFUL));
+							ghosts[g_index]->setSpawnPos(m_position.x, m_position.y);
+							ghostNr++;
+							g_index++;
+							break;
+						case 4:
+							ghosts.emplace_back(makeGhost(texture_manager, renderer, walkable, GhostType::POKEY));
+							ghosts[g_index]->setSpawnPos(m_position.x, m_position.y);
+							ghostNr++;
+							g_index++;
+							break;
+					}
+					c = '~';
+					break;
+				case 'S':
+					p1->setSpawnPos(m_position.x, m_position.y);
+					break;
+			}
+			m_position.x += 16;
+		}
+		m_position.x = 0;
+		m_position.y += 16;
+	}
 
 	//Freeing the RGB surface
 	SDL_FreeSurface(surface);
@@ -271,22 +300,25 @@ int GameManager::play(std::string name) {
 		SDL_Rect hp_dst = sdl_manager->createRect(16, 16, 0, SCREEN_HEIGHT - 25);
 		texture_manager->printFromTiles("LIVES ", renderer, text, hp_dst, text_src);
 		
+		//collision
 		int pCoordsLeft = p1->getCoords()->x;
 		int pCoordsRight = p1->getCoords()->x + p1->getCoords()->w;
 		int pCoordsUp = p1->getCoords()->y;
 		int pCoordsDown = p1->getCoords()->y + p1->getCoords()->h;
 
-		int gCoordsLeft = shadow->getCoords()->x;
-		int gCoordsRight = shadow->getCoords()->x + shadow->getCoords()->w;
-		int gCoordsUp = shadow->getCoords()->y;
-		int gCoordsDown = shadow->getCoords()->y + shadow->getCoords()->h;
+		for (auto &g : ghosts) {
+			int gCoordsLeft = g->getCoords()->x;
+			int gCoordsRight = g->getCoords()->x + g->getCoords()->w;
+			int gCoordsUp = g->getCoords()->y;
+			int gCoordsDown = g->getCoords()->y + g->getCoords()->h;
 
-		if (pCoordsLeft < gCoordsRight && pCoordsRight > gCoordsLeft) {
-			if (pCoordsUp < gCoordsDown && pCoordsDown > gCoordsUp) {
-				p1->hitByGhost();
-				SDL_Delay(1000);
-				if (p1->getHP() <= 0) {
-					isRunning = false;
+			if (pCoordsLeft < gCoordsRight && pCoordsRight > gCoordsLeft) {
+				if (pCoordsUp < gCoordsDown && pCoordsDown > gCoordsUp) {
+					p1->hitByGhost();
+					SDL_Delay(1000);
+					if (p1->getHP() <= 0) {
+						isRunning = false;
+					}
 				}
 			}
 		}
@@ -299,20 +331,19 @@ int GameManager::play(std::string name) {
 		//Move characters
 		p1->move(surface, SCREEN_WIDTH, SCREEN_HEIGHT, map, walls);
 
-		shadow->setTarget(getTarget(TargetType::AGRESSIVE, p1));
-		shadow->move(surface, SCREEN_WIDTH, SCREEN_HEIGHT, map, walls);
-
-		speedy->setTarget(getTarget(TargetType::AMBUSH, p1));
-		speedy->move(surface, SCREEN_WIDTH, SCREEN_HEIGHT, map, walls);
-
-		bashful->setTarget(getTarget(TargetType::SUPPORTIVE, p1, shadow));
-		bashful->move(surface, SCREEN_WIDTH, SCREEN_HEIGHT, map, walls);
-
-		pokey->setTarget(getTarget(TargetType::EVASIVE, p1, pokey));
-		pokey->move(surface, SCREEN_WIDTH, SCREEN_HEIGHT, map, walls);
-
-		//pokey->setTarget(getTarget(TargetType::AMBUSH, p1));
-		//pokey->move(surface, SCREEN_WIDTH, SCREEN_HEIGHT, map, walls);
+		int ghosts_i = 0;
+		for (auto& g : ghosts) {
+			if (g->getTargetMode() == TargetType::EVASIVE) {
+				g->setTarget(getTarget(g->getTargetMode(), p1, g));
+			} else if (g->getTargetMode() == TargetType::SUPPORTIVE) {
+				g->setTarget(getTarget(g->getTargetMode(), p1, ghosts[ghosts_i - 2]));
+			}
+			else {
+				g->setTarget(getTarget(g->getTargetMode(), p1));
+			}
+			g->move(surface, SCREEN_WIDTH, SCREEN_HEIGHT, map, walls);
+			ghosts_i++;
+		}
 
 		//render map
 		SDL_Rect mapRect = sdl_manager->createRect(16, 16, 0, 50);
@@ -358,21 +389,21 @@ int GameManager::play(std::string name) {
 				case '-':
 					break;
 				case 'S':
-					p1->setPos(mapRect.x, mapRect.y);
-					p1->setSpawnPos(mapRect.x, mapRect.y);
-					c = ' ';
+					//p1->setPos(mapRect.x, mapRect.y);
+					//p1->setSpawnPos(mapRect.x, mapRect.y);
+					//c = ' ';
 					break;
 				case 'G':
-					shadow->setPos(mapRect.x, mapRect.y);
-					c = ' ';
+					//shadow->setPos(mapRect.x, mapRect.y);
+					//c = ' ';
 					break;
 				case 'H':
-					speedy->setPos(mapRect.x, mapRect.y);
-					c = ' ';
+					//speedy->setPos(mapRect.x, mapRect.y);
+					//c = ' ';
 					break;
 				case 'O':
-					bashful->setPos(mapRect.x, mapRect.y);
-					c = ' ';
+					//bashful->setPos(mapRect.x, mapRect.y);
+					//c = ' ';
 					break;
 				}
 				mapRect.x += 16;
@@ -442,28 +473,34 @@ std::shared_ptr<Ghost> GameManager::makeGhost(std::shared_ptr<Texture_Manager> t
 	std::string ghost_path = "../images/Ghosts/";
 	std::string ghost_anim_path = "../images/Ghosts/";
 
+	TargetType mode;
+
 	switch (type) {
 		case GhostType::SHADOW:
 			ghost_path += "Shadow/shadow.png";
 			ghost_anim_path += "Shadow/";
+			mode = TargetType::AGRESSIVE;
 			break;
 		case GhostType::SPEEDY:
 			ghost_path += "Speedy/speedy.png";
 			ghost_anim_path += "Speedy/";
+			mode = TargetType::AMBUSH;
 			break;
 		case GhostType::BASHFUL:
 			ghost_path += "Bashful/bashful.png";
 			ghost_anim_path += "Bashful/";
+			mode = TargetType::SUPPORTIVE;
 			break;
 		case GhostType::POKEY:
 			ghost_path += "Pokey/pokey.png";
 			ghost_anim_path += "Pokey/";
+			mode = TargetType::EVASIVE;
 			break;
 	}
 
 	SDL_Texture* ghost_texture = texture_manager->loadTexture(&ghost_path[0], renderer);
 
-	auto ghost = std::make_shared<Ghost>(ghost_texture, renderer, walkable);
+	auto ghost = std::make_shared<Ghost>(ghost_texture, renderer, walkable, mode);
 	ghost->setPos(32, 0);
 	ghost->setSize(16, 16);
 

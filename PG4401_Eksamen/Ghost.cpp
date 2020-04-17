@@ -1,15 +1,15 @@
 #include "Ghost.h"
 
-Ghost::Ghost(SDL_Texture* t, SDL_Renderer* r, std::vector<SDL_Rect>& w) 
-	: texture(t), renderer(r), walkable(w)
+Ghost::Ghost(SDL_Texture* t, SDL_Renderer* r, std::vector<SDL_Rect>& w, enum class TargetType m)
+	: texture(t), renderer(r), walkable(w), targetMode(m)
 {
 	coords.h = 0;
 	coords.w = 0;
 	coords.x = 0;
 	coords.y = 0;
 }
-Ghost::Ghost(SDL_Texture* t, SDL_Renderer* r, SDL_Rect c, std::vector<SDL_Rect>& w)
-	:texture(t), renderer(r), coords(c), walkable(w) {}
+Ghost::Ghost(SDL_Texture* t, SDL_Renderer* r, SDL_Rect c, std::vector<SDL_Rect>& w, enum class TargetType m)
+	:texture(t), renderer(r), coords(c), walkable(w), targetMode(m) {}
 
 void Ghost::move(SDL_Surface *surface, int &SCREEN_WIDTH, int &SCREEN_HEIGHT, std::vector<std::vector<char>> &map, std::vector<SDL_Rect> &walls) {
 	//checkWallCollision(walls, 0, 0);
@@ -158,6 +158,20 @@ void Ghost::setPos(int x, int y) {
 void Ghost::setSize(int h, int w) {
 	coords.h = h;
 	coords.w = w;
+}
+
+void Ghost::setSpawnPos(int x, int y) {
+	spawn.first = x;
+	spawn.second = y;
+	setPos(x, y);
+}
+
+void Ghost::respawn() {
+	setPos(spawn.first, spawn.second);
+}
+
+enum class TargetType Ghost::getTargetMode() {
+	return targetMode;
 }
 
 void Ghost::animate(Animation a) {

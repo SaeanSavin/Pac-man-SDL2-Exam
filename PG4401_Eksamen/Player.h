@@ -38,6 +38,8 @@ public:
 
 	void setSpawnPos(int x, int y) override;
 
+	void respawn() override;
+
 	void setSize(int h, int w) override;
 
 	char getDirection() override;
@@ -52,19 +54,14 @@ public:
 		return hp;
 	}
 
-	SDL_Rect getSpawnPos() {
-		return startCoords;
-	}
-
 	void hitByGhost() override {
 		hp--;
-		coords.x = startCoords.x;
-		coords.y = startCoords.y;
+		respawn();
 	}
 
 private:
 	const Uint8* keys;
-
+	std::pair<int, int> spawn;
 	std::vector<SDL_Rect>& pellets;
 	
 	std::map<std::string, std::shared_ptr<Animation>> animations;
@@ -72,7 +69,6 @@ private:
 	SDL_Renderer* renderer;
 	SDL_Texture* texture;
 	SDL_Rect coords;
-	SDL_Rect startCoords;
 	
 	char direction = ' ';
 	char next_direction = 'n';

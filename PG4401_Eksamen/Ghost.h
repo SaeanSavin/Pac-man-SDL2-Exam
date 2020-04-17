@@ -3,12 +3,19 @@
 
 #include "Character.h"
 
+enum class TargetType {
+	AGRESSIVE,
+	SUPPORTIVE,
+	AMBUSH,
+	EVASIVE,
+};
+
 class Ghost : public Character
 {
 public:
 	//constructors
-	Ghost(SDL_Texture* t, SDL_Renderer* r, std::vector<SDL_Rect>& w);
-	Ghost(SDL_Texture* t, SDL_Renderer* r, SDL_Rect c, std::vector<SDL_Rect>& w);
+	Ghost(SDL_Texture* t, SDL_Renderer* r, std::vector<SDL_Rect>& w, enum class TargetType m);
+	Ghost(SDL_Texture* t, SDL_Renderer* r, SDL_Rect c, std::vector<SDL_Rect>& w, enum class TargetType m);
 
 	//movement
 	void move(SDL_Surface* surface, int& SCREEN_WIDTH, int& SCREEN_HEIGHT, std::vector<std::vector<char>>& map, std::vector<SDL_Rect>& walls) override;
@@ -49,15 +56,21 @@ public:
 		direction = d;
 	}
 
+	void setSpawnPos(int x, int y) override;
+
+	void respawn() override;
+
+	enum class TargetType getTargetMode();
+
 	//virtual implementations
 	void hitByGhost() override {};
 	int getScore() override { return 0; };
 	int getHP() override { return 0; };
-	void setSpawnPos(int x, int y) {};
 
 private:
+	enum class TargetType targetMode;
 	std::vector<SDL_Rect> walkable;
-
+	std::pair<int, int> spawn;
 	std::pair<int, int> target;
 	SDL_Renderer* renderer;
 	std::map<std::string, std::shared_ptr<Animation>> animations;
