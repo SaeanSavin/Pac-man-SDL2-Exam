@@ -305,6 +305,9 @@ void GameManager::play(std::string name) {
 		bashful->setTarget(getTarget(TargetType::SUPPORTIVE, p1, shadow));
 		bashful->move(surface, SCREEN_WIDTH, SCREEN_HEIGHT, map, walls);
 
+		pokey->setTarget(getTarget(TargetType::EVASIVE, p1, pokey));
+		pokey->move(surface, SCREEN_WIDTH, SCREEN_HEIGHT, map, walls);
+
 		//pokey->setTarget(getTarget(TargetType::AMBUSH, p1));
 		//pokey->move(surface, SCREEN_WIDTH, SCREEN_HEIGHT, map, walls);
 
@@ -521,9 +524,11 @@ std::pair<int, int> GameManager::getTarget(TargetType mode, std::shared_ptr<Char
 	return target;
 }
 
-//overloaded version of getTarget for SUPPORTIVE targetting behaviour
-std::pair<int, int> GameManager::getTarget(TargetType mode, std::shared_ptr<Character> enemy, std::shared_ptr<Ghost> ally) {
+//overloaded version of getTarget for SUPPORTIVE and EVASIVE targetting behaviour
+std::pair<int, int> GameManager::getTarget(TargetType mode, std::shared_ptr<Character> enemy, std::shared_ptr<Ghost> ghost) {
 	std::pair<int, int> target;
+	int v_x = 0;
+	int v_y = 0;
 	switch (mode) {
 		case TargetType::SUPPORTIVE:
 			//targeted tile is based on another ghosts position (originally blinkys)
@@ -534,19 +539,15 @@ std::pair<int, int> GameManager::getTarget(TargetType mode, std::shared_ptr<Char
 			switch (enemy->getDirection()) {
 			case 'w':
 				target.second -= 2 * 16;
-				std::cout << "set target w" << std::endl;
 				break;
 			case 's':
 				target.second += 2 * 16;
-				std::cout << "set target s" << std::endl;
 				break;
 			case 'a':
 				target.first -= 2 * 16;
-				std::cout << "set target a" << std::endl;
 				break;
 			case 'd':
 				target.first += 2 * 16;
-				std::cout << "set target d" << std::endl;
 				break;
 			case ' ':
 				target.first = enemy->getCoords()->x;
@@ -555,12 +556,26 @@ std::pair<int, int> GameManager::getTarget(TargetType mode, std::shared_ptr<Char
 			}
 
 			//then, calculate vector from this position to ghost ally
-			int v_x = abs(ally->getCoords()->x - target.first);
-			int v_y = abs(ally->getCoords()->y - target.second);
+			v_x = abs(ghost->getCoords()->x - target.first);
+			v_y = abs(ghost->getCoords()->y - target.second);
 
 			//finally, rotate vector 180 degrees and set target to this position
 			target.first += v_x * -1;
 			target.second += v_y * -1;
+			return target;
+
+		case TargetType::EVASIVE:
+			//target using AGRESSIVE if 16*8 away from enemy, else, scatter
+			int distance = std::sqrt(std::pow(abs(ghost->getCoords()->x - enemy->getCoords()->x), 2) + std::pow(abs(ghost->getCoords()->y - enemy->getCoords()->y), 2));
+			if (distance >= 8 * 16) {
+				std::cout << "chasing" << std::endl;
+				return getTarget(TargetType::AGRESSIVE, enemy);
+			}
+			else {
+				std::cout << "scattering" << std::endl;
+				target.first = 0;
+				target.second = 0;
+				return target;
+			}
 	}
-	return target;
 }
