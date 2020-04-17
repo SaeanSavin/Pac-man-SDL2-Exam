@@ -163,10 +163,6 @@ void Player::setSize(int h, int w) {
 	coords.w = w;
 }
 
-void Player::setScore(int s) {
-	score = s;
-}
-
 char Player::getDirection() {
 	return direction;
 }

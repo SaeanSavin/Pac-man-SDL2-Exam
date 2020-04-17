@@ -315,6 +315,9 @@ void GameManager::play(std::string name) {
 			if (pCoordsLeft < gCoordsRight && pCoordsRight > gCoordsLeft) {
 				if (pCoordsUp < gCoordsDown && pCoordsDown > gCoordsUp) {
 					p1->hitByGhost();
+					for (auto& g : ghosts) {
+						g->respawn();
+					}
 					SDL_Delay(1000);
 					if (p1->getHP() <= 0) {
 						isRunning = false;
@@ -432,7 +435,10 @@ void GameManager::play(std::string name) {
 			SDL_Rect levelcompletedDst = sdl_manager->createRect(16, 16, SCREEN_WIDTH / 2 - (levelcompletedText.length() * 8), SCREEN_HEIGHT / 2);
 			texture_manager->printFromTiles(levelcompletedText, renderer, text, levelcompletedDst, text_src);
 			sdl_manager->clearAndUpdateRenderer(renderer);
-			p1->setPos(p1->getSpawnPos().x, p1->getSpawnPos().y);
+			p1->respawn();
+			for (auto &g : ghosts) {
+				g->respawn();
+			}
 			map = defaultMap;
 			SDL_Delay(2000);
 		}
