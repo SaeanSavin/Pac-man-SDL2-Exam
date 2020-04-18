@@ -1,15 +1,15 @@
 #include "Player.h"
 
-Player::Player(SDL_Texture* t, SDL_Renderer* r, const Uint8* k, std::vector<SDL_Rect>& p)
-	:texture(t), renderer(r), keys(k), pellets(p)
+Player::Player(SDL_Texture* t, SDL_Renderer* r, const Uint8* k, std::vector<SDL_Rect>& p, SDL_GameController * controller)
+	:texture(t), renderer(r), keys(k), pellets(p), gameController(controller)
 {
 	coords.h = 0;
 	coords.w = 0;
 	coords.x = 0;
 	coords.y = 0;
 }
-Player::Player(SDL_Texture* t, SDL_Rect c, SDL_Renderer* r, const Uint8* k, std::vector<SDL_Rect>& p)
-	:texture(t), renderer(r), coords(c), keys(k), pellets(p)
+Player::Player(SDL_Texture* t, SDL_Rect c, SDL_Renderer* r, const Uint8* k, std::vector<SDL_Rect>& p, SDL_GameController *controller)
+	:texture(t), renderer(r), coords(c), keys(k), pellets(p), gameController(controller)
 {}
 
 //movement function
@@ -47,7 +47,7 @@ void Player::move(SDL_Surface *surface, int &SCREEN_WIDTH, int &SCREEN_HEIGHT, s
 	}
 
 	//check input
-	if (keys[SDL_SCANCODE_W] && collided != 'w') {
+	if ((keys[SDL_SCANCODE_W] || keys[SDL_SCANCODE_UP] || SDL_GameControllerGetButton(gameController, SDL_CONTROLLER_BUTTON_DPAD_UP)) && collided != 'w') {
 		if (!checkWallCollision(walls, 0, -1)) {
 			direction = 'w';
 			next_direction = 'n';
@@ -57,7 +57,7 @@ void Player::move(SDL_Surface *surface, int &SCREEN_WIDTH, int &SCREEN_HEIGHT, s
 		}
 	}
 
-	if (keys[SDL_SCANCODE_S] && collided != 's') {
+	if ((keys[SDL_SCANCODE_S] || keys[SDL_SCANCODE_DOWN] || SDL_GameControllerGetButton(gameController, SDL_CONTROLLER_BUTTON_DPAD_DOWN)) && collided != 's') {
 		if (!checkWallCollision(walls, 0, 1)) {
 			direction = 's';
 			next_direction = 'n';
@@ -67,7 +67,7 @@ void Player::move(SDL_Surface *surface, int &SCREEN_WIDTH, int &SCREEN_HEIGHT, s
 		}
 	}
 
-	if (keys[SDL_SCANCODE_A] && collided != 'a') {
+	if ((keys[SDL_SCANCODE_A] || keys[SDL_SCANCODE_LEFT] || SDL_GameControllerGetButton(gameController, SDL_CONTROLLER_BUTTON_DPAD_LEFT)) && collided != 'a') {
 		if (!checkWallCollision(walls, -1, 0)) {
 			direction = 'a';
 			next_direction = 'n';
@@ -77,7 +77,7 @@ void Player::move(SDL_Surface *surface, int &SCREEN_WIDTH, int &SCREEN_HEIGHT, s
 		}
 	}
 
-	if (keys[SDL_SCANCODE_D] && collided != 'd') {
+	if ((keys[SDL_SCANCODE_D] || keys[SDL_SCANCODE_RIGHT] || SDL_GameControllerGetButton(gameController, SDL_CONTROLLER_BUTTON_DPAD_RIGHT)) && collided != 'd') {
 		if (!checkWallCollision(walls, 1, 0)) {
 			direction = 'd';
 			next_direction = 'n';

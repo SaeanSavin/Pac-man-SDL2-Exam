@@ -35,6 +35,8 @@ void GameManager::play(std::string name) {
 	keys = SDL_GetKeyboardState(&numKeys);
 	SDL_Event evt;
 
+	SDL_GameController *gameController = nullptr;
+
 	std::string startText = "READY!";
 	std::string gameoverText = "GAME OVER!";
 	std::string levelcompletedText = "LEVEL COMPLETED!";
@@ -61,7 +63,7 @@ void GameManager::play(std::string name) {
 
 	std::cout << "initializing SDL..." << std::endl;
 
-	SDL_Init(SDL_INIT_AUDIO);
+	SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO | SDL_INIT_JOYSTICK);
 
 	auto sdl_manager = std::make_unique<SDL_Manager>();
 	auto texture_manager = std::make_shared<Texture_Manager>();
@@ -169,8 +171,9 @@ void GameManager::play(std::string name) {
 	//pacman
 	SDL_Surface *surface = sdl_manager->createSurface("../images/pacman/move/1.png", window, renderer);
 	SDL_Texture *pac_texture = texture_manager->draw(renderer, surface);
+	gameController = sdl_manager->getGameController();
 
-	std::shared_ptr<Character> p1 = std::make_shared<Player>(pac_texture, renderer, keys, edible);
+	std::shared_ptr<Character> p1 = std::make_shared<Player>(pac_texture, renderer, keys, edible, gameController);
 	p1->setPos(0, 0);
 	p1->setSize(16, 16);
 
@@ -269,7 +272,9 @@ void GameManager::play(std::string name) {
 	SDL_Rect readyDst = sdl_manager->createRect(16, 16, SCREEN_WIDTH / 2 - (startText.length() * 8), SCREEN_HEIGHT / 2);
 	texture_manager->printFromTiles(startText, renderer, text, readyDst, text_src);
 	sdl_manager->clearAndUpdateRenderer(renderer);
+	
 	SDL_Delay(2000);
+
 
 	/*   GAME LOOP START  */
 
@@ -431,6 +436,7 @@ void GameManager::play(std::string name) {
 
 	//Program exit 
 	SDL_CloseAudioDevice(deviceID);
+	SDL_GameControllerClose(0);
 
 	SDL_DestroyWindow(window);
 	IMG_Quit();

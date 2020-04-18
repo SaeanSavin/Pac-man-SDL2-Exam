@@ -7,8 +7,8 @@ class Player : public Character
 {
 public:
 	//constructors
-	Player(SDL_Texture* t, SDL_Renderer* r, const Uint8* k, std::vector<SDL_Rect>& p);
-	Player(SDL_Texture* t, SDL_Rect c, SDL_Renderer* r, const Uint8* k, std::vector<SDL_Rect>& p);
+	Player(SDL_Texture* t, SDL_Renderer* r, const Uint8* k, std::vector<SDL_Rect>& p, SDL_GameController *controller);
+	Player(SDL_Texture* t, SDL_Rect c, SDL_Renderer* r, const Uint8* k, std::vector<SDL_Rect>& p, SDL_GameController *controller);
 
 	//movement
 	void move(SDL_Surface *surface, int &SCREEN_WIDTH, int &SCREEN_HEIGHT, std::vector<std::vector<char>>& map, std::vector<SDL_Rect>& walls) override;
@@ -73,6 +73,7 @@ public:
 
 private:
 	const Uint8* keys;
+	SDL_GameController *gameController = nullptr;
 	std::pair<int, int> spawn;
 	std::vector<SDL_Rect>& pellets;
 	
