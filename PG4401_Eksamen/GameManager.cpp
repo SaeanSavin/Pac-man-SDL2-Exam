@@ -171,7 +171,7 @@ void GameManager::play(std::string name) {
 	SDL_Texture *pac_texture = texture_manager->draw(renderer, surface);
 	gameController = sdl_manager->getGameController();
 
-	std::shared_ptr<Character> p1 = std::make_shared<Player>(pac_texture, renderer, keys, edible, gameController);
+	std::shared_ptr<Player> p1 = std::make_shared<Player>(pac_texture, renderer, keys, edible, gameController);
 	p1->setPos(0, 0);
 	p1->setSize(16, 16);
 
