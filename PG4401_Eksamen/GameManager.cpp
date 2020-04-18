@@ -171,7 +171,7 @@ void GameManager::play(std::string name) {
 	SDL_Texture *pac_texture = texture_manager->draw(renderer, surface);
 	gameController = sdl_manager->getGameController();
 
-	std::shared_ptr<Character> p1 = std::make_shared<Player>(pac_texture, renderer, keys, edible, gameController);
+	std::shared_ptr<Player> p1 = std::make_shared<Player>(pac_texture, renderer, keys, edible, gameController);
 	p1->setPos(0, 0);
 	p1->setSize(16, 16);
 
@@ -267,13 +267,13 @@ void GameManager::play(std::string name) {
 	SDL_AudioDeviceID deviceID = SDL_OpenAudioDevice(NULL, 0, &wavSpec, NULL, 0);
 
 	int success = SDL_QueueAudio(deviceID, wavBuffer, wavLength);
-	//SDL_PauseAudioDevice(deviceID, 0);
+	SDL_PauseAudioDevice(deviceID, 0);
 
 	SDL_Rect readyDst = sdl_manager->createRect(16, 16, SCREEN_WIDTH / 2 - (startText.length() * 8), SCREEN_HEIGHT / 2);
 	texture_manager->printFromTiles(startText, renderer, text, readyDst, text_src);
 	sdl_manager->clearAndUpdateRenderer(renderer);
 	
-	SDL_Delay(2000);
+	SDL_Delay(8000);
 
 	/*    VARIABLES   */
 
@@ -365,12 +365,6 @@ void GameManager::play(std::string name) {
 
 		cycleDelta = (SDL_GetPerformanceCounter() - cycle) * 1000 / SDL_GetPerformanceCounter();
 		cycle += cycleDelta;
-		
-		if (!chasing) {
-			std::cout << "scattering" << std::endl;
-		} else {
-			std::cout << "chasing" << std::endl;
-		}
 
 		if(!chasing && cycle >= scatterDuration * 50000) {
 			cycle = 0;
