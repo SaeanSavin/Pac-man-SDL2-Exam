@@ -1,14 +1,14 @@
 #include "Ghost.h"
 
-Ghost::Ghost(SDL_Texture* t, SDL_Renderer* r, std::vector<SDL_Rect>& w, enum class TargetType m)
-	: texture(t), renderer(r), walkable(w), targetMode(m)
+Ghost::Ghost(SDL_Texture* t, SDL_Renderer* r, std::vector<SDL_Rect>& w, enum class TargetType m, enum class GhostType g)
+	: texture(t), renderer(r), walkable(w), targetMode(m), type(g)
 {
 	coords.h = 0;
 	coords.w = 0;
 	coords.x = 0;
 	coords.y = 0;
 }
-Ghost::Ghost(SDL_Texture* t, SDL_Renderer* r, SDL_Rect c, std::vector<SDL_Rect>& w, enum class TargetType m)
+Ghost::Ghost(SDL_Texture* t, SDL_Renderer* r, SDL_Rect c, std::vector<SDL_Rect>& w, enum class TargetType m, enum class GhostType g)
 	:texture(t), renderer(r), coords(c), walkable(w), targetMode(m) {}
 
 void Ghost::move(SDL_Surface *surface, int &SCREEN_WIDTH, int &SCREEN_HEIGHT, std::vector<std::vector<char>> &map, std::vector<SDL_Rect> &walls) {
@@ -34,7 +34,7 @@ void Ghost::move(SDL_Surface *surface, int &SCREEN_WIDTH, int &SCREEN_HEIGHT, st
 			newDirection = 'a';
 		} 
 
-		if (direction != 'w' && !checkWallCollision(walls, 0, 1)) {
+		if (direction != 'w' && !checkWallCollision(walls, 0, 1) && map[(coords.y - 50 + 16) / 16][coords.x / 16] != '~') {
 			newDir = std::sqrt(std::pow(abs((coords.x) - target.first), 2) + std::pow(abs((coords.y + 16) - target.second), 2));
 			if (newDir <= closestDir) {
 				closestDir = newDir;
@@ -164,6 +164,10 @@ void Ghost::setSpawnPos(int x, int y) {
 	spawn.first = x;
 	spawn.second = y;
 	setPos(x, y);
+}
+
+std::pair<int, int> Ghost::getSpawnPos() {
+	return spawn;
 }
 
 void Ghost::respawn() {

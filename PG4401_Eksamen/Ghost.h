@@ -8,16 +8,24 @@ enum class TargetType {
 	SUPPORTIVE,
 	AMBUSH,
 	EVASIVE,
+	SCATTER,
 	FRIGHTENED,
-	EYES
+	RETURN
+};
+
+enum class GhostType {
+	SHADOW,
+	SPEEDY,
+	BASHFUL,
+	POKEY
 };
 
 class Ghost : public Character
 {
 public:
 	//constructors
-	Ghost(SDL_Texture* t, SDL_Renderer* r, std::vector<SDL_Rect>& w, enum class TargetType m);
-	Ghost(SDL_Texture* t, SDL_Renderer* r, SDL_Rect c, std::vector<SDL_Rect>& w, enum class TargetType m);
+	Ghost(SDL_Texture* t, SDL_Renderer* r, std::vector<SDL_Rect>& w, enum class TargetType m, enum class GhostType g);
+	Ghost(SDL_Texture* t, SDL_Renderer* r, SDL_Rect c, std::vector<SDL_Rect>& w, enum class TargetType m, enum class GhostType g);
 
 	//movement
 	void move(SDL_Surface* surface, int& SCREEN_WIDTH, int& SCREEN_HEIGHT, std::vector<std::vector<char>>& map, std::vector<SDL_Rect>& walls) override;
@@ -60,6 +68,12 @@ public:
 
 	void setSpawnPos(int x, int y) override;
 
+	std::pair<int, int> getSpawnPos();
+
+	enum class GhostType getType() {
+		return type;
+	}
+
 	void respawn() override;
 
 	enum class TargetType getTargetMode();
@@ -71,6 +85,7 @@ public:
 
 private:
 	enum class TargetType targetMode;
+	enum class GhostType type;
 	std::vector<SDL_Rect> walkable;
 	std::pair<int, int> spawn;
 	std::pair<int, int> target;

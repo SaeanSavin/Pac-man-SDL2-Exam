@@ -27,13 +27,6 @@ void GameManager::setFramerate(const int FPS) {
 
 GameManager::GameManager() {}
 
-enum class GhostType {
-	SHADOW,
-	SPEEDY,
-	BASHFUL,
-	POKEY
-};
-
 void GameManager::play(std::string name) {
 
 	//input
@@ -398,21 +391,8 @@ void GameManager::play(std::string name) {
 				case '-':
 					break;
 				case 'S':
-					//p1->setPos(mapRect.x, mapRect.y);
-					//p1->setSpawnPos(mapRect.x, mapRect.y);
-					//c = ' ';
 					break;
 				case 'G':
-					//shadow->setPos(mapRect.x, mapRect.y);
-					//c = ' ';
-					break;
-				case 'H':
-					//speedy->setPos(mapRect.x, mapRect.y);
-					//c = ' ';
-					break;
-				case 'O':
-					//bashful->setPos(mapRect.x, mapRect.y);
-					//c = ' ';
 					break;
 				}
 				mapRect.x += 16;
@@ -517,7 +497,7 @@ std::shared_ptr<Ghost> GameManager::makeGhost(std::shared_ptr<Texture_Manager> t
 
 	SDL_Texture* ghost_texture = texture_manager->loadTexture(&ghost_path[0], renderer);
 
-	auto ghost = std::make_shared<Ghost>(ghost_texture, renderer, walkable, mode);
+	auto ghost = std::make_shared<Ghost>(ghost_texture, renderer, walkable, mode, type);
 	ghost->setPos(32, 0);
 	ghost->setSize(16, 16);
 
@@ -534,61 +514,69 @@ std::shared_ptr<Ghost> GameManager::makeGhost(std::shared_ptr<Texture_Manager> t
 	return ghost;
 }
 
+std::pair<int, int> GameManager::getTarget(TargetType mode) {
+	std::pair<int, int> target;
+	switch (mode) {
+	case TargetType::FRIGHTENED:
+		//randomly choose target
+		int random = rand() % 4 + 1;
+		if (random == 4) {
+			target.first = 0;
+			target.second = 0;
+		}
+		else if (random == 3) {
+			target.first = SCREEN_WIDTH;
+			target.second = 0;
+		}
+		else if (random == 2) {
+			target.first = 0;
+			target.second = SCREEN_HEIGHT;
+		}
+		else {
+			target.first = SCREEN_WIDTH;
+			target.second = SCREEN_HEIGHT;
+		}
+		break;
+	}
+	return target;
+}
+
+//overloaded version of getTarget for AGRESSIVE and AMBUSH targetting behaviour
 std::pair<int, int> GameManager::getTarget(TargetType mode, std::shared_ptr<Character> enemy) {
 	std::pair<int, int> target;
 	switch (mode) {
-		case TargetType::AGRESSIVE:
-			//target enemy directly
+	case TargetType::AGRESSIVE:
+		//target enemy directly
+		target.first = enemy->getCoords()->x;
+		target.second = enemy->getCoords()->y;
+		return target;
+	case TargetType::AMBUSH:
+		//target 4x16 ahead of enemys current direction
+		target.first = enemy->getCoords()->x;
+		target.second = enemy->getCoords()->y;
+		switch (enemy->getDirection()) {
+		case 'w':
+			target.second -= 4 * 16;
+			std::cout << "set target w" << std::endl;
+			break;
+		case 's':
+			target.second += 4 * 16;
+			std::cout << "set target s" << std::endl;
+			break;
+		case 'a':
+			target.first -= 4 * 16;
+			std::cout << "set target a" << std::endl;
+			break;
+		case 'd':
+			target.first += 4 * 16;
+			std::cout << "set target d" << std::endl;
+			break;
+		case ' ':
 			target.first = enemy->getCoords()->x;
 			target.second = enemy->getCoords()->y;
 			break;
-		case TargetType::AMBUSH:
-			//target 4x16 ahead of enemys current direction
-			target.first = enemy->getCoords()->x;
-			target.second = enemy->getCoords()->y;
-			switch (enemy->getDirection()) {
-				case 'w':
-					target.second -= 4 * 16;
-					std::cout << "set target w" << std::endl;
-					break;
-				case 's':
-					target.second += 4 * 16;
-					std::cout << "set target s" << std::endl;
-					break;
-				case 'a':
-					target.first -= 4 * 16;
-					std::cout << "set target a" << std::endl;
-					break;
-				case 'd':
-					target.first += 4 * 16;
-					std::cout << "set target d" << std::endl;
-					break;
-				case ' ':
-					target.first = enemy->getCoords()->x;
-					target.second = enemy->getCoords()->y;
-					break;
-			}
-			break;
-		case TargetType::FRIGHTENED:
-			//randomly choose target
-			int random = rand() % 4 + 1;
-			if (random == 4) {
-				target.first = 0;
-				target.second = 0;
-			}
-			else if (random == 3) {
-				target.first = SCREEN_WIDTH;
-				target.second = 0;
-			}
-			else if (random == 2) {
-				target.first = 0;
-				target.second = SCREEN_HEIGHT;
-			}
-			else {
-				target.first = SCREEN_WIDTH;
-				target.second = SCREEN_HEIGHT;
-			}
-			break;
+		}
+		return target;
 	}
 	return target;
 }
@@ -647,4 +635,37 @@ std::pair<int, int> GameManager::getTarget(TargetType mode, std::shared_ptr<Char
 				return target;
 			}
 	}
+}
+
+//overloaded version of getTarget for SCATTER and RETURN
+std::pair<int, int> GameManager::getTarget(TargetType mode, std::shared_ptr<Ghost> ghost) {
+	std::pair<int, int> target;
+	switch (mode) {
+		//target one of four map corners, based on which type of ghost they are
+	case TargetType::SCATTER:
+		switch (ghost->getType()) {
+		case GhostType::SHADOW:
+			target.first = SCREEN_WIDTH;
+			target.second = 0;
+			break;
+		case GhostType::SPEEDY:
+			target.first = 0;
+			target.second = 0;
+			break;
+		case GhostType::BASHFUL:
+			target.first = SCREEN_WIDTH;
+			target.second = SCREEN_HEIGHT;
+			break;
+		case GhostType::POKEY:
+			target.first = 0;
+			target.second = SCREEN_HEIGHT;
+			break;
+		}
+		return target;
+	case TargetType::RETURN:
+		target.first = ghost->getSpawnPos().first;
+		target.second = ghost->getSpawnPos().second;
+		return target;
+	}
+	return target;
 }
