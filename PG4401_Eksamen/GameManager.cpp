@@ -282,6 +282,16 @@ void GameManager::play(std::string name) {
 	Uint32 poweredStart = 0;
 	Uint32 poweredDelta = 0;
 
+	//time variables for chase-scatter cycle
+	Uint32 roundStart = SDL_GetPerformanceCounter();
+	Uint32 scatterDuration = 7;
+	Uint32 chaseDuration = 20;
+	Uint32 cycle = 0;
+	Uint32 cycleDelta = 0;
+	Uint32 scatterCount = 0;
+	Uint32 currentLevel = 0;
+	bool chasing = false;
+
 
 	/*   GAME LOOP START  */
 
@@ -347,6 +357,26 @@ void GameManager::play(std::string name) {
 			hp_dst.x += 20;
 		}
 
+		//manage chase-scatter cycle
+
+		cycleDelta = (SDL_GetPerformanceCounter() - cycle) * 1000 / SDL_GetPerformanceCounter();
+		cycle += cycleDelta;
+		
+		if (!chasing) {
+			std::cout << "scattering" << std::endl;
+		} else {
+			std::cout << "chasing" << std::endl;
+		}
+
+		if(!chasing && cycle >= scatterDuration * 50000) {
+			cycle = 0;
+			chasing = true;
+		} 
+		if (chasing && cycle >= chaseDuration * 50000) {
+			cycle = 0;
+			chasing = false;
+		}
+
 		//Move characters and check if pacman is powered
 		p1->move(surface, SCREEN_WIDTH, SCREEN_HEIGHT, map, walls);
 
@@ -370,11 +400,8 @@ void GameManager::play(std::string name) {
 			poweredDelta = (SDL_GetPerformanceCounter() - poweredStart) * 1000 / SDL_GetPerformanceCounter();
 			poweredStart += poweredDelta;
 
-			std::cout << "powered: " << (poweredStart * 100) / poweredTime <<  std::endl;
-
 			//check if frightened is over in 25% of time
 			if ((poweredStart * 100) / poweredTime >= 75) {
-				std::cout << "frightened ending soon!" << std::endl;
 				for (auto& g : ghosts) {
 					if (g->isFrightened()) {
 						g->startFrightenedEnding();
@@ -394,15 +421,22 @@ void GameManager::play(std::string name) {
 			}
 		}
 
-		//runs while pacman is powered
+		//decide target type for ghosts and move ghosts accordingly
 		int ghosts_i = 0;
 		for (auto& g : ghosts) {
+			//if ghost is eaten, return to spawn
 			if (g->isEaten()) {
 				g->setTarget(getTarget(TargetType::RETURN, g));
 			}
-			else if (p1->isPowered()) {
+			//if pacman is powered, ghosts should be frightened
+			else if (isPowered) {
 				g->setTarget(getTarget(TargetType::FRIGHTENED));
 			}
+			//if not chasing, scatter
+			else if (!chasing) {
+				g->setTarget(getTarget(TargetType::SCATTER, g));
+			}
+			//else, chase based on TargetMode pattern
 			else {
 				if (g->getTargetMode() == TargetType::EVASIVE) {
 					g->setTarget(getTarget(g->getTargetMode(), p1, g));
@@ -709,11 +743,9 @@ std::pair<int, int> GameManager::getTarget(TargetType mode, std::shared_ptr<Play
 			//target using AGRESSIVE if 16*8 away from enemy, else, scatter
 			int distance = std::sqrt(std::pow(abs(ghost->getCoords()->x - enemy->getCoords()->x), 2) + std::pow(abs(ghost->getCoords()->y - enemy->getCoords()->y), 2));
 			if (distance >= 8 * 16) {
-				std::cout << "chasing" << std::endl;
 				return getTarget(TargetType::AGRESSIVE, enemy);
 			}
 			else {
-				std::cout << "scattering" << std::endl;
 				return getTarget(TargetType::SCATTER, ghost);
 			}
 	}
