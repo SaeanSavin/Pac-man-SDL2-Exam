@@ -629,10 +629,7 @@ std::pair<int, int> GameManager::getTarget(TargetType mode, std::shared_ptr<Char
 				return getTarget(TargetType::AGRESSIVE, enemy);
 			}
 			else {
-				std::cout << "scattering" << std::endl;
-				target.first = 0;
-				target.second = 0;
-				return target;
+				return getTarget(TargetType::SCATTER, ghost);
 			}
 	}
 }
