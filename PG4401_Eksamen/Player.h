@@ -52,11 +52,24 @@ public:
 		return score;
 	}
 
-	int getHP() override {
-		return hp;
+	void addScore(int s) {
+		score += s;
 	}
 
-	void hitByGhost() override {
+	int getHP() {
+		return hp;
+	
+	}
+
+	bool isPowered() {
+		return powered;
+	}
+
+	void stopPowered() {
+		powered = false;
+	}
+
+	void hitByGhost() {
 		hp--;
 		Animation a = *animations["dead"];
 		animations["dead"]->resetAnimation();
@@ -89,5 +102,7 @@ private:
 	int speed = 1;
 	int score = 0;
 	int hp = 3;
+
+	bool powered = false;
 };
 #endif

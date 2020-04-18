@@ -22,12 +22,6 @@ public:
 
 	virtual void setAnimation(std::string name, std::shared_ptr<Animation> animation) = 0;
 
-	virtual int getScore() = 0;
-
-	virtual void hitByGhost() = 0;
-
-	virtual int getHP() = 0;
-
 	virtual void move(SDL_Surface *surface, int &SCREEN_WIDTH, int &SCREEN_HEIGHT, std::vector<std::vector<char>> &map, std::vector<SDL_Rect> &walls) = 0;
 
 	virtual void setSpawnPos(int x, int y) = 0;

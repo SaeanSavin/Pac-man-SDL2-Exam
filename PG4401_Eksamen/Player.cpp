@@ -235,6 +235,7 @@ bool Player::checkEdibleCollision(std::vector<SDL_Rect>& edible, std::vector<std
 			}
 			if (coords.x == e.x && map[(e.y - 50) / 16][e.x / 16] == 'P') {
 				map[(e.y - 50) / 16][e.x / 16] = ' ';
+				powered = true;
 				return true;
 			}
 		}
