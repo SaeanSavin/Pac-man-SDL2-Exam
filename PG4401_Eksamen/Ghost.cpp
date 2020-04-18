@@ -20,7 +20,16 @@ void Ghost::move(SDL_Surface *surface, int &SCREEN_WIDTH, int &SCREEN_HEIGHT, st
 
 	if (checkTileEntered(walkable)) {
 
-		if (isHome(walkable, map)) { 
+		if (eaten && speed == 1) {
+			speed = 2;
+		}
+
+		if (eaten && coords.x == spawn.first && coords.y == spawn.second) {
+			eaten = false;
+			speed = 1;
+		}
+
+		if (isHome(walkable, map) && !eaten) { 
 			target.first = coords.x;
 			target.second = 0;
 		}
@@ -34,7 +43,8 @@ void Ghost::move(SDL_Surface *surface, int &SCREEN_WIDTH, int &SCREEN_HEIGHT, st
 			newDirection = 'a';
 		} 
 
-		if (direction != 'w' && !checkWallCollision(walls, 0, 1) && map[(coords.y - 50 + 16) / 16][coords.x / 16] != '~') {
+		//the map-check makes sure ghosts doesn't return to ghost-house
+		if (direction != 'w' && !checkWallCollision(walls, 0, 1) && (map[(coords.y - 50 + 16) / 16][coords.x / 16] != '~' || eaten)) {
 			newDir = std::sqrt(std::pow(abs((coords.x) - target.first), 2) + std::pow(abs((coords.y + 16) - target.second), 2));
 			if (newDir <= closestDir) {
 				closestDir = newDir;
@@ -87,28 +97,72 @@ void Ghost::move(SDL_Surface *surface, int &SCREEN_WIDTH, int &SCREEN_HEIGHT, st
 	case 'w':
 		if (!checkWallCollision(walls, 0, -1)) {
 			coords.y -= speed;
-			animate(*animations["up"]);
+			if (eaten) {
+				animate(*animations["eaten_up"]);
+			}
+			else if (frightened_ending) {
+				animate(*animations["frightened_ending"]);
+			}
+			else if (frightened) {
+				animate(*animations["frightened"]);
+			}
+			else {
+				animate(*animations["up"]);
+			}
 		}
 		collided = 'n';
 		break;
 	case 's':
 		if (!checkWallCollision(walls, 0, 1)) {
 			coords.y += speed;
-			animate(*animations["down"]);
+			if (eaten) {
+				animate(*animations["eaten_down"]);
+			}
+			else if (frightened_ending) {
+				animate(*animations["frightened_ending"]);
+			}
+			else if (frightened) {
+				animate(*animations["frightened"]);
+			}
+			else {
+				animate(*animations["down"]);
+			}
 		}
 		collided = 'n';
 		break;
 	case 'a':
 		if (!checkWallCollision(walls, -1, 0)) {
 			coords.x -= speed;
-			animate(*animations["left"]);
+			if (eaten) {
+				animate(*animations["eaten_left"]);
+			}
+			else if (frightened_ending) {
+				animate(*animations["frightened_ending"]);
+			}
+			else if (frightened) {
+				animate(*animations["frightened"]);
+			}
+			else {
+				animate(*animations["left"]);
+			}
 		}
 		collided = 'n';
 		break;
 	case 'd':
 		if (!checkWallCollision(walls, 1, 0)) {
 			coords.x += speed;
-			animate(*animations["right"]);
+			if (eaten) {
+				animate(*animations["eaten_right"]);
+			}
+			else if (frightened_ending) {
+				animate(*animations["frightened_ending"]);
+			}
+			else if (frightened) {
+				animate(*animations["frightened"]);
+			}
+			else {
+				animate(*animations["right"]);
+			}
 		}
 		collided = 'n';
 		break;
@@ -172,6 +226,9 @@ std::pair<int, int> Ghost::getSpawnPos() {
 
 void Ghost::respawn() {
 	setPos(spawn.first, spawn.second);
+	eaten = false;
+	frightened = false;
+	frightened_ending = false;
 }
 
 enum class TargetType Ghost::getTargetMode() {

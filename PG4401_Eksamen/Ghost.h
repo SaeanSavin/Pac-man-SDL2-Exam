@@ -70,33 +70,76 @@ public:
 
 	std::pair<int, int> getSpawnPos();
 
+	void respawn() override;
+
 	enum class GhostType getType() {
 		return type;
 	}
 
-	void respawn() override;
-
 	enum class TargetType getTargetMode();
 
-	//virtual implementations
-	void hitByGhost() override {};
-	int getScore() override { return 0; };
-	int getHP() override { return 0; };
+	void startFrightened() {
+		frightened = true;
+	}
+
+	void startFrightenedEnding() {
+		frightened_ending = true;
+	}
+
+	void stopFrightenedEnding() {
+		frightened_ending = false;
+	}
+
+	void stopFrightened() {
+		frightened_ending = false;
+		frightened = false;
+	}
+
+	void startEaten() {
+		eaten = true;
+	}
+
+	void stopEaten() {
+		eaten = false;
+	}
+
+	void hitByPacman() {
+		frightened_ending = false;
+		frightened = false;
+		eaten = true;
+	}
+
+	bool isEaten() {
+		return eaten;
+	}
+
+	bool isFrightened() {
+		return frightened;
+	}
 
 private:
 	enum class TargetType targetMode;
 	enum class GhostType type;
+
 	std::vector<SDL_Rect> walkable;
-	std::pair<int, int> spawn;
-	std::pair<int, int> target;
-	SDL_Renderer* renderer;
-	std::map<std::string, std::shared_ptr<Animation>> animations;
 	SDL_Texture* texture;
 	SDL_Rect coords;
+	SDL_Renderer* renderer;
+
+	std::pair<int, int> spawn;
+	std::pair<int, int> target;
+
+	std::map<std::string, std::shared_ptr<Animation>> animations;
+	
 	char direction = 'i';
 	char next_direction = 'n';
 	char collided = 'n';
+	
 	int speed = 1;
+
+	bool frightened = false;
+	bool frightened_ending = false;
+	bool eaten = false;
 };
 
 #endif _GHOST_H_

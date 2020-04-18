@@ -88,9 +88,7 @@ void GameManager::play(std::string name) {
 	SDL_Surface *hpSurface = sdl_manager->createSurface("../images/Pacman/move/2.png", window, renderer);
 	SDL_Texture *hpTexture = texture_manager->draw(renderer, hpSurface);
 
-	/*    VARIABLES   */
-
-	bool isRunning = true;
+	/*    VECTORS   */
 
 	//Wall vector
 	//Use to check collison with walls
@@ -254,6 +252,8 @@ void GameManager::play(std::string name) {
 	SDL_Texture *corner_bottom_left = texture_manager->loadTexture("../images/mapTiles/wall_corner_bl_single.png", renderer);
 
 	SDL_Rect text_src = sdl_manager->createRect(8, 8, 0, 0);
+
+
 	/*   AUDIO SETUP   */
 
 	std::cout << "preparing audio..." << std::endl;
@@ -274,6 +274,17 @@ void GameManager::play(std::string name) {
 	sdl_manager->clearAndUpdateRenderer(renderer);
 	
 	SDL_Delay(2000);
+
+	/*    VARIABLES   */
+
+	//check if game is running
+	bool isRunning = true;
+	
+	//check and manage powered-state of pacman
+	bool isPowered = false;
+	Uint32 poweredTime = 1000000;
+	Uint32 poweredStart = 0;
+	Uint32 poweredDelta = 0;
 
 
 	/*   GAME LOOP START  */
@@ -315,13 +326,21 @@ void GameManager::play(std::string name) {
 
 			if (pCoordsLeft < gCoordsRight && pCoordsRight > gCoordsLeft) {
 				if (pCoordsUp < gCoordsDown && pCoordsDown > gCoordsUp) {
-					p1->hitByGhost();
-					for (auto& g : ghosts) {
-						g->respawn();
-					}
-					//SDL_Delay(1000);
-					if (p1->getHP() <= 0) {
-						isRunning = false;
+					//if pacman hits ghost while 
+					if (g->isFrightened()) {
+						g->hitByPacman();
+						SDL_Delay(1000);
+						p1->addScore(1000);
+					} else if (!g->isEaten()) {
+						p1->hitByGhost();
+						isPowered = false;
+						poweredStart = 0;
+						for (auto& g : ghosts) {
+							g->respawn();
+						}
+						if (p1->getHP() <= 0) {
+							isRunning = false;
+						}
 					}
 				}
 			}
@@ -332,18 +351,72 @@ void GameManager::play(std::string name) {
 			hp_dst.x += 20;
 		}
 
-		//Move characters
+		//Move characters and check if pacman is powered
 		p1->move(surface, SCREEN_WIDTH, SCREEN_HEIGHT, map, walls);
 
+		//runs on the frame that pacman gets power pellet
+		if (p1->isPowered()) {
+			p1->stopPowered();
+			isPowered = true;
+			poweredStart = 0;
+			poweredDelta = SDL_GetPerformanceCounter();
+			for (auto& g : ghosts) {
+				if (!g->isEaten()) {
+					g->stopFrightenedEnding();
+					g->startFrightened();
+				}
+			}
+		}
+
+		//runs while pacman is powered
+		if (isPowered) {
+
+			poweredDelta = (SDL_GetPerformanceCounter() - poweredStart) * 1000 / SDL_GetPerformanceCounter();
+			poweredStart += poweredDelta;
+
+			std::cout << "powered: " << (poweredStart * 100) / poweredTime <<  std::endl;
+
+			//check if frightened is over in 25% of time
+			if ((poweredStart * 100) / poweredTime >= 75) {
+				std::cout << "frightened ending soon!" << std::endl;
+				for (auto& g : ghosts) {
+					if (g->isFrightened()) {
+						g->startFrightenedEnding();
+					}
+				}
+			}
+
+			//check if frightened over;
+			if (poweredStart >= poweredTime) {
+				isPowered = false;
+				for (auto& g : ghosts) {
+					if (g->isFrightened()) {
+						g->stopFrightened();
+					}
+				}
+				poweredStart = 0;
+			}
+		}
+
+		//runs while pacman is powered
 		int ghosts_i = 0;
 		for (auto& g : ghosts) {
-			if (g->getTargetMode() == TargetType::EVASIVE) {
-				g->setTarget(getTarget(g->getTargetMode(), p1, g));
-			} else if (g->getTargetMode() == TargetType::SUPPORTIVE) {
-				g->setTarget(getTarget(g->getTargetMode(), p1, ghosts[ghosts_i - 2]));
+			if (g->isEaten()) {
+				g->setTarget(getTarget(TargetType::RETURN, g));
+			}
+			else if (p1->isPowered()) {
+				g->setTarget(getTarget(TargetType::FRIGHTENED));
 			}
 			else {
-				g->setTarget(getTarget(g->getTargetMode(), p1));
+				if (g->getTargetMode() == TargetType::EVASIVE) {
+					g->setTarget(getTarget(g->getTargetMode(), p1, g));
+				}
+				else if (g->getTargetMode() == TargetType::SUPPORTIVE) {
+					g->setTarget(getTarget(g->getTargetMode(), p1, ghosts[ghosts_i - 2]));
+				}
+				else {
+					g->setTarget(getTarget(g->getTargetMode(), p1));
+				}
 			}
 			g->move(surface, SCREEN_WIDTH, SCREEN_HEIGHT, map, walls);
 			ghosts_i++;
@@ -407,8 +480,6 @@ void GameManager::play(std::string name) {
 		}
 
 		sdl_manager->clearAndUpdateRenderer(renderer);
-
-		std::cout << "Current Pellets: " << currentPellets << std::endl;
 
 		if (p1->getHP() <= 0) {
 			setTotalPlayerScore(p1->getScore());
@@ -512,10 +583,26 @@ std::shared_ptr<Ghost> GameManager::makeGhost(std::shared_ptr<Texture_Manager> t
 	auto ghost_left = std::make_shared<Animation>(renderer, (ghost_anim_path + "move/left"), 12);
 	auto ghost_right = std::make_shared<Animation>(renderer, (ghost_anim_path + "move/right"), 12);
 
+	auto frightened = std::make_shared<Animation>(renderer, "../images/Ghosts/Frightened/move", 12);
+	auto frightened_ending = std::make_shared<Animation>(renderer, "../images/Ghosts/Frightened/move_last", 12);
+
+	auto eyes_up = std::make_shared<Animation>(renderer, "../images/Ghosts/Eyes/move/up", 12);
+	auto eyes_down = std::make_shared<Animation>(renderer, "../images/Ghosts/Eyes/move/down", 12);
+	auto eyes_left = std::make_shared<Animation>(renderer, "../images/Ghosts/Eyes/move/left", 12);
+	auto eyes_right = std::make_shared<Animation>(renderer, "../images/Ghosts/Eyes/move/right", 12);
+
 	ghost->setAnimation("up", ghost_up);
 	ghost->setAnimation("down", ghost_down);
 	ghost->setAnimation("left", ghost_left);
 	ghost->setAnimation("right", ghost_right);
+	
+	ghost->setAnimation("frightened", frightened);
+	ghost->setAnimation("frightened_ending", frightened_ending);
+
+	ghost->setAnimation("eaten_up", eyes_up);
+	ghost->setAnimation("eaten_down", eyes_down);
+	ghost->setAnimation("eaten_left", eyes_left);
+	ghost->setAnimation("eaten_right", eyes_right);
 
 	return ghost;
 }
@@ -548,7 +635,7 @@ std::pair<int, int> GameManager::getTarget(TargetType mode) {
 }
 
 //overloaded version of getTarget for AGRESSIVE and AMBUSH targetting behaviour
-std::pair<int, int> GameManager::getTarget(TargetType mode, std::shared_ptr<Character> enemy) {
+std::pair<int, int> GameManager::getTarget(TargetType mode, std::shared_ptr<Player> enemy) {
 	std::pair<int, int> target;
 	switch (mode) {
 	case TargetType::AGRESSIVE:
@@ -563,19 +650,15 @@ std::pair<int, int> GameManager::getTarget(TargetType mode, std::shared_ptr<Char
 		switch (enemy->getDirection()) {
 		case 'w':
 			target.second -= 4 * 16;
-			std::cout << "set target w" << std::endl;
 			break;
 		case 's':
 			target.second += 4 * 16;
-			std::cout << "set target s" << std::endl;
 			break;
 		case 'a':
 			target.first -= 4 * 16;
-			std::cout << "set target a" << std::endl;
 			break;
 		case 'd':
 			target.first += 4 * 16;
-			std::cout << "set target d" << std::endl;
 			break;
 		case ' ':
 			target.first = enemy->getCoords()->x;
@@ -588,7 +671,7 @@ std::pair<int, int> GameManager::getTarget(TargetType mode, std::shared_ptr<Char
 }
 
 //overloaded version of getTarget for SUPPORTIVE and EVASIVE targetting behaviour
-std::pair<int, int> GameManager::getTarget(TargetType mode, std::shared_ptr<Character> enemy, std::shared_ptr<Ghost> ghost) {
+std::pair<int, int> GameManager::getTarget(TargetType mode, std::shared_ptr<Player> enemy, std::shared_ptr<Ghost> ghost) {
 	std::pair<int, int> target;
 	int v_x = 0;
 	int v_y = 0;
@@ -635,6 +718,7 @@ std::pair<int, int> GameManager::getTarget(TargetType mode, std::shared_ptr<Char
 				return getTarget(TargetType::AGRESSIVE, enemy);
 			}
 			else {
+				std::cout << "scattering" << std::endl;
 				return getTarget(TargetType::SCATTER, ghost);
 			}
 	}
