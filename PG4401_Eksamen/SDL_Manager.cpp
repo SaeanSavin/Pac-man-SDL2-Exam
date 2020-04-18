@@ -60,6 +60,18 @@ SDL_Rect SDL_Manager::createRect(int w, int h, int x, int y) {
 	return rect;
 }
 
+SDL_GameController *SDL_Manager::getGameController() {
+	
+	if (SDL_IsGameController(0)) {
+		std::cout << "Controller found!" << std::endl;
+	} else {
+		std::cout << "No Controller found!" << std::endl;
+		return nullptr;
+	}
+	SDL_GameController *gc = SDL_GameControllerOpen(0);
+	return gc;
+}
+
 void SDL_Manager::SetRenderColor(SDL_Renderer *renderer, int r, int g, int b, int a) {
 	SDL_SetRenderDrawColor(renderer, r, g, b, 255);
 }

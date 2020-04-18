@@ -13,6 +13,8 @@ public:
 	SDL_Surface *createSurface(const char *c, SDL_Window *window, SDL_Renderer *renderer);
 	SDL_Rect createRect(int w, int h, int x, int y);
 
+	SDL_GameController *getGameController();
+
 	void SetRenderColor(SDL_Renderer *renderer, int r, int g, int b, int a);
 	void clearAndUpdateRenderer(SDL_Renderer *renderer);
 	void clearRenderer(SDL_Renderer *renderer);
