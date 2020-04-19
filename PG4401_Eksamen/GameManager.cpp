@@ -889,6 +889,7 @@ std::pair<int, int> GameManager::getTarget(TargetType mode, std::shared_ptr<Play
 				return getTarget(TargetType::SCATTER, ghost);
 			}
 	}
+	return target;
 }
 
 //overloaded version of getTarget for SCATTER and RETURN
