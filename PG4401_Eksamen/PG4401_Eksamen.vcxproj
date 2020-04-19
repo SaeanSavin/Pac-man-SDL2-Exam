@@ -147,6 +147,7 @@
     <ClCompile Include="main.cpp" />
     <ClCompile Include="GameManager.cpp" />
     <ClCompile Include="Player.cpp" />
+    <ClCompile Include="PromptManager.cpp" />
     <ClCompile Include="SDL_Manager.cpp" />
     <ClCompile Include="Animation.cpp" />
     <ClCompile Include="Sound.cpp" />
@@ -161,6 +162,7 @@
     <ClInclude Include="GameManager.h" />
     <ClInclude Include="Ghost.h" />
     <ClInclude Include="Player.h" />
+    <ClInclude Include="PromptManager.h" />
     <ClInclude Include="SDL_Manager.h" />
     <ClInclude Include="Sound.h" />
     <ClInclude Include="Texture_Manager.h" />

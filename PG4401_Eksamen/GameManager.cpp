@@ -241,6 +241,7 @@ void GameManager::play(std::string name) {
 	//Create Textures
 	SDL_Texture *pellet = texture_manager->loadTexture("../images/Edible/pellet.png", renderer);
 	SDL_Texture *cherry = texture_manager->loadTexture("../images/Edible/cherry.png", renderer);
+	SDL_Texture *apple = texture_manager->loadTexture("../images/Edible/apple.png", renderer);
 	SDL_Texture *poweups = texture_manager->loadTexture("../images/Edible/powerup.png", renderer);
 	SDL_Texture *wall_bottom = texture_manager->loadTexture("../images/mapTiles/wall_bottom_single.png", renderer);
 	SDL_Texture *wall_top = texture_manager->loadTexture("../images/mapTiles/wall_top_single.png", renderer);
@@ -267,13 +268,13 @@ void GameManager::play(std::string name) {
 	SDL_AudioDeviceID deviceID = SDL_OpenAudioDevice(NULL, 0, &wavSpec, NULL, 0);
 
 	int success = SDL_QueueAudio(deviceID, wavBuffer, wavLength);
-	SDL_PauseAudioDevice(deviceID, 0);
+	//SDL_PauseAudioDevice(deviceID, 0);
 
 	SDL_Rect readyDst = sdl_manager->createRect(16, 16, SCREEN_WIDTH / 2 - (startText.length() * 8), SCREEN_HEIGHT / 2);
 	texture_manager->printFromTiles(startText, renderer, text, readyDst, text_src);
 	sdl_manager->clearAndUpdateRenderer(renderer);
 	
-	SDL_Delay(8000);
+	SDL_Delay(2000);
 
 	/*    VARIABLES   */
 
@@ -465,6 +466,9 @@ void GameManager::play(std::string name) {
 					break;
 				case 'C':
 					SDL_RenderCopy(renderer, cherry, nullptr, &mapRect);
+					break;
+				case 'A':
+					SDL_RenderCopy(renderer, apple, nullptr, &mapRect);
 					break;
 				case 'P':
 					SDL_RenderCopy(renderer, poweups, nullptr, &mapRect);

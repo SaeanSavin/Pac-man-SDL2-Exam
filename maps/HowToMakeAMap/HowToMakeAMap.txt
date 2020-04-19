@@ -18,4 +18,5 @@ Space = Air
 x = Pellets
 S = Start Player
 C = Cherry
+A = Apple
 P = Power Ups

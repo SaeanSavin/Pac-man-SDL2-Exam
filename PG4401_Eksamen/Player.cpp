@@ -233,11 +233,20 @@ bool Player::checkEdibleCollision(std::vector<SDL_Rect>& edible, std::vector<std
 				score += 100;
 				return true;
 			}
+
+			if (coords.x == e.x && map[(e.y - 50) / 16][e.x / 16] == 'A') {
+				map[(e.y - 50) / 16][e.x / 16] = ' ';
+				score += 200;
+				return true;
+			}
+			
 			if (coords.x == e.x && map[(e.y - 50) / 16][e.x / 16] == 'P') {
 				map[(e.y - 50) / 16][e.x / 16] = ' ';
 				powered = true;
 				return true;
 			}
+
+			
 		}
 	}
 	return false;

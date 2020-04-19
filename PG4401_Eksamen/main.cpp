@@ -3,6 +3,7 @@
 
 #include "GameManager.h"
 #include "SDL_Manager.h"
+#include "PromptManager.h"
 
 int main(int argc, char *argv[]) {
 
@@ -24,9 +25,8 @@ int main(int argc, char *argv[]) {
 	}
 
 	std::cout << "Choose map: ";
-	std::cin >> mapSelection;
-	std::cout << mapSelection << std::endl;
-
+	mapSelection = PromptManager::validatePrompt(1, index - 1);
+	
 	std::cout << "\n\n\n" << std::endl;
 
 	std::string name = mapList[mapSelection - 1];
