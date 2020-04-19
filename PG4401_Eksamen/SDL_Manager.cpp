@@ -13,7 +13,7 @@ SDL_Window *SDL_Manager::createWindow(const char *c, const int w, const int h) {
 										  SDL_WINDOWPOS_UNDEFINED,
 										  w,
 										  h,
-										  SDL_WINDOW_SHOWN | SDL_WINDOW_OPENGL | SDL_WINDOW_BORDERLESS
+										  SDL_WINDOW_SHOWN | SDL_WINDOW_OPENGL | SDL_WINDOW_BORDERLESS 
 										  );
 	if (window == nullptr) {
 		printError(std::cout, "Cannot create window ");

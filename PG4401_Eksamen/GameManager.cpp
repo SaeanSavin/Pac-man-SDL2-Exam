@@ -76,6 +76,8 @@ void GameManager::play(std::string name) {
 	sdl_manager->SetRenderColor(renderer, 0, 0, 0, 255);
 	sdl_manager->clearRenderer(renderer);
 
+	//Sets focus on window
+	SDL_RaiseWindow(window);
 
 	/*   HUD SETUP   */
 

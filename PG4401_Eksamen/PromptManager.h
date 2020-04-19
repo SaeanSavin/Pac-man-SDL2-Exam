@@ -7,9 +7,4 @@ public:
 	static int validatePrompt(int min, int max);
 
 };
-
 #endif // !_PROMPTMANAGER_H_
-
-
-
-
