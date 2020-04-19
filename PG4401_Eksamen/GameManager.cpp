@@ -144,6 +144,9 @@ void GameManager::play(std::string name) {
 				edible.emplace_back(mapRect);
 				walkable.emplace_back(mapRect);
 				break;
+			case 'A' :
+				edible.emplace_back(mapRect);
+				walkable.emplace_back(mapRect);
 			case 'P':
 				edible.emplace_back(mapRect);
 				walkable.emplace_back(mapRect);
