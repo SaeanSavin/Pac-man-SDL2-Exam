@@ -52,11 +52,10 @@ public:
 
 	SDL_Rect* getCoords() override;
 
+	//Getters and Setters
 	void setPos(int x, int y) override;
 
 	void setSpawnPos(int x, int y) override;
-
-	void respawn() override;
 
 	void setSize(int h, int w) override;
 
@@ -75,6 +74,9 @@ public:
 
 	}
 
+	//other
+	void respawn() override;
+
 	bool isPowered() {
 		return powered;
 	}
@@ -82,7 +84,7 @@ public:
 	void addScore(int s) {
 		score += s;
 	}
-
+	
 	void stopPowered() {
 		powered = false;
 	}
