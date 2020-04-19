@@ -310,6 +310,8 @@ void GameManager::play(std::string name) {
 
 	while (Mix_Playing(1));
 
+	Mix_PlayChannel(1, bg_music, -1);
+
 
 	/*   GAME LOOP START  */
 
