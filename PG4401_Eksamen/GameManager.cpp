@@ -178,12 +178,14 @@ void GameManager::play(std::string name) {
 	Mix_Chunk* pow_music = NULL;
 	Mix_Chunk* eat_sound = NULL;
 	Mix_Chunk* death_sound = NULL;
+	Mix_Chunk* ghosteat_sound = NULL;
 
 	Mix_OpenAudio(22050, MIX_DEFAULT_FORMAT, 2, 4096);
 
 	intro_sound = Mix_LoadWAV("../audio/intro_2.wav");
 	eat_sound = Mix_LoadWAV("../audio/eat.wav");
 	death_sound = Mix_LoadWAV("../audio/death.wav");
+	ghosteat_sound = Mix_LoadWAV("../audio/eatghost.wav");
 	bg_music = Mix_LoadWAV("../audio/background.wav");
 	pow_music = Mix_LoadWAV("../audio/powered.wav");
 
@@ -358,7 +360,7 @@ void GameManager::play(std::string name) {
 				std::execution::par_unseq,
 				ghosts.begin(),
 				ghosts.end(),
-				[&pCoordsLeft, &pCoordsRight, &pCoordsUp, &pCoordsDown, &p, &isPowered, &poweredStart, ghosts, &isRunning, death_sound, &hit]
+				[&pCoordsLeft, &pCoordsRight, &pCoordsUp, &pCoordsDown, &p, &isPowered, &poweredStart, ghosts, &isRunning, death_sound, ghosteat_sound, &hit]
 			(auto& g) {
 				int gCoordsLeft = g->getCoords()->x;
 				int gCoordsRight = g->getCoords()->x + g->getCoords()->w;
@@ -370,7 +372,8 @@ void GameManager::play(std::string name) {
 						//if pacman hit frightened ghosts
 						if (g->isFrightened()) {
 							g->hitByPacman();
-							SDL_Delay(1000);
+							Mix_PlayChannel(3, ghosteat_sound, 0);
+							while (Mix_Playing(3));
 							p->addScore(1000);
 						}
 						//if pacman hit ghosts normally
@@ -470,6 +473,7 @@ void GameManager::play(std::string name) {
 
 				//check if frightened over;
 				if (poweredStart >= poweredTime) {
+					Mix_HaltChannel(1);
 					Mix_PlayChannel(1, bg_music, -1);
 					isPowered = false;
 					for (auto& g : ghosts) {
@@ -575,6 +579,7 @@ void GameManager::play(std::string name) {
 
 		sdl_manager->clearAndUpdateRenderer(renderer);
 
+		//game over
 		if (health <= 0) {
 			setTotalPlayerScore(score);
 			SDL_Rect gameoverDst = sdl_manager->createRect(16, 16, SCREEN_WIDTH / 2 - (gameoverText.length() * 8), SCREEN_HEIGHT / 2);
@@ -584,7 +589,9 @@ void GameManager::play(std::string name) {
 			SDL_Delay(2000);
 		}
 
+		//level complete
 		if (currentPellets <= 0 && health > 0) {
+			Mix_HaltChannel(-1);
 			SDL_Rect levelcompletedDst = sdl_manager->createRect(16, 16, SCREEN_WIDTH / 2 - (levelcompletedText.length() * 8), SCREEN_HEIGHT / 2);
 			texture_manager->printFromTiles(levelcompletedText, renderer, text, levelcompletedDst, text_src);
 			sdl_manager->clearAndUpdateRenderer(renderer);
