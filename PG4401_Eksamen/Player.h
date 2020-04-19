@@ -29,6 +29,23 @@ public:
 		animations[name] = animation;
 	}
 
+	//sound
+	void setSound(Mix_Chunk* s) {
+		sound = s;
+	}
+
+	void playSound() {
+		if (sound != NULL && !Mix_Playing(2)) {
+			Mix_PlayChannel(2, sound, -1);
+		}
+	}
+
+	void stopSound() {
+		if (Mix_Playing(2)) {
+			Mix_HaltChannel(2);
+		}
+	}
+
 	//getters and setters
 	SDL_Texture* getTexture() override;
 
@@ -95,6 +112,8 @@ private:
 	SDL_Renderer* renderer;
 	SDL_Texture* texture;
 	SDL_Rect coords;
+
+	Mix_Chunk* sound;
 	
 	char direction = ' ';
 	char next_direction = 'n';

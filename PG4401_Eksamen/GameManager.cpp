@@ -166,6 +166,26 @@ void GameManager::play(std::string name) {
 		mapRect.y += 16;
 	}
 
+	/*   AUDIO SETUP   */
+
+	std::cout << "preparing audio..." << std::endl;
+
+	Mix_Chunk* intro_sound = NULL;
+	Mix_Chunk* bg_music = NULL;
+	Mix_Chunk* pow_music = NULL;
+	Mix_Chunk* eat_sound = NULL;
+
+	Mix_OpenAudio(22050, MIX_DEFAULT_FORMAT, 2, 4096);
+
+	intro_sound = Mix_LoadWAV("../audio/intro_2.wav");
+	eat_sound = Mix_LoadWAV("../audio/eat.wav");;
+	bg_music = Mix_LoadWAV("../audio/background.wav");
+	pow_music = Mix_LoadWAV("../audio/powered.wav");
+
+	Mix_PlayChannel(1, intro_sound, 0);
+
+	while (Mix_Playing(1));
+
 	/* CHARACTER SETUP  */
 
 	std::cout << "building characters..." << std::endl;
@@ -184,6 +204,8 @@ void GameManager::play(std::string name) {
 
 	auto pacman_dead = std::make_shared<Animation>(renderer, "../images/Pacman/dead", 120);
 	p1->setAnimation("dead", pacman_dead);
+
+	p1->setSound(eat_sound);
 
 	//build ghosts and set spawn positions
 	std::vector<std::shared_ptr<Ghost>> ghosts;
@@ -262,23 +284,10 @@ void GameManager::play(std::string name) {
 	texture_manager->printFromTiles(startText, renderer, text, readyDst, text_src);
 	sdl_manager->clearAndUpdateRenderer(renderer);
 
-
-	/*   AUDIO SETUP   */
-
-	std::cout << "preparing audio..." << std::endl;
-
-	Mix_Chunk *wave = NULL;
-
-	Mix_OpenAudio(22050, MIX_DEFAULT_FORMAT, 2, 4096);
-
-	wave = Mix_LoadWAV("../audio/intro.wav");
-
-	Mix_PlayChannel(-1, wave, 0);
-
-	while ( Mix_Playing(-1) );
-
-
 	/*    VARIABLES   */
+
+	//manage pellets
+	int currentPellets = 0;
 
 	//check if game is running
 	bool isRunning = true;
@@ -392,6 +401,7 @@ void GameManager::play(std::string name) {
 
 		//runs on the frame that pacman gets power pellet
 		if (p1->isPowered()) {
+			Mix_PlayChannel(1, pow_music, -1);
 			p1->stopPowered();
 			isPowered = true;
 			poweredStart = 0;
@@ -421,6 +431,7 @@ void GameManager::play(std::string name) {
 
 			//check if frightened over;
 			if (poweredStart >= poweredTime) {
+				Mix_PlayChannel(1, bg_music, -1);
 				isPowered = false;
 				for (auto& g : ghosts) {
 					if (g->isFrightened()) {
@@ -465,7 +476,7 @@ void GameManager::play(std::string name) {
 		//render map
 		SDL_Rect mapRect = sdl_manager->createRect(16, 16, 0, 50);
 
-		int currentPellets = 0;
+		currentPellets = 0;
 
 		for (auto& row : map) {
 			for (auto& c : row) {
@@ -549,7 +560,7 @@ void GameManager::play(std::string name) {
 	/*   GAME LOOP END   */
 
 	//Program exit 
-	Mix_FreeChunk(wave);
+	Mix_FreeChunk(bg_music);
 	Mix_CloseAudio();
 	SDL_GameControllerClose(0);
 

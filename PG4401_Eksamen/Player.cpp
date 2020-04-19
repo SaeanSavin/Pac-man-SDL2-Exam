@@ -142,7 +142,9 @@ void Player::move(SDL_Surface *surface, int &SCREEN_WIDTH, int &SCREEN_HEIGHT, s
 	default:
 		break;
 	}
-	checkEdibleCollision(pellets, map);
+	if (!checkEdibleCollision(pellets, map)) {
+
+	}
 }
 
 SDL_Texture* Player::getTexture() {
@@ -225,28 +227,34 @@ bool Player::checkEdibleCollision(std::vector<SDL_Rect>& edible, std::vector<std
 			if (coords.x == e.x && map[(e.y - 50) / 16][e.x / 16] == 'x') {
 				map[(e.y - 50) / 16][e.x / 16] = ' ';
 				score+= 10;
+				playSound();
 				return true;
 			}
 
-			if (coords.x == e.x && map[(e.y - 50) / 16][e.x / 16] == 'C') {
+			else if (coords.x == e.x && map[(e.y - 50) / 16][e.x / 16] == 'C') {
 				map[(e.y - 50) / 16][e.x / 16] = ' ';
 				score += 100;
+				playSound();
 				return true;
 			}
 
-			if (coords.x == e.x && map[(e.y - 50) / 16][e.x / 16] == 'A') {
+			else if (coords.x == e.x && map[(e.y - 50) / 16][e.x / 16] == 'A') {
 				map[(e.y - 50) / 16][e.x / 16] = ' ';
 				score += 200;
+				playSound();
 				return true;
 			}
 			
-			if (coords.x == e.x && map[(e.y - 50) / 16][e.x / 16] == 'P') {
+			else if (coords.x == e.x && map[(e.y - 50) / 16][e.x / 16] == 'P') {
 				map[(e.y - 50) / 16][e.x / 16] = ' ';
 				powered = true;
+				playSound();
 				return true;
 			}
 
-			
+			else if (coords.x == e.x && map[(e.y - 50) / 16][e.x / 16] == ' ') {
+				stopSound();
+			}
 		}
 	}
 	return false;
