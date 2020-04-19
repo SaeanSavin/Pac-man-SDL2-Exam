@@ -7,8 +7,8 @@ class Player : public Character
 {
 public:
 	//constructors
-	Player(SDL_Texture* t, SDL_Renderer* r, const Uint8* k, std::vector<SDL_Rect>& p, SDL_GameController *controller);
-	Player(SDL_Texture* t, SDL_Rect c, SDL_Renderer* r, const Uint8* k, std::vector<SDL_Rect>& p, SDL_GameController *controller);
+	Player(SDL_Texture* t, SDL_Renderer* r, const Uint8* k, std::vector<SDL_Rect>& p, SDL_GameController *controller, std::vector<SDL_Rect>& w);
+	Player(SDL_Texture* t, SDL_Rect c, SDL_Renderer* r, const Uint8* k, std::vector<SDL_Rect>& p, SDL_GameController *controller, std::vector<SDL_Rect>& w);
 
 	//movement
 	void move(SDL_Surface *surface, int &SCREEN_WIDTH, int &SCREEN_HEIGHT, std::vector<std::vector<char>>& map, std::vector<SDL_Rect>& walls) override;
@@ -17,6 +17,8 @@ public:
 	bool checkWallCollision(std::vector<SDL_Rect>& walls, int x_offset, int y_offset);
 
 	bool checkEdibleCollision(std::vector<SDL_Rect>& edible, std::vector<std::vector<char>>& map);
+
+	bool checkTileEntered(std::vector<SDL_Rect>& walkable);
 
 	//animation 
 	void renderTexture();
@@ -106,6 +108,7 @@ private:
 	SDL_GameController *gameController = nullptr;
 	std::pair<int, int> spawn;
 	std::vector<SDL_Rect>& pellets;
+	std::vector<SDL_Rect>& walkable;
 	
 	std::map<std::string, std::shared_ptr<Animation>> animations;
 	
@@ -113,7 +116,7 @@ private:
 	SDL_Texture* texture;
 	SDL_Rect coords;
 
-	Mix_Chunk* sound;
+	Mix_Chunk* sound = NULL;
 	
 	char direction = ' ';
 	char next_direction = 'n';

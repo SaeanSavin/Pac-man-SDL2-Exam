@@ -1,19 +1,19 @@
 #include "Player.h"
 
-Player::Player(SDL_Texture* t, SDL_Renderer* r, const Uint8* k, std::vector<SDL_Rect>& p, SDL_GameController * controller)
-	:texture(t), renderer(r), keys(k), pellets(p), gameController(controller)
+Player::Player(SDL_Texture* t, SDL_Renderer* r, const Uint8* k, std::vector<SDL_Rect>& p, SDL_GameController * controller, std::vector<SDL_Rect>& w)
+	:texture(t), renderer(r), keys(k), pellets(p), gameController(controller), walkable(w)
 {
 	coords.h = 0;
 	coords.w = 0;
 	coords.x = 0;
 	coords.y = 0;
 }
-Player::Player(SDL_Texture* t, SDL_Rect c, SDL_Renderer* r, const Uint8* k, std::vector<SDL_Rect>& p, SDL_GameController *controller)
-	:texture(t), renderer(r), coords(c), keys(k), pellets(p), gameController(controller)
+Player::Player(SDL_Texture* t, SDL_Rect c, SDL_Renderer* r, const Uint8* k, std::vector<SDL_Rect>& p, SDL_GameController *controller, std::vector<SDL_Rect>& w)
+	:texture(t), renderer(r), coords(c), keys(k), pellets(p), gameController(controller), walkable(w)
 {}
 
 //movement function
-void Player::move(SDL_Surface *surface, int &SCREEN_WIDTH, int &SCREEN_HEIGHT, std::vector<std::vector<char>>& map, std::vector<SDL_Rect>& walls) {
+void Player::move(SDL_Surface* surface, int& SCREEN_WIDTH, int& SCREEN_HEIGHT, std::vector<std::vector<char>>& map, std::vector<SDL_Rect>& walls) {
 
 	checkWallCollision(walls, 0, 0);
 
@@ -142,8 +142,11 @@ void Player::move(SDL_Surface *surface, int &SCREEN_WIDTH, int &SCREEN_HEIGHT, s
 	default:
 		break;
 	}
-	if (!checkEdibleCollision(pellets, map)) {
-
+	if (checkEdibleCollision(pellets, map)) {
+		playSound();
+	}
+	else if (checkTileEntered(walkable)) {
+		stopSound();
 	}
 }
 
@@ -227,7 +230,6 @@ bool Player::checkEdibleCollision(std::vector<SDL_Rect>& edible, std::vector<std
 			if (coords.x == e.x && map[(e.y - 50) / 16][e.x / 16] == 'x') {
 				map[(e.y - 50) / 16][e.x / 16] = ' ';
 				score+= 10;
-				playSound();
 				return true;
 			}
 
@@ -248,10 +250,16 @@ bool Player::checkEdibleCollision(std::vector<SDL_Rect>& edible, std::vector<std
 				powered = true;
 				return true;
 			}
+		}
+	}
+	return false;
+}
 
-			else if (coords.x == e.x && map[(e.y - 50) / 16][e.x / 16] == ' ') {
-				stopSound();
-			}
+bool Player::checkTileEntered(std::vector<SDL_Rect>& walkable) {
+
+	for (auto& mapTile : walkable) {
+		if (coords.y == mapTile.y && coords.x == mapTile.x) {
+			return true;
 		}
 	}
 	return false;

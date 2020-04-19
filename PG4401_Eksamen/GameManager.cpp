@@ -177,11 +177,13 @@ void GameManager::play(std::string name) {
 	Mix_Chunk* bg_music = NULL;
 	Mix_Chunk* pow_music = NULL;
 	Mix_Chunk* eat_sound = NULL;
+	Mix_Chunk* death_sound = NULL;
 
 	Mix_OpenAudio(22050, MIX_DEFAULT_FORMAT, 2, 4096);
 
 	intro_sound = Mix_LoadWAV("../audio/intro_2.wav");
-	eat_sound = Mix_LoadWAV("../audio/eat.wav");;
+	eat_sound = Mix_LoadWAV("../audio/eat.wav");
+	death_sound = Mix_LoadWAV("../audio/death.wav");
 	bg_music = Mix_LoadWAV("../audio/background.wav");
 	pow_music = Mix_LoadWAV("../audio/powered.wav");
 
@@ -194,7 +196,7 @@ void GameManager::play(std::string name) {
 	SDL_Texture *pac_texture = texture_manager->draw(renderer, surface);
 	gameController = sdl_manager->getGameController();
 
-	std::shared_ptr<Player> p1 = std::make_shared<Player>(pac_texture, renderer, keys, edible, gameController);
+	std::shared_ptr<Player> p1 = std::make_shared<Player>(pac_texture, renderer, keys, edible, gameController, walkable);
 	p1->setPos(0, 0);
 	p1->setSize(16, 16);
 
@@ -313,12 +315,14 @@ void GameManager::play(std::string name) {
 
 	while (Mix_Playing(1));
 
-	Mix_PlayChannel(1, bg_music, -1);
-
 
 	/*   GAME LOOP START  */
 
 	while (isRunning) {
+
+		if (!Mix_Playing(1)) {
+			Mix_PlayChannel(1, bg_music, -1);
+		}
 
 		setFramerate(FPS);
 
@@ -353,7 +357,7 @@ void GameManager::play(std::string name) {
 			std::execution::par_unseq,
 			ghosts.begin(),
 			ghosts.end(),
-			[pCoordsLeft, pCoordsRight, pCoordsUp, pCoordsDown, p1, &isPowered, &poweredStart, ghosts, &isRunning]
+			[pCoordsLeft, pCoordsRight, pCoordsUp, pCoordsDown, p1, &isPowered, &poweredStart, ghosts, &isRunning, death_sound]
 		(auto &g) {
 			int gCoordsLeft = g->getCoords()->x;
 			int gCoordsRight = g->getCoords()->x + g->getCoords()->w;
@@ -370,9 +374,13 @@ void GameManager::play(std::string name) {
 					}
 					//if pacman hit ghosts normally
 					else if (!g->isEaten()) {
+						Mix_PlayChannel(2, death_sound, 0);
 						p1->hitByGhost();
 						isPowered = false;
 						poweredStart = 0;
+						if (Mix_Playing(1)) {
+							Mix_HaltChannel(1);
+						}
 						for (auto& g : ghosts) {
 							g->respawn();
 						}
