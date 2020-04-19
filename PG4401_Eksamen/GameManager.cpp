@@ -182,10 +182,6 @@ void GameManager::play(std::string name) {
 	bg_music = Mix_LoadWAV("../audio/background.wav");
 	pow_music = Mix_LoadWAV("../audio/powered.wav");
 
-	Mix_PlayChannel(1, intro_sound, 0);
-
-	while (Mix_Playing(1));
-
 	/* CHARACTER SETUP  */
 
 	std::cout << "building characters..." << std::endl;
@@ -307,6 +303,12 @@ void GameManager::play(std::string name) {
 	Uint32 scatterCount = 0;
 	Uint32 currentLevel = 0;
 	bool chasing = false;
+
+
+	//play intro
+	Mix_PlayChannel(1, intro_sound, 0);
+
+	while (Mix_Playing(1));
 
 
 	/*   GAME LOOP START  */
