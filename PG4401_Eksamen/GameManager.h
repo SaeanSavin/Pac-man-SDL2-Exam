@@ -2,6 +2,10 @@
 #define _GAMEMANAGER_H_
 
 #include <vector>
+#include <fstream>
+#include <sstream>
+#include <execution>
+#include <algorithm>
 
 #include "Player.h"
 #include "Ghost.h"
