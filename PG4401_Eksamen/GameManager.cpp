@@ -1,8 +1,3 @@
-#include <fstream>
-#include <sstream>
-#include <execution>
-#include <algorithm>
-
 #include "GameManager.h"
 
 //Window size

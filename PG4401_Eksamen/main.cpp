@@ -31,7 +31,7 @@ int main(int argc, char *argv[]) {
 	int index = 1;
 	size_t mapSelection = 0;
 
-	std::cout << "Select a map" << std::endl;
+	std::cout << "Select a map: " << std::endl;
 
 	for (const auto &entry : std::filesystem::directory_iterator(path)) {
 		
