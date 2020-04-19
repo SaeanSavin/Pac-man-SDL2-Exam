@@ -28,7 +28,7 @@ public:
 	Ghost(SDL_Texture* t, SDL_Renderer* r, SDL_Rect c, std::vector<SDL_Rect>& w, enum class TargetType m, enum class GhostType g);
 
 	//movement
-	void move(SDL_Surface* surface, int& SCREEN_WIDTH, int& SCREEN_HEIGHT, std::vector<std::vector<char>>& map, std::vector<SDL_Rect>& walls) override;
+	void move(int& SCREEN_WIDTH, int& SCREEN_HEIGHT, std::vector<std::vector<char>>& map, std::vector<SDL_Rect>& walls) override;
 
 	bool checkTileEntered(std::vector<SDL_Rect>& walkable);
 

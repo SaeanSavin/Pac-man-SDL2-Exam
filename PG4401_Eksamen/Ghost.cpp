@@ -11,7 +11,7 @@ Ghost::Ghost(SDL_Texture* t, SDL_Renderer* r, std::vector<SDL_Rect>& w, enum cla
 Ghost::Ghost(SDL_Texture* t, SDL_Renderer* r, SDL_Rect c, std::vector<SDL_Rect>& w, enum class TargetType m, enum class GhostType g)
 	:texture(t), renderer(r), coords(c), walkable(w), targetMode(m) {}
 
-void Ghost::move(SDL_Surface *surface, int &SCREEN_WIDTH, int &SCREEN_HEIGHT, std::vector<std::vector<char>> &map, std::vector<SDL_Rect> &walls) {
+void Ghost::move(int &SCREEN_WIDTH, int &SCREEN_HEIGHT, std::vector<std::vector<char>> &map, std::vector<SDL_Rect> &walls) {
 	//checkWallCollision(walls, 0, 0);
 
 	SDL_PumpEvents();
@@ -20,8 +20,11 @@ void Ghost::move(SDL_Surface *surface, int &SCREEN_WIDTH, int &SCREEN_HEIGHT, st
 
 	if (checkTileEntered(walkable)) {
 
-		if (eaten && speed == 1) {
+		if (eaten) {
 			speed = 2;
+		}
+		else {
+			speed = 1;
 		}
 
 		if (eaten && coords.x == spawn.first && coords.y == spawn.second) {

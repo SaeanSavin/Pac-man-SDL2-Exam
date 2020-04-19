@@ -13,7 +13,7 @@ Player::Player(SDL_Texture* t, SDL_Rect c, SDL_Renderer* r, const Uint8* k, std:
 {}
 
 //movement function
-void Player::move(SDL_Surface* surface, int& SCREEN_WIDTH, int& SCREEN_HEIGHT, std::vector<std::vector<char>>& map, std::vector<SDL_Rect>& walls) {
+void Player::move(int& SCREEN_WIDTH, int& SCREEN_HEIGHT, std::vector<std::vector<char>>& map, std::vector<SDL_Rect>& walls) {
 
 	checkWallCollision(walls, 0, 0);
 

@@ -1,9 +1,9 @@
 #include <fstream>
 #include <sstream>
 #include <execution>
+#include <algorithm>
 
 #include "GameManager.h"
-#include "SDL_Manager.h"
 
 //Window size
 int SCREEN_WIDTH{};
@@ -66,7 +66,7 @@ void GameManager::play(std::string name) {
 
 	SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO | SDL_INIT_JOYSTICK);
 
-	auto sdl_manager = std::make_unique<SDL_Manager>();
+	auto sdl_manager = std::make_shared<SDL_Manager>();
 	auto texture_manager = std::make_shared<Texture_Manager>();
 	
 	SDL_Window* window = sdl_manager->createWindow("Pac-man", SCREEN_WIDTH, SCREEN_HEIGHT);
@@ -191,24 +191,10 @@ void GameManager::play(std::string name) {
 
 	std::cout << "building characters..." << std::endl;
 
-	//pacman
-	SDL_Surface *surface = sdl_manager->createSurface("../images/pacman/move/1.png", window, renderer);
-	SDL_Texture *pac_texture = texture_manager->draw(renderer, surface);
-	gameController = sdl_manager->getGameController();
 
-	std::shared_ptr<Player> p1 = std::make_shared<Player>(pac_texture, renderer, keys, edible, gameController, walkable);
-	p1->setPos(0, 0);
-	p1->setSize(16, 16);
-
-	auto pacman_move = std::make_shared<Animation>(renderer, "../images/Pacman/move", 12);
-	p1->setAnimation("move", pacman_move);
-
-	auto pacman_dead = std::make_shared<Animation>(renderer, "../images/Pacman/dead", 120);
-	p1->setAnimation("dead", pacman_dead);
-
-	p1->setSound(eat_sound);
-
-	//build ghosts and set spawn positions
+	//build players, ghosts and set spawn positions
+	std::vector<std::shared_ptr<Player>> players;
+	int p_index = 0;
 	std::vector<std::shared_ptr<Ghost>> ghosts;
 	int ghostNr = 1;
 	int g_index = 0;
@@ -240,14 +226,16 @@ void GameManager::play(std::string name) {
 						case 4:
 							ghosts.emplace_back(makeGhost(texture_manager, renderer, walkable, GhostType::POKEY));
 							ghosts[g_index]->setSpawnPos(m_position.x, m_position.y);
-							ghostNr++;
+							ghostNr = 1;
 							g_index++;
 							break;
 					}
 					c = '~';
 					break;
 				case 'S':
-					p1->setSpawnPos(m_position.x, m_position.y);
+					players.emplace_back(makePlayer(texture_manager, sdl_manager, renderer, keys, edible, walkable, eat_sound));
+					players[p_index]->setSpawnPos(m_position.x, m_position.y);
+					p_index++;
 					break;
 			}
 			m_position.x += 16;
@@ -257,7 +245,6 @@ void GameManager::play(std::string name) {
 	}
 
 	//Freeing the RGB surface
-	SDL_FreeSurface(surface);
 	SDL_FreeSurface(textSurface);
 
 
@@ -287,6 +274,9 @@ void GameManager::play(std::string name) {
 
 	/*    VARIABLES   */
 
+	int score = 0;
+	int health = 3;
+
 	//manage pellets
 	int currentPellets = 0;
 
@@ -315,8 +305,6 @@ void GameManager::play(std::string name) {
 
 	while (Mix_Playing(1));
 
-
-
 	printGameDetails();
 
 	/*   GAME LOOP START  */
@@ -337,68 +325,99 @@ void GameManager::play(std::string name) {
 				}
 			}
 		}
-		
+
 		//Print score
 
 		SDL_Rect text_dst = sdl_manager->createRect(16,16, 0, 25);
 
 		texture_manager->printFromTiles("SCORE ", renderer, text, text_dst, text_src);
-		texture_manager->printPlayerScore(p1->getScore(), renderer, text, text_dst, text_src);
+
+		score = 0;
+		for (auto& p : players) {
+			score += p->getScore();
+		}
+
+		texture_manager->printPlayerScore(score, renderer, text, text_dst, text_src);
 
 		SDL_Rect hp_dst = sdl_manager->createRect(16, 16, 0, SCREEN_HEIGHT - 25);
 		texture_manager->printFromTiles("LIVES ", renderer, text, hp_dst, text_src);
 		
-		//parallel collision check between pacman and ghosts
+		// collision check for each player with each ghost
+		for (auto &p : players) {
+			//first get pacman coords once in this thread
+			int pCoordsLeft = p->getCoords()->x;
+			int pCoordsRight = p->getCoords()->x + p->getCoords()->w;
+			int pCoordsUp = p->getCoords()->y;
+			int pCoordsDown = p->getCoords()->y + p->getCoords()->h;
 
-		//first get pacman coords once in this thread
-		int pCoordsLeft = p1->getCoords()->x;
-		int pCoordsRight = p1->getCoords()->x + p1->getCoords()->w;
-		int pCoordsUp = p1->getCoords()->y;
-		int pCoordsDown = p1->getCoords()->y + p1->getCoords()->h;
-		//run collision check with each ghost parallel
-		std::for_each(
-			std::execution::par_unseq,
-			ghosts.begin(),
-			ghosts.end(),
-			[pCoordsLeft, pCoordsRight, pCoordsUp, pCoordsDown, p1, &isPowered, &poweredStart, ghosts, &isRunning, death_sound]
-		(auto &g) {
-			int gCoordsLeft = g->getCoords()->x;
-			int gCoordsRight = g->getCoords()->x + g->getCoords()->w;
-			int gCoordsUp = g->getCoords()->y;
-			int gCoordsDown = g->getCoords()->y + g->getCoords()->h;
+			bool hit = false;
 
-			if (pCoordsLeft < gCoordsRight && pCoordsRight > gCoordsLeft) {
-				if (pCoordsUp < gCoordsDown && pCoordsDown > gCoordsUp) {
-					//if pacman hit frightened ghosts
-					if (g->isFrightened()) {
-						g->hitByPacman();
-						SDL_Delay(1000);
-						p1->addScore(1000);
-					}
-					//if pacman hit ghosts normally
-					else if (!g->isEaten()) {
-						Mix_PlayChannel(2, death_sound, 0);
-						p1->hitByGhost();
-						isPowered = false;
-						poweredStart = 0;
-						if (Mix_Playing(1)) {
-							Mix_HaltChannel(1);
+			//run collision check with each ghost parallel
+			std::for_each(
+				std::execution::par_unseq,
+				ghosts.begin(),
+				ghosts.end(),
+				[&pCoordsLeft, &pCoordsRight, &pCoordsUp, &pCoordsDown, &p, &isPowered, &poweredStart, ghosts, &isRunning, death_sound, &hit]
+			(auto& g) {
+				int gCoordsLeft = g->getCoords()->x;
+				int gCoordsRight = g->getCoords()->x + g->getCoords()->w;
+				int gCoordsUp = g->getCoords()->y;
+				int gCoordsDown = g->getCoords()->y + g->getCoords()->h;
+
+				if (pCoordsLeft < gCoordsRight && pCoordsRight > gCoordsLeft) {
+					if (pCoordsUp < gCoordsDown && pCoordsDown > gCoordsUp) {
+						//if pacman hit frightened ghosts
+						if (g->isFrightened()) {
+							g->hitByPacman();
+							SDL_Delay(1000);
+							p->addScore(1000);
 						}
-						for (auto& g : ghosts) {
-							g->respawn();
-						}
-						if (p1->getHP() <= 0) {
-							isRunning = false;
+						//if pacman hit ghosts normally
+						else if (!g->isEaten()) {
+							hit = true;
 						}
 					}
 				}
-			}
-		});
+			});
 
-		for (int i = 0; i < p1->getHP(); i++) {
-			SDL_RenderCopy(renderer, hpTexture, nullptr, &hp_dst);
-			hp_dst.x += 20;
+			if (hit) {
+				Mix_PlayChannel(2, death_sound, 0);
+				p->hitByGhost();
+				isPowered = false;
+				poweredStart = 0;
+				if (Mix_Playing(1)) {
+					Mix_HaltChannel(1);
+				}
+				for (auto& g : ghosts) {
+					g->respawn();
+				}
+			}
 		}
+
+		if (players.size() > 1) {
+			auto end = std::remove_if(players.begin(),
+				players.end(),
+				[](auto& p) {
+				return p->getHP() <= 0;
+			});
+
+			players.erase(end, players.end());
+		}
+
+		health = 0;
+		for (auto& p : players) {
+			if (p->getHP() <= 0) {
+				continue;
+			}
+			for (int i = 0; i < p->getHP(); i++) {
+				SDL_RenderCopy(renderer, hpTexture, nullptr, &hp_dst);
+				hp_dst.x += 20;
+				health++;
+			}
+		}
+
+
+		std::cout << health << std::endl;
 
 		//manage chase-scatter cycle
 
@@ -414,49 +433,51 @@ void GameManager::play(std::string name) {
 			chasing = false;
 		}
 
-		//Move characters and check if pacman is powered
-		p1->move(surface, SCREEN_WIDTH, SCREEN_HEIGHT, map, walls);
+		for (auto& p : players) {
+			//Move characters and check if pacman is powered
+			p->move(SCREEN_WIDTH, SCREEN_HEIGHT, map, walls);
 
-		//runs on the frame that pacman gets power pellet
-		if (p1->isPowered()) {
-			Mix_PlayChannel(1, pow_music, -1);
-			p1->stopPowered();
-			isPowered = true;
-			poweredStart = 0;
-			poweredDelta = SDL_GetPerformanceCounter();
-			for (auto& g : ghosts) {
-				if (!g->isEaten()) {
-					g->stopFrightenedEnding();
-					g->startFrightened();
-				}
-			}
-		}
-
-		//runs while pacman is powered
-		if (isPowered) {
-
-			poweredDelta = (SDL_GetPerformanceCounter() - poweredStart) * 1000 / SDL_GetPerformanceCounter();
-			poweredStart += poweredDelta;
-
-			//check if frightened is over in 25% of time
-			if ((poweredStart * 100) / poweredTime >= 75) {
-				for (auto& g : ghosts) {
-					if (g->isFrightened()) {
-						g->startFrightenedEnding();
-					}
-				}
-			}
-
-			//check if frightened over;
-			if (poweredStart >= poweredTime) {
-				Mix_PlayChannel(1, bg_music, -1);
-				isPowered = false;
-				for (auto& g : ghosts) {
-					if (g->isFrightened()) {
-						g->stopFrightened();
-					}
-				}
+			//runs on the frame that pacman gets power pellet
+			if (p->isPowered()) {
+				Mix_PlayChannel(1, pow_music, -1);
+				p->stopPowered();
+				isPowered = true;
 				poweredStart = 0;
+				poweredDelta = SDL_GetPerformanceCounter();
+				for (auto& g : ghosts) {
+					if (!g->isEaten()) {
+						g->stopFrightenedEnding();
+						g->startFrightened();
+					}
+				}
+			}
+
+			//runs while pacman is powered
+			if (isPowered) {
+
+				poweredDelta = (SDL_GetPerformanceCounter() - poweredStart) * 1000 / SDL_GetPerformanceCounter();
+				poweredStart += poweredDelta;
+
+				//check if frightened is over in 25% of time
+				if ((poweredStart * 100) / poweredTime >= 75) {
+					for (auto& g : ghosts) {
+						if (g->isFrightened()) {
+							g->startFrightenedEnding();
+						}
+					}
+				}
+
+				//check if frightened over;
+				if (poweredStart >= poweredTime) {
+					Mix_PlayChannel(1, bg_music, -1);
+					isPowered = false;
+					for (auto& g : ghosts) {
+						if (g->isFrightened()) {
+							g->stopFrightened();
+						}
+					}
+					poweredStart = 0;
+				}
 			}
 		}
 
@@ -478,16 +499,16 @@ void GameManager::play(std::string name) {
 			//else, chase based on TargetMode pattern
 			else {
 				if (g->getTargetMode() == TargetType::EVASIVE) {
-					g->setTarget(getTarget(g->getTargetMode(), p1, g));
+					g->setTarget(getTarget(g->getTargetMode(), targetClosestPlayer(g, players), g));
 				}
 				else if (g->getTargetMode() == TargetType::SUPPORTIVE) {
-					g->setTarget(getTarget(g->getTargetMode(), p1, ghosts[ghosts_i - 2]));
+					g->setTarget(getTarget(g->getTargetMode(), targetClosestPlayer(g, players), ghosts[ghosts_i - 2]));
 				}
 				else {
-					g->setTarget(getTarget(g->getTargetMode(), p1));
+					g->setTarget(getTarget(g->getTargetMode(), targetClosestPlayer(g, players)));
 				}
 			}
-			g->move(surface, SCREEN_WIDTH, SCREEN_HEIGHT, map, walls);
+			g->move(SCREEN_WIDTH, SCREEN_HEIGHT, map, walls);
 			ghosts_i++;
 		}
 
@@ -553,8 +574,8 @@ void GameManager::play(std::string name) {
 
 		sdl_manager->clearAndUpdateRenderer(renderer);
 
-		if (p1->getHP() <= 0) {
-			setTotalPlayerScore(p1->getScore());
+		if (health <= 0) {
+			setTotalPlayerScore(score);
 			SDL_Rect gameoverDst = sdl_manager->createRect(16, 16, SCREEN_WIDTH / 2 - (gameoverText.length() * 8), SCREEN_HEIGHT / 2);
 			texture_manager->printFromTiles(gameoverText, renderer, text, gameoverDst, text_src);
 			sdl_manager->clearAndUpdateRenderer(renderer);
@@ -562,11 +583,13 @@ void GameManager::play(std::string name) {
 			SDL_Delay(2000);
 		}
 
-		if (currentPellets <= 0 && p1->getHP() > 0) {
+		if (currentPellets <= 0 && health > 0) {
 			SDL_Rect levelcompletedDst = sdl_manager->createRect(16, 16, SCREEN_WIDTH / 2 - (levelcompletedText.length() * 8), SCREEN_HEIGHT / 2);
 			texture_manager->printFromTiles(levelcompletedText, renderer, text, levelcompletedDst, text_src);
 			sdl_manager->clearAndUpdateRenderer(renderer);
-			p1->respawn();
+			for (auto& p : players) {
+				p->respawn();
+			}
 			for (auto &g : ghosts) {
 				g->respawn();
 			}
@@ -632,6 +655,27 @@ void GameManager::printGameDetails() {
 		<< "Right = Dpad Right" << std::endl;
 }
 
+//returns a Player type pointer
+std::shared_ptr<Player> GameManager::makePlayer(std::shared_ptr<Texture_Manager> texture_manager, std::shared_ptr<SDL_Manager> sdl_manager, SDL_Renderer* renderer, const Uint8 *keys, std::vector<SDL_Rect>& edible, std::vector<SDL_Rect>& walkable, Mix_Chunk *eat_sound) {
+	SDL_Texture* pac_texture = texture_manager->loadTexture("../images/pacman/move/1.png", renderer);
+	SDL_GameController* gameController = sdl_manager->getGameController();
+
+	std::shared_ptr<Player> p = std::make_shared<Player>(pac_texture, renderer, keys, edible, gameController, walkable);
+	p->setPos(0, 0);
+	p->setSize(16, 16);
+
+	auto pacman_move = std::make_shared<Animation>(renderer, "../images/Pacman/move", 12);
+	p->setAnimation("move", pacman_move);
+
+	auto pacman_dead = std::make_shared<Animation>(renderer, "../images/Pacman/dead", 120);
+	p->setAnimation("dead", pacman_dead);
+
+	p->setSound(eat_sound);
+
+	return p;
+}
+
+//returns a Ghost class pointer
 std::shared_ptr<Ghost> GameManager::makeGhost(std::shared_ptr<Texture_Manager> texture_manager, SDL_Renderer* renderer, std::vector<SDL_Rect>& walkable, GhostType type) {
 	std::string ghost_path = "../images/Ghosts/";
 	std::string ghost_anim_path = "../images/Ghosts/";
@@ -694,6 +738,32 @@ std::shared_ptr<Ghost> GameManager::makeGhost(std::shared_ptr<Texture_Manager> t
 	ghost->setAnimation("eaten_right", eyes_right);
 
 	return ghost;
+}
+
+//selects which player the ghosts should target
+std::shared_ptr<Player> GameManager::targetClosestPlayer(std::shared_ptr<Ghost> ghost, std::vector<std::shared_ptr<Player>> &players) {
+
+	if (players.size() == 1) {
+		return players[0];
+	}
+
+	int gx = ghost->getCoords()->x;
+	int gy = ghost->getCoords()->y;
+	double closestPlayer = closestPlayer = std::sqrt(std::pow(abs(players[0]->getCoords()->x - gx), 2) + std::pow(abs(players[0]->getCoords()->y - gy), 2));;
+	double nextPlayer = 0;
+
+	std::shared_ptr<Player> target = players[0];
+
+	for (auto& p : players) {
+		nextPlayer = std::sqrt(std::pow(abs(p->getCoords()->x - gx), 2) + std::pow(abs(p->getCoords()->y - gy), 2));
+		if (nextPlayer <= closestPlayer) {
+			closestPlayer = nextPlayer;
+			target = p;
+		}
+	}
+
+	return target;
+
 }
 
 std::pair<int, int> GameManager::getTarget(TargetType mode) {

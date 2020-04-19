@@ -11,7 +11,7 @@ public:
 	Player(SDL_Texture* t, SDL_Rect c, SDL_Renderer* r, const Uint8* k, std::vector<SDL_Rect>& p, SDL_GameController *controller, std::vector<SDL_Rect>& w);
 
 	//movement
-	void move(SDL_Surface *surface, int &SCREEN_WIDTH, int &SCREEN_HEIGHT, std::vector<std::vector<char>>& map, std::vector<SDL_Rect>& walls) override;
+	void move(int &SCREEN_WIDTH, int &SCREEN_HEIGHT, std::vector<std::vector<char>>& map, std::vector<SDL_Rect>& walls) override;
 
 	//collision
 	bool checkWallCollision(std::vector<SDL_Rect>& walls, int x_offset, int y_offset);
