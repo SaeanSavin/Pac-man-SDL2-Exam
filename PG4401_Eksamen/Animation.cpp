@@ -1,8 +1,8 @@
 #include "Animation.h"
 
-Animation::Animation(SDL_Renderer* r, std::string path, int tick_rate) {
+Animation::Animation(SDL_Renderer* r, std::string path, int tickRate) {
 	length = 0;
-	rate = tick_rate;
+	rate = tickRate;
 	startTime = SDL_GetTicks();
 	for (const auto& entry : std::filesystem::directory_iterator(path)) {
 		length++;

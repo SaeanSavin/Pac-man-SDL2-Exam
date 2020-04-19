@@ -61,15 +61,15 @@ void GameManager::play(std::string name) {
 
 	SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO | SDL_INIT_GAMECONTROLLER);
 	
-	auto sdl_manager = std::make_shared<SDL_Manager>();
-	auto texture_manager = std::make_shared<Texture_Manager>();
+	auto sdlManager = std::make_shared<SDL_Manager>();
+	auto textureManager = std::make_shared<Texture_Manager>();
 	
-	SDL_Window* window = sdl_manager->createWindow("Pac-man", SCREEN_WIDTH, SCREEN_HEIGHT);
-	SDL_Renderer* renderer = sdl_manager->createRenderer(window, -1);
+	SDL_Window* window = sdlManager->createWindow("Pac-man", SCREEN_WIDTH, SCREEN_HEIGHT);
+	SDL_Renderer* renderer = sdlManager->createRenderer(window, -1);
 
 	//draws background
-	sdl_manager->SetRenderColor(renderer, 0, 0, 0, 255);
-	sdl_manager->clearRenderer(renderer);
+	sdlManager->SetRenderColor(renderer, 0, 0, 0, 255);
+	sdlManager->clearRenderer(renderer);
 
 	//Sets focus on window
 	SDL_RaiseWindow(window);
@@ -79,26 +79,25 @@ void GameManager::play(std::string name) {
 	std::cout << "building HUD..." << std::endl;
 
 	//Text 
-	SDL_Surface *textSurface = sdl_manager->createSurface("../images/TextTiles/text.png", window, renderer);
-	SDL_Texture *text = texture_manager->draw(renderer, textSurface);
+	SDL_Surface *textSurface = sdlManager->createSurface("../images/TextTiles/text.png", window, renderer);
+	SDL_Texture *text = textureManager->draw(renderer, textSurface);
 
 	//HP 
-	SDL_Surface *hpSurface = sdl_manager->createSurface("../images/Pacman/move/2.png", window, renderer);
-	SDL_Texture *hpTexture = texture_manager->draw(renderer, hpSurface);
+	SDL_Surface *hpSurface = sdlManager->createSurface("../images/Pacman/move/2.png", window, renderer);
+	SDL_Texture *hpTexture = textureManager->draw(renderer, hpSurface);
 
 	/*    VECTORS   */
 
 	//Wall vector
-	//Use to check collison with walls
 	std::vector<SDL_Rect> walls{};
 
 	//pellet vector
-	//Use to check collision on edible
 	std::vector<SDL_Rect> edible{};
+	
 	//walkable vector
 	std::vector<SDL_Rect> walkable{};
 
-	SDL_Rect mapRect = sdl_manager->createRect(16, 16, 0, 50);
+	SDL_Rect mapRect = sdlManager->createRect(16, 16, 0, 50);
 
 	for (auto& row : map) {
 		for (auto& c : row) {
@@ -170,21 +169,21 @@ void GameManager::play(std::string name) {
 
 	std::cout << "preparing audio..." << std::endl;
 
-	Mix_Chunk* intro_sound = NULL;
-	Mix_Chunk* bg_music = NULL;
-	Mix_Chunk* pow_music = NULL;
-	Mix_Chunk* eat_sound = NULL;
-	Mix_Chunk* death_sound = NULL;
-	Mix_Chunk* ghosteat_sound = NULL;
+	Mix_Chunk* introSound = NULL;
+	Mix_Chunk* bgMusic = NULL;
+	Mix_Chunk* powMusic = NULL;
+	Mix_Chunk* eatSound = NULL;
+	Mix_Chunk* deathSound = NULL;
+	Mix_Chunk* ghostEatSound = NULL;
 
 	Mix_OpenAudio(22050, MIX_DEFAULT_FORMAT, 2, 4096);
 
-	intro_sound = Mix_LoadWAV("../audio/intro_2.wav");
-	eat_sound = Mix_LoadWAV("../audio/eat.wav");
-	death_sound = Mix_LoadWAV("../audio/death.wav");
-	ghosteat_sound = Mix_LoadWAV("../audio/eatghost.wav");
-	bg_music = Mix_LoadWAV("../audio/background.wav");
-	pow_music = Mix_LoadWAV("../audio/powered.wav");
+	introSound = Mix_LoadWAV("../audio/intro_2.wav");
+	eatSound = Mix_LoadWAV("../audio/eat.wav");
+	deathSound = Mix_LoadWAV("../audio/death.wav");
+	ghostEatSound = Mix_LoadWAV("../audio/eatghost.wav");
+	bgMusic = Mix_LoadWAV("../audio/background.wav");
+	powMusic = Mix_LoadWAV("../audio/powered.wav");
 
 	/* CHARACTER SETUP  */
 
@@ -193,11 +192,11 @@ void GameManager::play(std::string name) {
 
 	//build players, ghosts and set spawn positions
 	std::vector<std::shared_ptr<Player>> players;
-	int p_index = 0;
+	int pIndex = 0;
 	std::vector<std::shared_ptr<Ghost>> ghosts;
 	int ghostNr = 1;
-	int g_index = 0;
-	SDL_Rect m_position = sdl_manager->createRect(16, 16, 0, 50);
+	int gIndex = 0;
+	SDL_Rect mPosition = sdlManager->createRect(16, 16, 0, 50);
 
 	for (auto& row : map) {
 		for (auto& c : row) {
@@ -205,42 +204,42 @@ void GameManager::play(std::string name) {
 				case 'G':
 					switch (ghostNr) {
 						case 1:
-							ghosts.emplace_back(makeGhost(texture_manager, renderer, walkable, GhostType::SHADOW));
-							ghosts[g_index]->setSpawnPos(m_position.x, m_position.y);
+							ghosts.emplace_back(makeGhost(textureManager, renderer, walkable, GhostType::SHADOW));
+							ghosts[gIndex]->setSpawnPos(mPosition.x, mPosition.y);
 							ghostNr++;
-							g_index++;
+							gIndex++;
 							break;
 						case 2:
-							ghosts.emplace_back(makeGhost(texture_manager, renderer, walkable, GhostType::SPEEDY));
-							ghosts[g_index]->setSpawnPos(m_position.x, m_position.y);
+							ghosts.emplace_back(makeGhost(textureManager, renderer, walkable, GhostType::SPEEDY));
+							ghosts[gIndex]->setSpawnPos(mPosition.x, mPosition.y);
 							ghostNr++;
-							g_index++;
+							gIndex++;
 							break;
 						case 3:
-							ghosts.emplace_back(makeGhost(texture_manager, renderer, walkable, GhostType::BASHFUL));
-							ghosts[g_index]->setSpawnPos(m_position.x, m_position.y);
+							ghosts.emplace_back(makeGhost(textureManager, renderer, walkable, GhostType::BASHFUL));
+							ghosts[gIndex]->setSpawnPos(mPosition.x, mPosition.y);
 							ghostNr++;
-							g_index++;
+							gIndex++;
 							break;
 						case 4:
-							ghosts.emplace_back(makeGhost(texture_manager, renderer, walkable, GhostType::POKEY));
-							ghosts[g_index]->setSpawnPos(m_position.x, m_position.y);
+							ghosts.emplace_back(makeGhost(textureManager, renderer, walkable, GhostType::POKEY));
+							ghosts[gIndex]->setSpawnPos(mPosition.x, mPosition.y);
 							ghostNr = 1;
-							g_index++;
+							gIndex++;
 							break;
 					}
 					c = '~';
 					break;
 				case 'S':
-					players.emplace_back(makePlayer(texture_manager, sdl_manager, renderer, keys, edible, walkable, eat_sound, p_index));
-					players[p_index]->setSpawnPos(m_position.x, m_position.y);
-					p_index++;
+					players.emplace_back(makePlayer(textureManager, sdlManager, renderer, keys, edible, walkable, eatSound, pIndex));
+					players[pIndex]->setSpawnPos(mPosition.x, mPosition.y);
+					pIndex++;
 					break;
 			}
-			m_position.x += 16;
+			mPosition.x += 16;
 		}
-		m_position.x = 0;
-		m_position.y += 16;
+		mPosition.x = 0;
+		mPosition.y += 16;
 	}
 
 	//Freeing the RGB surface
@@ -252,24 +251,24 @@ void GameManager::play(std::string name) {
 	std::cout << "loading assets..." << std::endl;
 
 	//Create Textures
-	SDL_Texture *pellet = texture_manager->loadTexture("../images/Edible/pellet.png", renderer);
-	SDL_Texture *cherry = texture_manager->loadTexture("../images/Edible/cherry.png", renderer);
-	SDL_Texture *apple = texture_manager->loadTexture("../images/Edible/apple.png", renderer);
-	SDL_Texture *poweups = texture_manager->loadTexture("../images/Edible/powerup.png", renderer);
-	SDL_Texture *wall_bottom = texture_manager->loadTexture("../images/mapTiles/wall_bottom_single.png", renderer);
-	SDL_Texture *wall_top = texture_manager->loadTexture("../images/mapTiles/wall_top_single.png", renderer);
-	SDL_Texture *wall_left = texture_manager->loadTexture("../images/mapTiles/wall_left_single.png", renderer);
-	SDL_Texture *wall_right = texture_manager->loadTexture("../images/mapTiles/wall_right_single.png", renderer);
-	SDL_Texture *corner_top_right = texture_manager->loadTexture("../images/mapTiles/wall_corner_tr_single.png", renderer);
-	SDL_Texture *corner_top_left = texture_manager->loadTexture("../images/mapTiles/wall_corner_tl_single.png", renderer);
-	SDL_Texture *corner_bottom_right = texture_manager->loadTexture("../images/mapTiles/wall_corner_br_single.png", renderer);
-	SDL_Texture *corner_bottom_left = texture_manager->loadTexture("../images/mapTiles/wall_corner_bl_single.png", renderer);
+	SDL_Texture *pellet = textureManager->loadTexture("../images/Edible/pellet.png", renderer);
+	SDL_Texture *cherry = textureManager->loadTexture("../images/Edible/cherry.png", renderer);
+	SDL_Texture *apple = textureManager->loadTexture("../images/Edible/apple.png", renderer);
+	SDL_Texture *poweups = textureManager->loadTexture("../images/Edible/powerup.png", renderer);
+	SDL_Texture *wallBottom = textureManager->loadTexture("../images/mapTiles/wall_bottom_single.png", renderer);
+	SDL_Texture *wallTop = textureManager->loadTexture("../images/mapTiles/wall_top_single.png", renderer);
+	SDL_Texture *wallLeft = textureManager->loadTexture("../images/mapTiles/wall_left_single.png", renderer);
+	SDL_Texture *wallRight = textureManager->loadTexture("../images/mapTiles/wall_right_single.png", renderer);
+	SDL_Texture *cornerTopRight = textureManager->loadTexture("../images/mapTiles/wall_corner_tr_single.png", renderer);
+	SDL_Texture *cornerTopLeft = textureManager->loadTexture("../images/mapTiles/wall_corner_tl_single.png", renderer);
+	SDL_Texture *cornerBottomRight = textureManager->loadTexture("../images/mapTiles/wall_corner_br_single.png", renderer);
+	SDL_Texture *cornerBottomLeft = textureManager->loadTexture("../images/mapTiles/wall_corner_bl_single.png", renderer);
 
-	SDL_Rect text_src = sdl_manager->createRect(8, 8, 0, 0);
+	SDL_Rect textSrc = sdlManager->createRect(8, 8, 0, 0);
 
-	SDL_Rect readyDst = sdl_manager->createRect(16, 16, SCREEN_WIDTH / 2 - (startText.length() * 8), SCREEN_HEIGHT / 2);
-	texture_manager->printFromTiles(startText, renderer, text, readyDst, text_src);
-	sdl_manager->clearAndUpdateRenderer(renderer);
+	SDL_Rect readyDst = sdlManager->createRect(16, 16, SCREEN_WIDTH / 2 - (startText.length() * 8), SCREEN_HEIGHT / 2);
+	textureManager->printFromTiles(startText, renderer, text, readyDst, textSrc);
+	sdlManager->clearAndUpdateRenderer(renderer);
 
 	/*    VARIABLES   */
 
@@ -300,7 +299,7 @@ void GameManager::play(std::string name) {
 
 
 	//play intro
-	Mix_PlayChannel(1, intro_sound, 0);
+	Mix_PlayChannel(1, introSound, 0);
 
 	while (Mix_Playing(1));
 
@@ -309,7 +308,7 @@ void GameManager::play(std::string name) {
 	while (isRunning) {
 
 		if (!Mix_Playing(1)) {
-			Mix_PlayChannel(1, bg_music, -1);
+			Mix_PlayChannel(1, bgMusic, -1);
 		}
 
 		setFramerate(FPS);
@@ -325,19 +324,19 @@ void GameManager::play(std::string name) {
 
 		//Print score
 
-		SDL_Rect text_dst = sdl_manager->createRect(16,16, 0, 25);
+		SDL_Rect textDst = sdlManager->createRect(16,16, 0, 25);
 
-		texture_manager->printFromTiles("SCORE ", renderer, text, text_dst, text_src);
+		textureManager->printFromTiles("SCORE ", renderer, text, textDst, textSrc);
 
 		score = 0;
 		for (auto& p : players) {
 			score += p->getScore();
 		}
 
-		texture_manager->printPlayerScore(score, renderer, text, text_dst, text_src);
+		textureManager->printPlayerScore(score, renderer, text, textDst, textSrc);
 
-		SDL_Rect hp_dst = sdl_manager->createRect(16, 16, 0, SCREEN_HEIGHT - 25);
-		texture_manager->printFromTiles("LIVES ", renderer, text, hp_dst, text_src);
+		SDL_Rect hpDst = sdlManager->createRect(16, 16, 0, SCREEN_HEIGHT - 25);
+		textureManager->printFromTiles("LIVES ", renderer, text, hpDst, textSrc);
 		
 		// collision check for each player with each ghost
 		for (auto &p : players) {
@@ -354,7 +353,7 @@ void GameManager::play(std::string name) {
 				std::execution::par_unseq,
 				ghosts.begin(),
 				ghosts.end(),
-				[&pCoordsLeft, &pCoordsRight, &pCoordsUp, &pCoordsDown, &p, &isPowered, &poweredStart, ghosts, &isRunning, death_sound, ghosteat_sound, &hit]
+				[&pCoordsLeft, &pCoordsRight, &pCoordsUp, &pCoordsDown, &p, &isPowered, &poweredStart, ghosts, &isRunning, deathSound, ghostEatSound, &hit]
 			(auto& g) {
 				int gCoordsLeft = g->getCoords()->x;
 				int gCoordsRight = g->getCoords()->x + g->getCoords()->w;
@@ -366,7 +365,7 @@ void GameManager::play(std::string name) {
 						//if pacman hit frightened ghosts
 						if (g->isFrightened()) {
 							g->hitByPacman();
-							Mix_PlayChannel(3, ghosteat_sound, 0);
+							Mix_PlayChannel(3, ghostEatSound, 0);
 							while (Mix_Playing(3));
 							p->addScore(1000);
 						}
@@ -379,7 +378,7 @@ void GameManager::play(std::string name) {
 			});
 
 			if (hit) {
-				Mix_PlayChannel(2, death_sound, 0);
+				Mix_PlayChannel(2, deathSound, 0);
 				p->hitByGhost();
 				isPowered = false;
 				poweredStart = 0;
@@ -408,14 +407,11 @@ void GameManager::play(std::string name) {
 				continue;
 			}
 			for (int i = 0; i < p->getHP(); i++) {
-				SDL_RenderCopy(renderer, hpTexture, nullptr, &hp_dst);
-				hp_dst.x += 20;
+				SDL_RenderCopy(renderer, hpTexture, nullptr, &hpDst);
+				hpDst.x += 20;
 				health++;
 			}
 		}
-
-
-		//std::cout << health << std::endl;
 
 		//manage chase-scatter cycle
 
@@ -437,7 +433,7 @@ void GameManager::play(std::string name) {
 
 			//runs on the frame that pacman gets power pellet
 			if (p->isPowered()) {
-				Mix_PlayChannel(1, pow_music, -1);
+				Mix_PlayChannel(1, powMusic, -1);
 				p->stopPowered();
 				isPowered = true;
 				poweredStart = 0;
@@ -468,7 +464,7 @@ void GameManager::play(std::string name) {
 				//check if frightened over;
 				if (poweredStart >= poweredTime) {
 					Mix_HaltChannel(1);
-					Mix_PlayChannel(1, bg_music, -1);
+					Mix_PlayChannel(1, bgMusic, -1);
 					isPowered = false;
 					for (auto& g : ghosts) {
 						if (g->isFrightened()) {
@@ -481,7 +477,7 @@ void GameManager::play(std::string name) {
 		}
 
 		//decide target type for ghosts and move ghosts accordingly
-		int ghosts_i = 0;
+		size_t gIndex = 0;
 		for (auto& g : ghosts) {
 			//if ghost is eaten, return to spawn
 			if (g->isEaten()) {
@@ -501,18 +497,18 @@ void GameManager::play(std::string name) {
 					g->setTarget(getTarget(g->getTargetMode(), targetClosestPlayer(g, players), g));
 				}
 				else if (g->getTargetMode() == TargetType::SUPPORTIVE) {
-					g->setTarget(getTarget(g->getTargetMode(), targetClosestPlayer(g, players), ghosts[ghosts_i - 2]));
+					g->setTarget(getTarget(g->getTargetMode(), targetClosestPlayer(g, players), ghosts[gIndex - 2]));
 				}
 				else {
 					g->setTarget(getTarget(g->getTargetMode(), targetClosestPlayer(g, players)));
 				}
 			}
 			g->move(SCREEN_WIDTH, SCREEN_HEIGHT, map, walls);
-			ghosts_i++;
+			gIndex++;
 		}
 
 		//render map
-		SDL_Rect mapRect = sdl_manager->createRect(16, 16, 0, 50);
+		SDL_Rect mapRect = sdlManager->createRect(16, 16, 0, 50);
 
 		currentPellets = 0;
 
@@ -534,28 +530,28 @@ void GameManager::play(std::string name) {
 					SDL_RenderCopy(renderer, poweups, nullptr, &mapRect);
 					break;
 				case '1':
-					SDL_RenderCopy(renderer, corner_bottom_left, nullptr, &mapRect);
+					SDL_RenderCopy(renderer, cornerBottomLeft, nullptr, &mapRect);
 					break;
 				case '3':
-					SDL_RenderCopy(renderer, corner_bottom_right, nullptr, &mapRect);
+					SDL_RenderCopy(renderer, cornerBottomRight, nullptr, &mapRect);
 					break;
 				case '7':
-					SDL_RenderCopy(renderer, corner_top_left, nullptr, &mapRect);
+					SDL_RenderCopy(renderer, cornerTopLeft, nullptr, &mapRect);
 					break;
 				case '9':
-					SDL_RenderCopy(renderer, corner_top_right, nullptr, &mapRect);
+					SDL_RenderCopy(renderer, cornerTopRight, nullptr, &mapRect);
 					break;
 				case '2':
-					SDL_RenderCopy(renderer, wall_bottom, nullptr, &mapRect);
+					SDL_RenderCopy(renderer, wallBottom, nullptr, &mapRect);
 					break;
 				case '4':
-					SDL_RenderCopy(renderer, wall_left, nullptr, &mapRect);
+					SDL_RenderCopy(renderer, wallLeft, nullptr, &mapRect);
 					break;
 				case '6':
-					SDL_RenderCopy(renderer, wall_right, nullptr, &mapRect);
+					SDL_RenderCopy(renderer, wallRight, nullptr, &mapRect);
 					break;
 				case '8':
-					SDL_RenderCopy(renderer, wall_top, nullptr, &mapRect);
+					SDL_RenderCopy(renderer, wallTop, nullptr, &mapRect);
 					break;
 				case ' ':
 				case '-':
@@ -571,14 +567,13 @@ void GameManager::play(std::string name) {
 			mapRect.y += 16;
 		}
 
-		sdl_manager->clearAndUpdateRenderer(renderer);
+		sdlManager->clearAndUpdateRenderer(renderer);
 
 		//game over
 		if (health <= 0) {
-			setTotalPlayerScore(score);
-			SDL_Rect gameoverDst = sdl_manager->createRect(16, 16, SCREEN_WIDTH / 2 - (gameoverText.length() * 8), SCREEN_HEIGHT / 2);
-			texture_manager->printFromTiles(gameoverText, renderer, text, gameoverDst, text_src);
-			sdl_manager->clearAndUpdateRenderer(renderer);
+			SDL_Rect gameoverDst = sdlManager->createRect(16, 16, SCREEN_WIDTH / 2 - (gameoverText.length() * 8), SCREEN_HEIGHT / 2);
+			textureManager->printFromTiles(gameoverText, renderer, text, gameoverDst, textSrc);
+			sdlManager->clearAndUpdateRenderer(renderer);
 			isRunning = false;
 			SDL_Delay(2000);
 		}
@@ -586,9 +581,9 @@ void GameManager::play(std::string name) {
 		//level complete
 		if (currentPellets <= 0 && health > 0) {
 			Mix_HaltChannel(-1);
-			SDL_Rect levelcompletedDst = sdl_manager->createRect(16, 16, SCREEN_WIDTH / 2 - (levelcompletedText.length() * 8), SCREEN_HEIGHT / 2);
-			texture_manager->printFromTiles(levelcompletedText, renderer, text, levelcompletedDst, text_src);
-			sdl_manager->clearAndUpdateRenderer(renderer);
+			SDL_Rect levelcompletedDst = sdlManager->createRect(16, 16, SCREEN_WIDTH / 2 - (levelcompletedText.length() * 8), SCREEN_HEIGHT / 2);
+			textureManager->printFromTiles(levelcompletedText, renderer, text, levelcompletedDst, textSrc);
+			sdlManager->clearAndUpdateRenderer(renderer);
 			for (auto& p : players) {
 				p->respawn();
 			}
@@ -603,10 +598,9 @@ void GameManager::play(std::string name) {
 	/*   GAME LOOP END   */
 
 	//Program exit 
-	Mix_FreeChunk(bg_music);
+	Mix_FreeChunk(bgMusic);
 	Mix_CloseAudio();
-	SDL_GameControllerClose(0);
-
+	SDL_GameControllerClose(gameController);
 	SDL_DestroyWindow(window);
 	IMG_Quit();
 	SDL_Quit();
@@ -637,91 +631,87 @@ void GameManager::loadMap(std::string map, std::vector<std::vector<char>> &mapVe
 	fIn.close();
 }
 
-void GameManager::setTotalPlayerScore(int playerScore) {
-	totalScore += playerScore;
-}
-
 //returns a Player type pointer
-std::shared_ptr<Player> GameManager::makePlayer(std::shared_ptr<Texture_Manager> texture_manager, std::shared_ptr<SDL_Manager> sdl_manager, SDL_Renderer* renderer, const Uint8 *keys, std::vector<SDL_Rect>& edible, std::vector<SDL_Rect>& walkable, Mix_Chunk *eat_sound, int index) {
-	SDL_Texture* pac_texture = texture_manager->loadTexture("../images/pacman/move/1.png", renderer);
-	SDL_GameController* gameController = sdl_manager->getGameController(index);
+std::shared_ptr<Player> GameManager::makePlayer(std::shared_ptr<Texture_Manager> textureManager, std::shared_ptr<SDL_Manager> sdlManager, SDL_Renderer* renderer, const Uint8 *keys, std::vector<SDL_Rect>& edible, std::vector<SDL_Rect>& walkable, Mix_Chunk *eatSound, int index) {
+	SDL_Texture* pacTexture = textureManager->loadTexture("../images/pacman/move/1.png", renderer);
+	SDL_GameController* gameController = sdlManager->getGameController(index);
 
-	std::shared_ptr<Player> p = std::make_shared<Player>(pac_texture, renderer, keys, edible, gameController, walkable, index);
+	std::shared_ptr<Player> p = std::make_shared<Player>(pacTexture, renderer, keys, edible, gameController, walkable, index);
 	p->setPos(0, 0);
 	p->setSize(16, 16);
 
-	auto pacman_move = std::make_shared<Animation>(renderer, "../images/Pacman/move", 12);
-	p->setAnimation("move", pacman_move);
+	auto pacmanMove = std::make_shared<Animation>(renderer, "../images/Pacman/move", 12);
+	p->setAnimation("move", pacmanMove);
 
-	auto pacman_dead = std::make_shared<Animation>(renderer, "../images/Pacman/dead", 120);
-	p->setAnimation("dead", pacman_dead);
+	auto pacmanDead = std::make_shared<Animation>(renderer, "../images/Pacman/dead", 120);
+	p->setAnimation("dead", pacmanDead);
 
-	p->setSound(eat_sound);
+	p->setSound(eatSound);
 
 	return p;
 }
 
 //returns a Ghost class pointer
-std::shared_ptr<Ghost> GameManager::makeGhost(std::shared_ptr<Texture_Manager> texture_manager, SDL_Renderer* renderer, std::vector<SDL_Rect>& walkable, GhostType type) {
-	std::string ghost_path = "../images/Ghosts/";
-	std::string ghost_anim_path = "../images/Ghosts/";
+std::shared_ptr<Ghost> GameManager::makeGhost(std::shared_ptr<Texture_Manager> textureManager, SDL_Renderer* renderer, std::vector<SDL_Rect>& walkable, GhostType type) {
+	std::string ghostPath = "../images/Ghosts/";
+	std::string ghostAnimPath = "../images/Ghosts/";
 
 	TargetType mode;
 
 	switch (type) {
 		case GhostType::SHADOW:
-			ghost_path += "Shadow/shadow.png";
-			ghost_anim_path += "Shadow/";
+			ghostPath += "Shadow/shadow.png";
+			ghostAnimPath += "Shadow/";
 			mode = TargetType::AGRESSIVE;
 			break;
 		case GhostType::SPEEDY:
-			ghost_path += "Speedy/speedy.png";
-			ghost_anim_path += "Speedy/";
+			ghostPath += "Speedy/speedy.png";
+			ghostAnimPath += "Speedy/";
 			mode = TargetType::AMBUSH;
 			break;
 		case GhostType::BASHFUL:
-			ghost_path += "Bashful/bashful.png";
-			ghost_anim_path += "Bashful/";
+			ghostPath += "Bashful/bashful.png";
+			ghostAnimPath += "Bashful/";
 			mode = TargetType::SUPPORTIVE;
 			break;
 		case GhostType::POKEY:
-			ghost_path += "Pokey/pokey.png";
-			ghost_anim_path += "Pokey/";
+			ghostPath += "Pokey/pokey.png";
+			ghostAnimPath += "Pokey/";
 			mode = TargetType::EVASIVE;
 			break;
 	}
 
-	SDL_Texture* ghost_texture = texture_manager->loadTexture(&ghost_path[0], renderer);
+	SDL_Texture* ghostTexture = textureManager->loadTexture(&ghostPath[0], renderer);
 
-	auto ghost = std::make_shared<Ghost>(ghost_texture, renderer, walkable, mode, type);
+	auto ghost = std::make_shared<Ghost>(ghostTexture, renderer, walkable, mode, type);
 	ghost->setPos(32, 0);
 	ghost->setSize(16, 16);
 
-	auto ghost_up = std::make_shared<Animation>(renderer, (ghost_anim_path + "move/up"), 12);
-	auto ghost_down = std::make_shared<Animation>(renderer, (ghost_anim_path + "move/down"), 12);
-	auto ghost_left = std::make_shared<Animation>(renderer, (ghost_anim_path + "move/left"), 12);
-	auto ghost_right = std::make_shared<Animation>(renderer, (ghost_anim_path + "move/right"), 12);
+	auto ghostUp = std::make_shared<Animation>(renderer, (ghostAnimPath + "move/up"), 12);
+	auto ghostDown = std::make_shared<Animation>(renderer, (ghostAnimPath + "move/down"), 12);
+	auto ghostLeft = std::make_shared<Animation>(renderer, (ghostAnimPath + "move/left"), 12);
+	auto ghostRight = std::make_shared<Animation>(renderer, (ghostAnimPath + "move/right"), 12);
 
 	auto frightened = std::make_shared<Animation>(renderer, "../images/Ghosts/Frightened/move", 12);
-	auto frightened_ending = std::make_shared<Animation>(renderer, "../images/Ghosts/Frightened/move_last", 12);
+	auto frightenedEnding = std::make_shared<Animation>(renderer, "../images/Ghosts/Frightened/move_last", 12);
 
-	auto eyes_up = std::make_shared<Animation>(renderer, "../images/Ghosts/Eyes/move/up", 12);
-	auto eyes_down = std::make_shared<Animation>(renderer, "../images/Ghosts/Eyes/move/down", 12);
-	auto eyes_left = std::make_shared<Animation>(renderer, "../images/Ghosts/Eyes/move/left", 12);
-	auto eyes_right = std::make_shared<Animation>(renderer, "../images/Ghosts/Eyes/move/right", 12);
+	auto eyesUp = std::make_shared<Animation>(renderer, "../images/Ghosts/Eyes/move/up", 12);
+	auto eyesDown = std::make_shared<Animation>(renderer, "../images/Ghosts/Eyes/move/down", 12);
+	auto eyesLeft = std::make_shared<Animation>(renderer, "../images/Ghosts/Eyes/move/left", 12);
+	auto eyesRight = std::make_shared<Animation>(renderer, "../images/Ghosts/Eyes/move/right", 12);
 
-	ghost->setAnimation("up", ghost_up);
-	ghost->setAnimation("down", ghost_down);
-	ghost->setAnimation("left", ghost_left);
-	ghost->setAnimation("right", ghost_right);
+	ghost->setAnimation("up", ghostUp);
+	ghost->setAnimation("down", ghostDown);
+	ghost->setAnimation("left", ghostLeft);
+	ghost->setAnimation("right", ghostRight);
 	
 	ghost->setAnimation("frightened", frightened);
-	ghost->setAnimation("frightened_ending", frightened_ending);
+	ghost->setAnimation("frightened_ending", frightenedEnding);
 
-	ghost->setAnimation("eaten_up", eyes_up);
-	ghost->setAnimation("eaten_down", eyes_down);
-	ghost->setAnimation("eaten_left", eyes_left);
-	ghost->setAnimation("eaten_right", eyes_right);
+	ghost->setAnimation("eaten_up", eyesUp);
+	ghost->setAnimation("eaten_down", eyesDown);
+	ghost->setAnimation("eaten_left", eyesLeft);
+	ghost->setAnimation("eaten_right", eyesRight);
 
 	return ghost;
 }
@@ -818,8 +808,8 @@ std::pair<int, int> GameManager::getTarget(TargetType mode, std::shared_ptr<Play
 //overloaded version of getTarget for SUPPORTIVE and EVASIVE targetting behaviour
 std::pair<int, int> GameManager::getTarget(TargetType mode, std::shared_ptr<Player> enemy, std::shared_ptr<Ghost> ghost) {
 	std::pair<int, int> target;
-	int v_x = 0;
-	int v_y = 0;
+	int vX = 0;
+	int vY = 0;
 	switch (mode) {
 		case TargetType::SUPPORTIVE:
 			//targeted tile is based on another ghosts position (originally blinkys)
@@ -847,12 +837,12 @@ std::pair<int, int> GameManager::getTarget(TargetType mode, std::shared_ptr<Play
 			}
 
 			//then, calculate vector from this position to ghost ally
-			v_x = abs(ghost->getCoords()->x - target.first);
-			v_y = abs(ghost->getCoords()->y - target.second);
+			vX = abs(ghost->getCoords()->x - target.first);
+			vY = abs(ghost->getCoords()->y - target.second);
 
 			//finally, rotate vector 180 degrees and set target to this position
-			target.first += v_x * -1;
-			target.second += v_y * -1;
+			target.first += vX * -1;
+			target.second += vY * -1;
 			return target;
 
 		case TargetType::EVASIVE:

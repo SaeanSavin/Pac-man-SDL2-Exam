@@ -18,7 +18,6 @@ public:
 	GameManager();
 	void play(std::string name);
 	void loadMap(std::string map, std::vector<std::vector<char>> &mapVector);
-	void setTotalPlayerScore(int);
 
 private:
 	void setFramerate(const int FPS);
@@ -29,7 +28,6 @@ private:
 	std::shared_ptr<Player> makePlayer(std::shared_ptr<Texture_Manager> texture_manager, std::shared_ptr<SDL_Manager> sdl_manager, SDL_Renderer* renderer, const Uint8* keys, std::vector<SDL_Rect>& edible, std::vector<SDL_Rect>& walkable, Mix_Chunk* eat_sound, int index);
 	std::shared_ptr<Ghost> makeGhost(std::shared_ptr<Texture_Manager> texture_manager, SDL_Renderer *renderer, std::vector<SDL_Rect> &walkable, enum class GhostType type);
 	std::shared_ptr<Player> targetClosestPlayer(std::shared_ptr<Ghost> ghost, std::vector<std::shared_ptr<Player>> &players);
-	int totalScore = 0;
 
 };
 #endif

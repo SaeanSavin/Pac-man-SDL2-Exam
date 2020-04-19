@@ -12,12 +12,10 @@ Ghost::Ghost(SDL_Texture* t, SDL_Renderer* r, SDL_Rect c, std::vector<SDL_Rect>&
 	:texture(t), renderer(r), coords(c), walkable(w), targetMode(m), type(g) {}
 
 void Ghost::move(int &SCREEN_WIDTH, int &SCREEN_HEIGHT, std::vector<std::vector<char>> &map, std::vector<SDL_Rect> &walls) {
-	//checkWallCollision(walls, 0, 0);
 
 	SDL_PumpEvents();
 
 	//calculate direction based on target
-
 	if (checkTileEntered(walkable)) {
 
 		if (eaten) {
@@ -103,7 +101,7 @@ void Ghost::move(int &SCREEN_WIDTH, int &SCREEN_HEIGHT, std::vector<std::vector<
 			if (eaten) {
 				animate(*animations["eaten_up"]);
 			}
-			else if (frightened_ending) {
+			else if (frightenedEnding) {
 				animate(*animations["frightened_ending"]);
 			}
 			else if (frightened) {
@@ -121,7 +119,7 @@ void Ghost::move(int &SCREEN_WIDTH, int &SCREEN_HEIGHT, std::vector<std::vector<
 			if (eaten) {
 				animate(*animations["eaten_down"]);
 			}
-			else if (frightened_ending) {
+			else if (frightenedEnding) {
 				animate(*animations["frightened_ending"]);
 			}
 			else if (frightened) {
@@ -139,7 +137,7 @@ void Ghost::move(int &SCREEN_WIDTH, int &SCREEN_HEIGHT, std::vector<std::vector<
 			if (eaten) {
 				animate(*animations["eaten_left"]);
 			}
-			else if (frightened_ending) {
+			else if (frightenedEnding) {
 				animate(*animations["frightened_ending"]);
 			}
 			else if (frightened) {
@@ -157,7 +155,7 @@ void Ghost::move(int &SCREEN_WIDTH, int &SCREEN_HEIGHT, std::vector<std::vector<
 			if (eaten) {
 				animate(*animations["eaten_right"]);
 			}
-			else if (frightened_ending) {
+			else if (frightenedEnding) {
 				animate(*animations["frightened_ending"]);
 			}
 			else if (frightened) {
@@ -176,7 +174,7 @@ void Ghost::move(int &SCREEN_WIDTH, int &SCREEN_HEIGHT, std::vector<std::vector<
 	}
 }
 
-bool Ghost::checkTileEntered(std::vector<SDL_Rect>& walkable) {
+bool Ghost::checkTileEntered(std::vector<SDL_Rect> &walkable) {
 
 	for (auto& mapTile : walkable) {
 		if (coords.y == mapTile.y && coords.x == mapTile.x) {
@@ -186,7 +184,7 @@ bool Ghost::checkTileEntered(std::vector<SDL_Rect>& walkable) {
 	return false;
 }
 
-bool Ghost::isHome(std::vector<SDL_Rect>& walkable, std::vector<std::vector<char>>& map) {
+bool Ghost::isHome(std::vector<SDL_Rect> &walkable, std::vector<std::vector<char>> &map) {
 	for (auto& mapTile : walkable) {
 		if (coords.y == mapTile.y && coords.x == mapTile.x && map[(coords.y - 50) / 16][coords.x / 16] == '~') {
 			return true;
@@ -231,7 +229,7 @@ void Ghost::respawn() {
 	setPos(spawn.first, spawn.second);
 	eaten = false;
 	frightened = false;
-	frightened_ending = false;
+	frightenedEnding = false;
 }
 
 enum class TargetType Ghost::getTargetMode() {
@@ -255,7 +253,7 @@ void Ghost::animateEx(Animation a, char direction) {
 	else if (direction == 's') {
 		rotation = 90;
 	}
-	SDL_RenderCopyEx(renderer, a.getFrame(), nullptr, &coords, rotation, NULL, flipType);
+	SDL_RenderCopyEx(renderer, a.getFrame(), nullptr, &coords, rotation, nullptr, flipType);
 }
 
 void Ghost::renderTexture() {

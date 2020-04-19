@@ -30,7 +30,5 @@ public:
 
 private:
 	int speed = 2;
-	//TODO: add move function
-
 };
 #endif

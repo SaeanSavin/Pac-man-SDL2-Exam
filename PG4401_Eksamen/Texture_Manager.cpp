@@ -73,8 +73,6 @@ void Texture_Manager::printPlayerScore(int score, SDL_Renderer *r, SDL_Texture *
 		SDL_RenderCopy(r, t, &src, &dst);
 		dst.x += 16;
 	}
-
 	src.x = 0;
 	SDL_RenderCopy(r, t, &src, &dst);
-
 }

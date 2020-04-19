@@ -24,8 +24,8 @@ SDL_Window *SDL_Manager::createWindow(const char *c, const int w, const int h) {
 	return window;
 }
 
-SDL_Renderer *SDL_Manager::createRenderer(SDL_Window *w, int index) {
-	SDL_Renderer *renderer = SDL_CreateRenderer(w, index, SDL_RENDERER_ACCELERATED);
+SDL_Renderer *SDL_Manager::createRenderer(SDL_Window *w, int i) {
+	SDL_Renderer *renderer = SDL_CreateRenderer(w, i, SDL_RENDERER_ACCELERATED);
 
 	if (renderer == nullptr) {
 		printError(std::cout, "Cannot create renederer ");
@@ -36,12 +36,12 @@ SDL_Renderer *SDL_Manager::createRenderer(SDL_Window *w, int index) {
 	return renderer;
 }
 
-SDL_Surface *SDL_Manager::createSurface(const char *c, SDL_Window *window, SDL_Renderer *renderer) {
+SDL_Surface *SDL_Manager::createSurface(const char *c, SDL_Window *w, SDL_Renderer *r) {
 	SDL_Surface *surface = IMG_Load(c);
 
 	if (surface == nullptr) {
-		SDL_DestroyRenderer(renderer);
-		SDL_DestroyWindow(window);
+		SDL_DestroyRenderer(r);
+		SDL_DestroyWindow(w);
 		IMG_Quit();
 		SDL_Quit();
 		return nullptr;
@@ -76,11 +76,11 @@ void SDL_Manager::SetRenderColor(SDL_Renderer *renderer, int r, int g, int b, in
 	SDL_SetRenderDrawColor(renderer, r, g, b, 255);
 }
 
-void SDL_Manager::clearAndUpdateRenderer(SDL_Renderer *renderer) {
-	SDL_RenderPresent(renderer);
-	SDL_RenderClear(renderer);
+void SDL_Manager::clearAndUpdateRenderer(SDL_Renderer *r) {
+	SDL_RenderPresent(r);
+	SDL_RenderClear(r);
 }
 
-void SDL_Manager::clearRenderer(SDL_Renderer *renderer) {
-	SDL_RenderClear(renderer);
+void SDL_Manager::clearRenderer(SDL_Renderer *r) {
+	SDL_RenderClear(r);
 }

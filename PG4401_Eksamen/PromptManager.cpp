@@ -13,7 +13,6 @@ int PromptManager::validatePrompt(int min, int max) {
 			std::cout << "Invalid Input! Please enter a valid input: ";
 			std::cin.clear();
 			std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
-			//std::cin.ignore(max, '\n');
 		}
 
 	} while (input < min || input > max);

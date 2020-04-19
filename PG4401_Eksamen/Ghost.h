@@ -83,15 +83,15 @@ public:
 	}
 
 	void startFrightenedEnding() {
-		frightened_ending = true;
+		frightenedEnding = true;
 	}
 
 	void stopFrightenedEnding() {
-		frightened_ending = false;
+		frightenedEnding = false;
 	}
 
 	void stopFrightened() {
-		frightened_ending = false;
+		frightenedEnding = false;
 		frightened = false;
 	}
 
@@ -104,7 +104,7 @@ public:
 	}
 
 	void hitByPacman() {
-		frightened_ending = false;
+		frightenedEnding = false;
 		frightened = false;
 		eaten = true;
 	}
@@ -132,13 +132,13 @@ private:
 	std::map<std::string, std::shared_ptr<Animation>> animations;
 	
 	char direction = 'i';
-	char next_direction = 'n';
+	char nextDirection = 'n';
 	char collided = 'n';
 	
 	int speed = 1;
 
 	bool frightened = false;
-	bool frightened_ending = false;
+	bool frightenedEnding = false;
 	bool eaten = false;
 };
 

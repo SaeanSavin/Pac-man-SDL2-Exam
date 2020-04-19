@@ -10,7 +10,7 @@
 
 class Animation {
 public:
-	Animation(SDL_Renderer *r, std::string path, int tick_rate);
+	Animation(SDL_Renderer *r, std::string path, int tickRate);
 	SDL_Texture* getFrame();
 	void resetAnimation();
 
