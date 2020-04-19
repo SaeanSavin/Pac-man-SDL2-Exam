@@ -309,9 +309,6 @@ void GameManager::play(std::string name) {
 
 	while (Mix_Playing(1));
 
-	//Prints controlls for player
-	printGameDetails();
-
 	/*   GAME LOOP START  */
 
 	while (isRunning) {
@@ -647,22 +644,6 @@ void GameManager::loadMap(std::string map, std::vector<std::vector<char>> &mapVe
 
 void GameManager::setTotalPlayerScore(int playerScore) {
 	totalScore += playerScore;
-}
-
-void GameManager::printGameDetails() {
-	std::cout << "\n\nHow to play: \n"
-		<< "Collect every pellets to advance to next round\n\n"
-		<< "Keyboard:\n"
-		<< "Up    =	 P1: W		P2: Arrow Up		P3: T		P4: I\n"
-		<< "Down  =	 P1: S		P2: Arrow Down		P3: G		P4: K\n"
-		<< "Left  =	 P1: A		P2: Arrow Left		P3: F		P4: J\n"
-		<< "Right =	 P1: D		P2: Arrow Right		P3: H		P4: L\n\n"
-		<< "Quit = ESC\n\n"
-		<< "Gamepad (1 - 4 Players):\n"
-		<< "Up = Dpad Up\n"
-		<< "Down = Dpad Down\n"
-		<< "Left = Dpad Left\n"
-		<< "Right = Dpad Right" << std::endl;
 }
 
 //returns a Player type pointer
