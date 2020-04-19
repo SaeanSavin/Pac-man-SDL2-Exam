@@ -316,6 +316,9 @@ void GameManager::play(std::string name) {
 	while (Mix_Playing(1));
 
 
+
+	printGameDetails();
+
 	/*   GAME LOOP START  */
 
 	while (isRunning) {
@@ -611,6 +614,22 @@ void GameManager::loadMap(std::string map, std::vector<std::vector<char>> &mapVe
 
 void GameManager::setTotalPlayerScore(int playerScore) {
 	totalScore += playerScore;
+}
+
+void GameManager::printGameDetails() {
+	std::cout << "\n\nHow to play: \n"
+		<< "Collect every pellets to advance to next round\n\n"
+		<< "Keyboard:\n"
+		<< "Up = Arrow Up, W\n"
+		<< "Down = Arrow Down, S\n"
+		<< "Left = Arrow Left, A\n"
+		<< "Right = Arrow Right, D\n"
+		<< "Quit = ESC\n\n"
+		<< "Gamepad:\n"
+		<< "Up = Dpad Up\n"
+		<< "Down = Dpad Down\n"
+		<< "Left = Dpad Left\n"
+		<< "Right = Dpad Right" << std::endl;
 }
 
 std::shared_ptr<Ghost> GameManager::makeGhost(std::shared_ptr<Texture_Manager> texture_manager, SDL_Renderer* renderer, std::vector<SDL_Rect>& walkable, GhostType type) {

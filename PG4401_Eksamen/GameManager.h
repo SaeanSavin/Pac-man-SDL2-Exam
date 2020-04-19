@@ -14,6 +14,7 @@ public:
 	void play(std::string name);
 	void loadMap(std::string map, std::vector<std::vector<char>> &mapVector);
 	void setTotalPlayerScore(int);
+	void printGameDetails();
 
 private:
 	void setFramerate(const int FPS);
