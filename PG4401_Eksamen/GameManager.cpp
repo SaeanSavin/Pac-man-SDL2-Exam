@@ -64,8 +64,8 @@ void GameManager::play(std::string name) {
 
 	std::cout << "initializing SDL..." << std::endl;
 
-	SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO | SDL_INIT_JOYSTICK);
-
+	SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO | SDL_INIT_GAMECONTROLLER);
+	
 	auto sdl_manager = std::make_shared<SDL_Manager>();
 	auto texture_manager = std::make_shared<Texture_Manager>();
 	
@@ -233,7 +233,7 @@ void GameManager::play(std::string name) {
 					c = '~';
 					break;
 				case 'S':
-					players.emplace_back(makePlayer(texture_manager, sdl_manager, renderer, keys, edible, walkable, eat_sound));
+					players.emplace_back(makePlayer(texture_manager, sdl_manager, renderer, keys, edible, walkable, eat_sound, p_index));
 					players[p_index]->setSpawnPos(m_position.x, m_position.y);
 					p_index++;
 					break;
@@ -305,6 +305,7 @@ void GameManager::play(std::string name) {
 
 	while (Mix_Playing(1));
 
+	//Prints controlls for player
 	printGameDetails();
 
 	/*   GAME LOOP START  */
@@ -417,7 +418,7 @@ void GameManager::play(std::string name) {
 		}
 
 
-		std::cout << health << std::endl;
+		//std::cout << health << std::endl;
 
 		//manage chase-scatter cycle
 
@@ -643,12 +644,12 @@ void GameManager::printGameDetails() {
 	std::cout << "\n\nHow to play: \n"
 		<< "Collect every pellets to advance to next round\n\n"
 		<< "Keyboard:\n"
-		<< "Up = Arrow Up, W\n"
-		<< "Down = Arrow Down, S\n"
-		<< "Left = Arrow Left, A\n"
-		<< "Right = Arrow Right, D\n"
+		<< "Up    =	 P1: W		P2: Arrow Up		P3: T		P4: I\n"
+		<< "Down  =	 P1: S		P2: Arrow Down		P3: G		P4: K\n"
+		<< "Left  =	 P1: A		P2: Arrow Left		P3: F		P4: J\n"
+		<< "Right =	 P1: D		P2: Arrow Right		P3: H		P4: L\n\n"
 		<< "Quit = ESC\n\n"
-		<< "Gamepad:\n"
+		<< "Gamepad (1 - 4 Players):\n"
 		<< "Up = Dpad Up\n"
 		<< "Down = Dpad Down\n"
 		<< "Left = Dpad Left\n"
@@ -656,11 +657,11 @@ void GameManager::printGameDetails() {
 }
 
 //returns a Player type pointer
-std::shared_ptr<Player> GameManager::makePlayer(std::shared_ptr<Texture_Manager> texture_manager, std::shared_ptr<SDL_Manager> sdl_manager, SDL_Renderer* renderer, const Uint8 *keys, std::vector<SDL_Rect>& edible, std::vector<SDL_Rect>& walkable, Mix_Chunk *eat_sound) {
+std::shared_ptr<Player> GameManager::makePlayer(std::shared_ptr<Texture_Manager> texture_manager, std::shared_ptr<SDL_Manager> sdl_manager, SDL_Renderer* renderer, const Uint8 *keys, std::vector<SDL_Rect>& edible, std::vector<SDL_Rect>& walkable, Mix_Chunk *eat_sound, int index) {
 	SDL_Texture* pac_texture = texture_manager->loadTexture("../images/pacman/move/1.png", renderer);
-	SDL_GameController* gameController = sdl_manager->getGameController();
+	SDL_GameController* gameController = sdl_manager->getGameController(index);
 
-	std::shared_ptr<Player> p = std::make_shared<Player>(pac_texture, renderer, keys, edible, gameController, walkable);
+	std::shared_ptr<Player> p = std::make_shared<Player>(pac_texture, renderer, keys, edible, gameController, walkable, index);
 	p->setPos(0, 0);
 	p->setSize(16, 16);
 

@@ -1,15 +1,15 @@
 #include "Player.h"
 
-Player::Player(SDL_Texture* t, SDL_Renderer* r, const Uint8* k, std::vector<SDL_Rect>& p, SDL_GameController * controller, std::vector<SDL_Rect>& w)
-	:texture(t), renderer(r), keys(k), pellets(p), gameController(controller), walkable(w)
+Player::Player(SDL_Texture* t, SDL_Renderer* r, const Uint8* k, std::vector<SDL_Rect>& p, SDL_GameController * controller, std::vector<SDL_Rect>& w, int i)
+	:texture(t), renderer(r), keys(k), pellets(p), gameController(controller), walkable(w), pIndex(i)
 {
 	coords.h = 0;
 	coords.w = 0;
 	coords.x = 0;
 	coords.y = 0;
 }
-Player::Player(SDL_Texture* t, SDL_Rect c, SDL_Renderer* r, const Uint8* k, std::vector<SDL_Rect>& p, SDL_GameController *controller, std::vector<SDL_Rect>& w)
-	:texture(t), renderer(r), coords(c), keys(k), pellets(p), gameController(controller), walkable(w)
+Player::Player(SDL_Texture* t, SDL_Rect c, SDL_Renderer* r, const Uint8* k, std::vector<SDL_Rect>& p, SDL_GameController *controller, std::vector<SDL_Rect>& w, int i)
+	:texture(t), renderer(r), coords(c), keys(k), pellets(p), gameController(controller), walkable(w), pIndex(i)
 {}
 
 //movement function
@@ -47,7 +47,11 @@ void Player::move(int& SCREEN_WIDTH, int& SCREEN_HEIGHT, std::vector<std::vector
 	}
 
 	//check input
-	if ((keys[SDL_SCANCODE_W] || keys[SDL_SCANCODE_UP] || SDL_GameControllerGetButton(gameController, SDL_CONTROLLER_BUTTON_DPAD_UP)) && collided != 'w') {
+	if (((keys[SDL_SCANCODE_W] && pIndex == 0) 
+		 || (keys[SDL_SCANCODE_UP] && pIndex == 1)
+		 || (keys[SDL_SCANCODE_T] && pIndex == 2) 
+		 || (keys[SDL_SCANCODE_I] && pIndex == 3)
+		 || SDL_GameControllerGetButton(gameController, SDL_CONTROLLER_BUTTON_DPAD_UP)) && collided != 'w') {
 		if (!checkWallCollision(walls, 0, -1)) {
 			direction = 'w';
 			next_direction = 'n';
@@ -57,7 +61,11 @@ void Player::move(int& SCREEN_WIDTH, int& SCREEN_HEIGHT, std::vector<std::vector
 		}
 	}
 
-	if ((keys[SDL_SCANCODE_S] || keys[SDL_SCANCODE_DOWN] || SDL_GameControllerGetButton(gameController, SDL_CONTROLLER_BUTTON_DPAD_DOWN)) && collided != 's') {
+	if (((keys[SDL_SCANCODE_S] && pIndex == 0) 
+		 || (keys[SDL_SCANCODE_DOWN] && pIndex == 1)
+		 || (keys[SDL_SCANCODE_G] && pIndex == 2)
+		 || (keys[SDL_SCANCODE_K] && pIndex == 3)
+		 || SDL_GameControllerGetButton(gameController, SDL_CONTROLLER_BUTTON_DPAD_DOWN)) && collided != 's') {
 		if (!checkWallCollision(walls, 0, 1)) {
 			direction = 's';
 			next_direction = 'n';
@@ -67,7 +75,11 @@ void Player::move(int& SCREEN_WIDTH, int& SCREEN_HEIGHT, std::vector<std::vector
 		}
 	}
 
-	if ((keys[SDL_SCANCODE_A] || keys[SDL_SCANCODE_LEFT] || SDL_GameControllerGetButton(gameController, SDL_CONTROLLER_BUTTON_DPAD_LEFT)) && collided != 'a') {
+	if (((keys[SDL_SCANCODE_A] && pIndex == 0)
+		 ||	(keys[SDL_SCANCODE_LEFT] && pIndex == 1)
+		 || (keys[SDL_SCANCODE_F] && pIndex == 2)
+		 || (keys[SDL_SCANCODE_J] && pIndex == 3)
+		 || SDL_GameControllerGetButton(gameController, SDL_CONTROLLER_BUTTON_DPAD_LEFT)) && collided != 'a') {
 		if (!checkWallCollision(walls, -1, 0)) {
 			direction = 'a';
 			next_direction = 'n';
@@ -77,7 +89,11 @@ void Player::move(int& SCREEN_WIDTH, int& SCREEN_HEIGHT, std::vector<std::vector
 		}
 	}
 
-	if ((keys[SDL_SCANCODE_D] || keys[SDL_SCANCODE_RIGHT] || SDL_GameControllerGetButton(gameController, SDL_CONTROLLER_BUTTON_DPAD_RIGHT)) && collided != 'd') {
+	if (((keys[SDL_SCANCODE_D] && pIndex == 0) 
+		 || (keys[SDL_SCANCODE_RIGHT] && pIndex == 1) 
+		 || (keys[SDL_SCANCODE_H] && pIndex == 2)
+		 || (keys[SDL_SCANCODE_L] && pIndex == 3)
+		 || SDL_GameControllerGetButton(gameController, SDL_CONTROLLER_BUTTON_DPAD_RIGHT)) && collided != 'd') {
 		if (!checkWallCollision(walls, 1, 0)) {
 			direction = 'd';
 			next_direction = 'n';

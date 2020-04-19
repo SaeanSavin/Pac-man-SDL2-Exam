@@ -9,7 +9,7 @@ Ghost::Ghost(SDL_Texture* t, SDL_Renderer* r, std::vector<SDL_Rect>& w, enum cla
 	coords.y = 0;
 }
 Ghost::Ghost(SDL_Texture* t, SDL_Renderer* r, SDL_Rect c, std::vector<SDL_Rect>& w, enum class TargetType m, enum class GhostType g)
-	:texture(t), renderer(r), coords(c), walkable(w), targetMode(m) {}
+	:texture(t), renderer(r), coords(c), walkable(w), targetMode(m), type(g) {}
 
 void Ghost::move(int &SCREEN_WIDTH, int &SCREEN_HEIGHT, std::vector<std::vector<char>> &map, std::vector<SDL_Rect> &walls) {
 	//checkWallCollision(walls, 0, 0);
