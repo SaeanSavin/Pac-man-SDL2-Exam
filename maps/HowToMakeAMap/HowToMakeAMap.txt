@@ -1,4 +1,5 @@
 Use this in your map:
+Use TemplateMap.txt as a reference
 
 //Walls
 1 = Buttom Left Corner
@@ -13,6 +14,7 @@ Use this in your map:
 //Void
 Space = Air
 - = Out of bounds
+~ = Ghost House
 
 //Edible
 x = Pellets
