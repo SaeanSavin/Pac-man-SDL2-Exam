@@ -1,5 +1,6 @@
 #include <fstream>
 #include <sstream>
+#include <execution>
 
 #include "GameManager.h"
 #include "SDL_Manager.h"
@@ -254,27 +255,25 @@ void GameManager::play(std::string name) {
 
 	SDL_Rect text_src = sdl_manager->createRect(8, 8, 0, 0);
 
+	SDL_Rect readyDst = sdl_manager->createRect(16, 16, SCREEN_WIDTH / 2 - (startText.length() * 8), SCREEN_HEIGHT / 2);
+	texture_manager->printFromTiles(startText, renderer, text, readyDst, text_src);
+	sdl_manager->clearAndUpdateRenderer(renderer);
+
 
 	/*   AUDIO SETUP   */
 
 	std::cout << "preparing audio..." << std::endl;
 
-	SDL_AudioSpec wavSpec;
-	Uint32 wavLength;
-	Uint8* wavBuffer;
+	Mix_Chunk *wave = NULL;
 
-	SDL_LoadWAV("../audio/intro.wav", &wavSpec, &wavBuffer, &wavLength);
+	Mix_OpenAudio(22050, MIX_DEFAULT_FORMAT, 2, 4096);
 
-	SDL_AudioDeviceID deviceID = SDL_OpenAudioDevice(NULL, 0, &wavSpec, NULL, 0);
+	wave = Mix_LoadWAV("../audio/intro.wav");
 
-	int success = SDL_QueueAudio(deviceID, wavBuffer, wavLength);
-	//SDL_PauseAudioDevice(deviceID, 0);
+	Mix_PlayChannel(-1, wave, 0);
 
-	SDL_Rect readyDst = sdl_manager->createRect(16, 16, SCREEN_WIDTH / 2 - (startText.length() * 8), SCREEN_HEIGHT / 2);
-	texture_manager->printFromTiles(startText, renderer, text, readyDst, text_src);
-	sdl_manager->clearAndUpdateRenderer(renderer);
-	
-	SDL_Delay(2000);
+	while ( Mix_Playing(-1) );
+
 
 	/*    VARIABLES   */
 
@@ -323,13 +322,20 @@ void GameManager::play(std::string name) {
 		SDL_Rect hp_dst = sdl_manager->createRect(16, 16, 0, SCREEN_HEIGHT - 25);
 		texture_manager->printFromTiles("LIVES ", renderer, text, hp_dst, text_src);
 		
-		//collision
+		//parallel collision check between pacman and ghosts
+
+		//first get pacman coords once in this thread
 		int pCoordsLeft = p1->getCoords()->x;
 		int pCoordsRight = p1->getCoords()->x + p1->getCoords()->w;
 		int pCoordsUp = p1->getCoords()->y;
 		int pCoordsDown = p1->getCoords()->y + p1->getCoords()->h;
-
-		for (auto &g : ghosts) {
+		//run collision check with each ghost parallel
+		std::for_each(
+			std::execution::par_unseq,
+			ghosts.begin(),
+			ghosts.end(),
+			[pCoordsLeft, pCoordsRight, pCoordsUp, pCoordsDown, p1, &isPowered, &poweredStart, ghosts, &isRunning]
+		(auto &g) {
 			int gCoordsLeft = g->getCoords()->x;
 			int gCoordsRight = g->getCoords()->x + g->getCoords()->w;
 			int gCoordsUp = g->getCoords()->y;
@@ -337,12 +343,14 @@ void GameManager::play(std::string name) {
 
 			if (pCoordsLeft < gCoordsRight && pCoordsRight > gCoordsLeft) {
 				if (pCoordsUp < gCoordsDown && pCoordsDown > gCoordsUp) {
-					//if pacman hits ghost while 
+					//if pacman hit frightened ghosts
 					if (g->isFrightened()) {
 						g->hitByPacman();
 						SDL_Delay(1000);
 						p1->addScore(1000);
-					} else if (!g->isEaten()) {
+					}
+					//if pacman hit ghosts normally
+					else if (!g->isEaten()) {
 						p1->hitByGhost();
 						isPowered = false;
 						poweredStart = 0;
@@ -355,7 +363,7 @@ void GameManager::play(std::string name) {
 					}
 				}
 			}
-		}
+		});
 
 		for (int i = 0; i < p1->getHP(); i++) {
 			SDL_RenderCopy(renderer, hpTexture, nullptr, &hp_dst);
@@ -538,7 +546,8 @@ void GameManager::play(std::string name) {
 	/*   GAME LOOP END   */
 
 	//Program exit 
-	SDL_CloseAudioDevice(deviceID);
+	Mix_FreeChunk(wave);
+	Mix_CloseAudio();
 	SDL_GameControllerClose(0);
 
 	SDL_DestroyWindow(window);
