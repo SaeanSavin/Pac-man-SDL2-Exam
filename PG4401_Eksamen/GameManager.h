@@ -5,7 +5,6 @@
 
 #include "Player.h"
 #include "Ghost.h"
-#include "Sound.h"
 
 #include "SDL_Manager.h"
 
