@@ -8,12 +8,31 @@
 int main(int argc, char *argv[]) {
 
 	std::cout << "Welcome to pac-man\n" << std::endl;
+
+	std::cout << "\nHow to play: \n"
+		<< "Collect every pellets to advance to next round\n\n"
+		<< "Keyboard:\n"
+		<< "Up    =	 P1: W		P2: Arrow Up		P3: T		P4: I\n"
+		<< "Down  =	 P1: S		P2: Arrow Down		P3: G		P4: K\n"
+		<< "Left  =	 P1: A		P2: Arrow Left		P3: F		P4: J\n"
+		<< "Right =	 P1: D		P2: Arrow Right		P3: H		P4: L\n\n"
+		<< "Quit = ESC\n\n"
+		<< "Gamepad (1 - 4 Players):\n"
+		<< "Up = Dpad Up\n"
+		<< "Down = Dpad Down\n"
+		<< "Left = Dpad Left\n"
+		<< "Right = Dpad Right\n" << std::endl;
+
+	std::cout << "Press any key to continue..." << std::endl;
+	std::cin.ignore();
+
 	std::string path = "../maps";
 	std::vector<std::string> mapList{};
 	int index = 1;
-	int mapSelection = 0;
+	size_t mapSelection = 0;
 
-	
+	std::cout << "Select a map" << std::endl;
+
 	for (const auto &entry : std::filesystem::directory_iterator(path)) {
 		
 		if (entry.path().has_extension()) {
