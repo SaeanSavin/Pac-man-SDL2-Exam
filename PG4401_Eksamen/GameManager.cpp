@@ -168,6 +168,9 @@ void GameManager::play(std::string name) {
 
 	/*   AUDIO SETUP   */
 
+	//channel 1 is reserved for music
+	//channel 2 is reserved for sound effects
+
 	std::cout << "preparing audio..." << std::endl;
 
 	Mix_Chunk* intro_sound = NULL;
