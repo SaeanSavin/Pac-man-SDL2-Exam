@@ -48,7 +48,6 @@ public:
 		}
 	}
 
-	//getters and setters
 	SDL_Texture* getTexture() override;
 
 	SDL_Rect* getCoords() override;
